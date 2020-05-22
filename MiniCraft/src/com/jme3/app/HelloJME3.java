@@ -1,16 +1,27 @@
+package com.jme3.app;
 
+import com.jme3.app.MySimpleApplication;
 import com.jme3.app.SimpleApplication;
+import com.jme3.app.StatsAppState;
+import com.jme3.app.DebugApplication;
+import com.jme3.app.FlyCamAppState;
 import com.jme3.asset.plugins.FileLocator;
+import com.jme3.input.GamerCamera;
+import com.jme3.input.KeyInput;
+import com.jme3.input.controls.KeyTrigger;
 import com.jme3.light.AmbientLight;
 import com.jme3.light.DirectionalLight;
 import com.jme3.material.Material;
 import com.jme3.math.ColorRGBA;
 import com.jme3.math.FastMath;
 import com.jme3.math.Vector3f;
+import com.jme3.renderer.queue.RenderQueue.Bucket;
 import com.jme3.scene.Geometry;
 import com.jme3.scene.Mesh;
+import com.jme3.scene.Spatial.CullHint;
 import com.jme3.scene.shape.Box;
 import com.jme3.system.AppSettings;
+import com.jme3.system.JmeContext.Type;
 import com.jme3.texture.Texture;
 import com.jme3.texture.Texture.MagFilter;
 
@@ -22,37 +33,45 @@ public class HelloJME3 extends SimpleApplication {
 	
 	private Geometry geom;
 
+
+	
 	/**
 	 * 初始化3D场景，显示一个方块。
 	 */
 	@Override
 	public void simpleInitApp() {
+		System.out.println("HelloJME3.simpleInitApp()");
 		
-		 // #1 创建一个无光材质
+		if (stateManager.getState(FlyCamAppState.class) != null) {
+            flyCam = new GamerCamera(cam);//我修改的地方
+            flyCam.setMoveSpeed(5f); // odd to set this here but it did it before
+            stateManager.getState(FlyCamAppState.class).setCamera( flyCam );
+        }
+		
+		
+		 // #1 创建一个材料
         Material mat = new Material(assetManager, "Common/MatDefs/Light/Lighting.j3md");
 
         // #2 设置纹理贴图
         // 漫反射贴图
-        //assetManager.registerLocator("C:/StarSky/Programming/JavaLab/MiniCraft/MiniCraft/assets", FileLocator.class);
         assetManager.registerLocator("assets", FileLocator.class);
         
         Texture tex = assetManager.loadTexture("texture/dirt.bmp");
         tex.setMagFilter(MagFilter.Nearest);
         mat.setTexture("DiffuseMap", tex);
         
+        
+        
         // 法线贴图
         //tex = assetManager.loadTexture("Textures/Terrain/BrickWall/BrickWall_normal.jpg");
         //mat.setTexture("NormalMap", tex);
         
-        // 视差贴图
-        //tex = assetManager.loadTexture("Textures/Terrain/BrickWall/BrickWall_height.jpg");
-        //mat.setTexture("ParallaxMap", tex);
 
         // 设置反光度
         mat.setFloat("Shininess", 2.0f);
         
         // #3 创造1个方块，应用此材质。
-        Geometry geom = new Geometry("文艺方块", new Box(1, 1, 1));
+        geom = new Geometry("文艺方块", new Box(1, 1, 1));
         geom.setMaterial(mat);
         
         rootNode.attachChild(geom);
