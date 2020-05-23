@@ -42,6 +42,23 @@ public class GamerCamera extends FlyByCamera {
 	}
 	
 	@Override
+	//因为FlyByCamera的这个函数有些bug，因此override
+	public void setEnabled(boolean enable){
+        if (enabled && !enable){
+            if (inputManager!= null && (!dragToRotate || (dragToRotate && canRotate))){
+                inputManager.setCursorVisible(true);
+            }
+        }
+        
+        if (!enabled && enable) {
+        	if(inputManager!= null && !dragToRotate) {
+        		inputManager.setCursorVisible(false);//FlyByCamera中没有这个
+        	}
+        }
+        enabled = enable;
+    }
+	
+	@Override
 	/**
      * Register this controller to receive input events from the specified input
      * manager.

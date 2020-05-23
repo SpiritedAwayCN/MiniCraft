@@ -1,13 +1,12 @@
 package com.jme3.app;
 
-import com.jme3.app.MySimpleApplication;
 import com.jme3.app.SimpleApplication;
 import com.jme3.app.StatsAppState;
-import com.jme3.app.DebugApplication;
 import com.jme3.app.FlyCamAppState;
 import com.jme3.asset.plugins.FileLocator;
 import com.jme3.input.GamerCamera;
 import com.jme3.input.KeyInput;
+import com.jme3.input.controls.ActionListener;
 import com.jme3.input.controls.KeyTrigger;
 import com.jme3.light.AmbientLight;
 import com.jme3.light.DirectionalLight;
@@ -31,12 +30,14 @@ import com.jme3.texture.Texture.MagFilter;
  */
 public class HelloJME3 extends SimpleApplication {
 	
+	public static final String INPUT_MAPPING_MENU = "MYAPP_Menu";
+	
 	private Geometry geom;
 
 
 	
 	/**
-	 * 初始化3D场景，显示一个方块。
+	 * 初始化APP
 	 */
 	@Override
 	public void simpleInitApp() {
@@ -47,6 +48,21 @@ public class HelloJME3 extends SimpleApplication {
             flyCam.setMoveSpeed(5f); // odd to set this here but it did it before
             stateManager.getState(FlyCamAppState.class).setCamera( flyCam );
         }
+		//将esc的作用改写为释放/隐藏鼠标，便于用鼠标调整窗口大小
+		if (inputManager!=null) {
+			inputManager.deleteMapping(INPUT_MAPPING_EXIT);
+			inputManager.addMapping(INPUT_MAPPING_MENU, new KeyTrigger(KeyInput.KEY_ESCAPE));
+			inputManager.addListener(new ActionListener() {
+				@Override
+		        public void onAction(String name, boolean value, float tpf) {
+	            //if (name.equals(INPUT_MAPPING_EXIT))
+					//System.out.println("esc action triggered");
+					if(value)
+						flyCam.setEnabled(!flyCam.isEnabled());
+				}
+			}, INPUT_MAPPING_MENU);
+		}
+	
 		
 		
 		 // #1 创建一个材料
@@ -110,13 +126,14 @@ public class HelloJME3 extends SimpleApplication {
 	public static void main(String[] args) {
 		// 配置参数
 		AppSettings settings = new AppSettings(true);
-		settings.setTitle("一个方块");
-		settings.setResolution(480, 720);
+		settings.setTitle("MiniCraft");
+		settings.setResolution(1024, 768);
+		settings.setResizable(true);
 		
 		// 启动jME3程序
 		HelloJME3 app = new HelloJME3();
-		//app.setSettings(settings);// 应用参数
-		//app.setShowSettings(false);
+		app.setSettings(settings);// 应用参数
+		app.setShowSettings(false);
 		app.start();
 	}
 
