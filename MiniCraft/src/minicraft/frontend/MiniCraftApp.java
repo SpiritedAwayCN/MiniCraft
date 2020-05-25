@@ -1,10 +1,13 @@
-package com.jme3.app;
+package minicraft.frontend;
 
 import com.jme3.app.SimpleApplication;
 import com.jme3.app.StatsAppState;
-import com.jme3.app.FlyCamAppState;
+import com.jme3.app.state.ConstantVerifierState;
+import com.jme3.app.DebugKeysAppState;
+//import com.jme3.app.FlyCamAppState;
+//用了minicraft.frontend.FlyCamAppState
 import com.jme3.asset.plugins.FileLocator;
-import com.jme3.input.GamerCamera;
+import com.jme3.audio.AudioListenerState;
 import com.jme3.input.KeyInput;
 import com.jme3.input.controls.ActionListener;
 import com.jme3.input.controls.KeyTrigger;
@@ -25,24 +28,26 @@ import com.jme3.texture.Texture;
 import com.jme3.texture.Texture.MagFilter;
 
 /**
- * 你的第一个jME3程序
- * @author yanmaoyuan
+ * Minicraft主类
+ * @author StarSky/IcyChlorine
  */
-public class HelloJME3 extends SimpleApplication {
+public class MiniCraftApp extends SimpleApplication {
 	
 	public static final String INPUT_MAPPING_MENU = "MYAPP_Menu";
 	
 	private Geometry geom;
-
-
 	
-	/**
-	 * 初始化APP
-	 */
+	
+	MiniCraftApp(){
+		super(new StatsAppState(),
+				new minicraft.frontend.FlyCamAppState(),//注意这里
+				new AudioListenerState(),
+				new DebugKeysAppState(),
+	            new ConstantVerifierState());
+	}
 	@Override
-	public void simpleInitApp() {
-		System.out.println("HelloJME3.simpleInitApp()");
-		
+	public void initialize() {
+		super.initialize();
 		if (stateManager.getState(FlyCamAppState.class) != null) {
             flyCam = new GamerCamera(cam);//我修改的地方
             flyCam.setMoveSpeed(5f); // odd to set this here but it did it before
@@ -62,32 +67,33 @@ public class HelloJME3 extends SimpleApplication {
 				}
 			}, INPUT_MAPPING_MENU);
 		}
+	}
 	
-		
+	/**
+	 * 初始化APP
+	 */
+	@Override
+	public void simpleInitApp() {
+		System.out.println("MiniCraftApp.simpleInitApp()");
 		
 		 // #1 创建一个材料
         Material mat = new Material(assetManager, "Common/MatDefs/Light/Lighting.j3md");
 
         // #2 设置纹理贴图
-        // 漫反射贴图
         assetManager.registerLocator("assets", FileLocator.class);
-        
-        Texture tex = assetManager.loadTexture("texture/dirt.bmp");
+        Texture tex = assetManager.loadTexture("texture/grass.bmp");
         tex.setMagFilter(MagFilter.Nearest);
         mat.setTexture("DiffuseMap", tex);
-        
-        
-        
+
         // 法线贴图
         //tex = assetManager.loadTexture("Textures/Terrain/BrickWall/BrickWall_normal.jpg");
         //mat.setTexture("NormalMap", tex);
         
-
         // 设置反光度
         mat.setFloat("Shininess", 2.0f);
         
         // #3 创造1个方块，应用此材质。
-        geom = new Geometry("文艺方块", new Box(1, 1, 1));
+        geom = new Geometry("文艺方块", new Block(1, 1, 1));
         geom.setMaterial(mat);
         
         rootNode.attachChild(geom);
@@ -131,7 +137,7 @@ public class HelloJME3 extends SimpleApplication {
 		settings.setResizable(true);
 		
 		// 启动jME3程序
-		HelloJME3 app = new HelloJME3();
+		MiniCraftApp app = new MiniCraftApp();
 		app.setSettings(settings);// 应用参数
 		app.setShowSettings(false);
 		app.start();

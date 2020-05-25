@@ -1,6 +1,12 @@
-package com.jme3.input;
+package minicraft.frontend;
 
 import com.jme3.collision.MotionAllowedListener;
+import com.jme3.input.CameraInput;
+import com.jme3.input.FlyByCamera;
+import com.jme3.input.InputManager;
+import com.jme3.input.Joystick;
+import com.jme3.input.KeyInput;
+import com.jme3.input.MouseInput;
 import com.jme3.input.controls.ActionListener;
 import com.jme3.input.controls.AnalogListener;
 import com.jme3.input.controls.KeyTrigger;
