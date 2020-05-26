@@ -1,11 +1,11 @@
-package minecraft.backend.map;
+package minicraft.backend.map;
 
 import static org.junit.Assert.*;
 
 import org.junit.Test;
 
-import minecraft.backend.map.block.Block;
-import minecraft.backend.utils.BlockCoordinate;
+import minicraft.backend.map.block.Block;
+import minicraft.backend.utils.BlockCoordinate;
 
 public class DimensionMapTest {
     @Test

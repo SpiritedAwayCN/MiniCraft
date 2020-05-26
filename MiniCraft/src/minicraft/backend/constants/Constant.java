@@ -1,4 +1,4 @@
-package minecraft.backend.constants;
+package minicraft.backend.constants;
 
 public class Constant {
     public static final int minX = -128;

@@ -1,10 +1,10 @@
-package minecraft.backend.map.block;
+package minicraft.backend.map.block;
 
-public class BedrockBlock extends Block{
+public class DirtBlock extends Block{
     private static final int blockID = 1;
 
-    public BedrockBlock(){
-        super("bedrock");
+    public DirtBlock(){
+        super("dirt");
     }
 
     @Override

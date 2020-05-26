@@ -1,7 +1,7 @@
-package minecraft.backend.map.generator;
+package minicraft.backend.map.generator;
 
-import minecraft.backend.constants.Constant;
-import minecraft.backend.map.block.*;
+import minicraft.backend.constants.Constant;
+import minicraft.backend.map.block.*;
 
 public abstract class Generator {
     protected int[][] heightMap;

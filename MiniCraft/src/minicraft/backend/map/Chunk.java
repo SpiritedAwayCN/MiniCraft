@@ -1,8 +1,8 @@
-package minecraft.backend.map;
+package minicraft.backend.map;
 
-import minecraft.backend.constants.Constant;
-import minecraft.backend.map.block.Block;
-import minecraft.backend.utils.*;
+import minicraft.backend.constants.Constant;
+import minicraft.backend.map.block.Block;
+import minicraft.backend.utils.*;
 
 public class Chunk {
     private ChunkCoordinate chunkCoordinate;

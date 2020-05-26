@@ -1,6 +1,6 @@
-package minecraft.backend.map.generator;
+package minicraft.backend.map.generator;
 
-import minecraft.backend.constants.Constant;
+import minicraft.backend.constants.Constant;
 
 public class FlatGenerator extends Generator {
 

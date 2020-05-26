@@ -1,8 +1,8 @@
-package minecraft.backend.map.block;
+package minicraft.backend.map.block;
 
-import minecraft.backend.constants.Constant;
-import minecraft.backend.map.*;
-import minecraft.backend.utils.*;
+import minicraft.backend.constants.Constant;
+import minicraft.backend.map.*;
+import minicraft.backend.utils.*;
 
 public abstract class Block {
     protected BlockCoordinate blockCoordinate;
@@ -86,7 +86,7 @@ public abstract class Block {
     public static Block getBlockInstanceByID(int blockID){
         Block block = null;
         try {
-            block = (Block)Class.forName("minecraft.backend.map.block." + Constant.BLOCKNAME_STRINGS[blockID] + "Block").newInstance();
+            block = (Block)Class.forName("minicraft.backend.map.block." + Constant.BLOCKNAME_STRINGS[blockID] + "Block").newInstance();
         } catch (Exception e) {
             e.printStackTrace();
             block = null;

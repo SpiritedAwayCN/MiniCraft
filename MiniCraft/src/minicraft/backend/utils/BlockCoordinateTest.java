@@ -1,4 +1,4 @@
-package minecraft.backend.utils;
+package minicraft.backend.utils;
 
 import org.junit.Test;
 import static org.junit.Assert.*;

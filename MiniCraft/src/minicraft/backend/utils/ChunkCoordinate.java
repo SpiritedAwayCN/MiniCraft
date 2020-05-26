@@ -1,4 +1,4 @@
-package minecraft.backend.utils;
+package minicraft.backend.utils;
 
 public class ChunkCoordinate {
     private int x;

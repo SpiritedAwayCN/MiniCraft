@@ -1,6 +1,6 @@
-package minecraft.backend.utils;
+package minicraft.backend.utils;
 
-import minecraft.backend.constants.Constant;
+import minicraft.backend.constants.Constant;
 
 public class BlockCoordinate {
     private int x;

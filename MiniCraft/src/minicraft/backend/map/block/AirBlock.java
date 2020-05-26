@@ -1,7 +1,7 @@
-package minecraft.backend.map.block;
+package minicraft.backend.map.block;
 
-import minecraft.backend.map.DimensionMap;
-import minecraft.backend.utils.BlockCoordinate;
+import minicraft.backend.map.DimensionMap;
+import minicraft.backend.utils.BlockCoordinate;
 
 public class AirBlock extends Block{
     private static final int blockID = 0;
