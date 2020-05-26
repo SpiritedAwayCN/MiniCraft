@@ -1,15 +1,15 @@
-package backend.utils;
+package minecraft.backend.utils;
 
 public class EntityCoordinate {
     private double x;
     private double y;
     private double z;
 
-    EntityCoordinate(){
+    public EntityCoordinate(){
         x = y = z = 0;
     }
 
-    EntityCoordinate(double x, double y, double z){
+    public EntityCoordinate(double x, double y, double z){
         this.x = x;
         this.y = y;
         this.z = z;

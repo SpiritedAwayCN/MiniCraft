@@ -1,13 +1,13 @@
-package backend.utils;
+package minecraft.backend.utils;
 
 public class ChunkCoordinate {
     private int x;
     private int z;
 
-    ChunkCoordinate(){
+    public ChunkCoordinate(){
         x = z = 0;
     }
-    ChunkCoordinate(int x, int z){
+    public ChunkCoordinate(int x, int z){
         this.x = x;
         this.z = z;
     }

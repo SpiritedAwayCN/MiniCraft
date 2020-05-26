@@ -1,22 +1,41 @@
-package backend.map;
+package minecraft.backend.map;
 
-import backend.constants.Constant;
-import backend.map.block.Block;
-import backend.utils.*;
+import minecraft.backend.constants.Constant;
+import minecraft.backend.map.block.Block;
+import minecraft.backend.map.generator.*;
+import minecraft.backend.utils.*;
 
 public class DimensionMap {
     private String name;
     private Chunk[][] mapChunks;
-    private int chunkIndexBiasX;
-    private int chunkIndexBiasZ;
+    private final int chunkIndexBiasX;
+    private final int chunkIndexBiasZ;
 
-    DimensionMap(){
-        this.name = "word";
+
+    private int[][][] initialBlockMap;
+
+    public DimensionMap(String name){
+        this.name = name;
         chunkIndexBiasX = -Constant.minX / Constant.chunkX;
         chunkIndexBiasZ = -Constant.minZ / Constant.chunkZ;
 
         mapChunks = new Chunk[(Constant.maxX - Constant.minX) / Constant.chunkX][(Constant.maxZ - Constant.minZ) / Constant.chunkZ];
 
+    }
+
+    /**
+     * 生成一个全新的地图
+     * @param flat 是否超平坦（现在只能超平坦）
+     */
+    public void generateFromGenerator(boolean flat){
+        Generator generator = new FlatGenerator();
+        generator.generateBlockMap();
+        initialBlockMap = generator.getBlockMap();
+
+        for(int i = 0; i < mapChunks.length; i++)
+            for(int j = 0; j < mapChunks[i].length; j++){
+                mapChunks[i][j] = new Chunk(new ChunkCoordinate(i - chunkIndexBiasX, j - chunkIndexBiasZ), initialBlockMap);
+            }
     }
 
     public Chunk getChunkByCoordinate(ChunkCoordinate chunkCoordinate){

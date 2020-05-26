@@ -1,17 +1,17 @@
-package backend.utils;
+package minecraft.backend.utils;
 
-import backend.constants.Constant;
+import minecraft.backend.constants.Constant;
 
 public class BlockCoordinate {
     private int x;
     private int y;
     private int z;
 
-    BlockCoordinate(){
+    public BlockCoordinate(){
         x = y = z = 0;
     }
 
-    BlockCoordinate(int x, int y, int z){
+    public BlockCoordinate(int x, int y, int z){
         this.x = x;
         this.y = y;
         this.z = z;

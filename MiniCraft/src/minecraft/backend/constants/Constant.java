@@ -1,4 +1,4 @@
-package backend.constants;
+package minecraft.backend.constants;
 
 public class Constant {
     public static final int minX = -128;
@@ -9,4 +9,6 @@ public class Constant {
 
     public static final int chunkX = 16;
     public static final int chunkZ = 16;
+
+    public static final String[] BLOCKNAME_STRINGS = {"Air", "Stone", "Grass", "Dirt", "Bedrock"};
 }
