@@ -28,15 +28,15 @@ public abstract class Generator {
 
         for(int i = 0; i < Constant.maxX + biasX; i++)
             for(int j = 0; j < Constant.maxZ + biasZ; j++){
-                blockMap[i][0][j] = 4; //bedrock
+                blockMap[i][0][j] = BedrockBlock.getBlockidStatic(); //bedrock
                 int k = 1;
                 for(; k < heightMap[i][j] - 3; k++)
-                    blockMap[i][k][j] = 1; //stone
+                    blockMap[i][k][j] = StoneBlock.getBlockidStatic();
                 for(; k < heightMap[i][j]; k++)
-                    blockMap[i][k][j] = 3; //dirt
-                blockMap[i][k][j] = 2; //grass
+                    blockMap[i][k][j] = DirtBlock.getBlockidStatic(); //dirt
+                blockMap[i][k][j] = GrassBlock.getBlockidStatic(); //grass
                 for(k++; k < Constant.maxY; k++)
-                    blockMap[i][k][j] = AirBlock.getBlockidStatic();
+                    blockMap[i][k][j] = AirBlock.getBlockidStatic(); //air
             }
 
     }
