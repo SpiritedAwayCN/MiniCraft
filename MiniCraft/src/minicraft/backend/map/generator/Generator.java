@@ -24,10 +24,10 @@ public abstract class Generator {
         generateHightMap();
         fixHeightMap();
 
-        blockMap = new int[Constant.maxX + biasX][Constant.maxY][Constant.maxZ + biasZ];
+        blockMap = new int[Constant.maxX + biasX + 1][Constant.maxY][Constant.maxZ + biasZ + 1];
 
-        for(int i = 0; i < Constant.maxX + biasX; i++)
-            for(int j = 0; j < Constant.maxZ + biasZ; j++){
+        for(int i = 0; i <= Constant.maxX + biasX; i++)
+            for(int j = 0; j <= Constant.maxZ + biasZ; j++){
                 blockMap[i][0][j] = BedrockBlock.getBlockidStatic(); //bedrock
                 int k = 1;
                 for(; k < heightMap[i][j] - 3; k++)

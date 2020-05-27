@@ -1,6 +1,9 @@
 package minicraft.backend.map;
 
+import java.util.LinkedList;
+
 import minicraft.backend.constants.Constant;
+import minicraft.backend.entity.PlayerBackend;
 import minicraft.backend.map.block.BlockBackend;
 import minicraft.backend.map.generator.*;
 import minicraft.backend.utils.*;
@@ -11,6 +14,9 @@ public class DimensionMap {
     private final int chunkIndexBiasX;
     private final int chunkIndexBiasZ;
 
+    private PlayerBackend player;
+    private LinkedList<BlockBackend> updateBlockList;
+
 
     private int[][][] initialBlockMap;
 
@@ -19,8 +25,9 @@ public class DimensionMap {
         chunkIndexBiasX = -Constant.minX / Constant.chunkX;
         chunkIndexBiasZ = -Constant.minZ / Constant.chunkZ;
 
-        mapChunks = new Chunk[(Constant.maxX - Constant.minX) / Constant.chunkX][(Constant.maxZ - Constant.minZ) / Constant.chunkZ];
-
+        mapChunks = new Chunk[(Constant.maxX - Constant.minX + 1) / Constant.chunkX][(Constant.maxZ - Constant.minZ + 1) / Constant.chunkZ];
+        player = new PlayerBackend();
+        updateBlockList = new LinkedList<>();
     }
 
     /**
@@ -34,7 +41,7 @@ public class DimensionMap {
 
         for(int i = 0; i < mapChunks.length; i++)
             for(int j = 0; j < mapChunks[i].length; j++){
-                mapChunks[i][j] = new Chunk(new ChunkCoordinate(i - chunkIndexBiasX, j - chunkIndexBiasZ), initialBlockMap);
+                mapChunks[i][j] = new Chunk(new ChunkCoordinate(i - chunkIndexBiasX, j - chunkIndexBiasZ), initialBlockMap, this);
             }
     }
 
@@ -56,5 +63,39 @@ public class DimensionMap {
 
     public void setName(String name) {
         this.name = name;
+    }
+
+    public Chunk[][] getMapChunks() {
+        return mapChunks;
+    }
+
+    public PlayerBackend getPlayer() {
+        return player;
+    }
+
+    /**
+     * 需要更新的方块列表，注意前端用完后调用clear，后端没有任何删除此列表元素的操作
+     * @return 待前端更新的方块列表
+     */
+    public LinkedList<BlockBackend> getUpdateBlockList() {
+        return updateBlockList;
+    }
+
+    /**
+     * 通过玩家的位置重新刷新整个世界
+     * 所有应显示的方块全都加入updateBlockList
+     * 注：还没写，因为相当难写(考虑到之后有视距问题)，先用一个简单方法弄着
+     */
+    @Deprecated
+    public void refreshWholeUpdateBlockList(){
+        ChunkCoordinate st = player.toChunkCoordinate();
+
+    }
+
+    /** 
+     * 注：这是暂时的，最终版会弃用
+     */
+    public void initializeWholeUpdateBlockListTemp(){
+        
     }
 }
