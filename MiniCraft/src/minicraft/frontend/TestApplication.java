@@ -27,23 +27,18 @@ import com.jme3.system.JmeContext.Type;
 import com.jme3.texture.Texture;
 import com.jme3.texture.Texture.MagFilter;
 
-import minicraft.backend.constants.Constant;
-import minicraft.backend.map.DimensionMap;
-import minicraft.backend.map.block.BlockBackend;
-import minicraft.backend.utils.BlockCoordinate;
-
 /**
  * Minicraft主类
  * @author StarSky/IcyChlorine
  */
-public class MiniCraftApp extends SimpleApplication {
+public class TestApplication extends SimpleApplication {
 	
 	public static final String INPUT_MAPPING_MENU = "MYAPP_Menu";
 	
 	private Geometry geom;
 	
 	
-	MiniCraftApp(){
+	TestApplication(){
 		super(new StatsAppState(),
 				new minicraft.frontend.FlyCamAppState(),//注意这里
 				new AudioListenerState(),
@@ -79,29 +74,12 @@ public class MiniCraftApp extends SimpleApplication {
 	 */
 	@Override
 	public void simpleInitApp() {
-		System.out.println("MiniCraftApp.simpleInitApp()");
+		System.out.println("TestApplication.simpleInitApp()");
 		
-		DimensionMap overworld=new DimensionMap("overworld");
-		overworld.generateFromGenerator(true);
-		//BlockBackend block=BlockBackend.getBlockInstanceByID(1);
-		//block.placeAt(new BlockCoordinate(0,1,0), overworld);
 		
-		GeometryBlock.initialize(assetManager);
 		
-		BlockBackend block;
-		for(int x=-32;x<=32;x++) {
-			System.out.println(x);
-			for(int y=4;y<5;y++) {
-				for(int z=-32;z<=32;z++) {
-					block=overworld.getBlockByCoordinate(new BlockCoordinate(x,y,z));
-					if(block.getBlockid()==0)
-						continue;
-					geom=new GeometryBlock(overworld.getBlockByCoordinate(new BlockCoordinate(x,y,z)));
-					rootNode.attachChild(geom);
-					rootNode.detachChild(geom);
-				}
-			}
-		}
+		rootNode.attachChild(geom);
+		
 		
         
         // 定向光
@@ -122,6 +100,10 @@ public class MiniCraftApp extends SimpleApplication {
         
 	}
 	
+	private Vector3f Vector3f(int i, int j, int k) {
+		// TODO Auto-generated method stub
+		return null;
+	}
 	/**
 	 * 主循环
 	 */
@@ -143,7 +125,7 @@ public class MiniCraftApp extends SimpleApplication {
 		settings.setResizable(true);
 		
 		// 启动jME3程序
-		MiniCraftApp app = new MiniCraftApp();
+		TestApplication app = new TestApplication();
 		app.setSettings(settings);// 应用参数
 		app.setShowSettings(false);
 		app.start();
