@@ -27,23 +27,18 @@ import com.jme3.system.JmeContext.Type;
 import com.jme3.texture.Texture;
 import com.jme3.texture.Texture.MagFilter;
 
-import minicraft.backend.constants.Constant;
-import minicraft.backend.map.DimensionMap;
-import minicraft.backend.map.block.BlockBackend;
-import minicraft.backend.utils.BlockCoordinate;
-
 /**
  * Minicraft主类
  * @author StarSky/IcyChlorine
  */
-public class MiniCraftApp extends SimpleApplication {
+public class TestApplication extends SimpleApplication {
 	
 	public static final String INPUT_MAPPING_MENU = "MYAPP_Menu";
 	
 	private Geometry geom;
 	
 	
-	MiniCraftApp(){
+	TestApplication(){
 		super(new StatsAppState(),
 				new minicraft.frontend.FlyCamAppState(),//注意这里
 				new AudioListenerState(),
@@ -79,30 +74,30 @@ public class MiniCraftApp extends SimpleApplication {
 	 */
 	@Override
 	public void simpleInitApp() {
-		System.out.println("MiniCraftApp.simpleInitApp()");
+		System.out.println("TestApplication.simpleInitApp()");
 		
-		DimensionMap overworld=new DimensionMap("overworld");
-		overworld.generateFromGenerator(true);
-		BlockBackend block=BlockBackend.getBlockInstanceByID(1);
-		block.placeAt(new BlockCoordinate(0,1,0), overworld);
-		
-		GeometryBlock.initialize(assetManager);
-		
-		
-		for(int x=Constant.minX;x<=Constant.maxX;x++) {
-			for(int y=Constant.minY;y<=Constant.maxY;y++) {
-				for(int z=Constant.minZ;z<=Constant.maxZ;z++) {
-					geom=new GeometryBlock(overworld.getBlockByCoordinate(new BlockCoordinate(x,y,z)));
-					rootNode.attachChild(geom);
-				}
-			}
-		}
-		//geom=new GeometryBlock(block);
+		 // #1 创建一个材料
+        Material mat = new Material(assetManager, "Common/MatDefs/Light/Lighting.j3md");
 
-		//geom.setMaterial();
-		//geom.setMesh(null);
+        // #2 设置纹理贴图
+        assetManager.registerLocator("assets", FileLocator.class);
+        Texture tex = assetManager.loadTexture("texture/grass.bmp");
+        tex.setMagFilter(MagFilter.Nearest);
+        mat.setTexture("DiffuseMap", tex);
+
+        // 法线贴图
+        //tex = assetManager.loadTexture("Textures/Terrain/BrickWall/BrickWall_normal.jpg");
+        //mat.setTexture("NormalMap", tex);
+        
+        // 设置反光度
+        mat.setFloat("Shininess", 2.0f);
+        
+        // #3 创造1个方块，应用此材质。
+        geom = new Geometry("grass", new Box(Vector3f(0,5,0),1,1,1));
+		geom.setMaterial(mat);
 		
-		//rootNode.attachChild(geom);
+		rootNode.attachChild(geom);
+		
 		
         
         // 定向光
@@ -123,6 +118,10 @@ public class MiniCraftApp extends SimpleApplication {
         
 	}
 	
+	private Vector3f Vector3f(int i, int j, int k) {
+		// TODO Auto-generated method stub
+		return null;
+	}
 	/**
 	 * 主循环
 	 */
@@ -144,7 +143,7 @@ public class MiniCraftApp extends SimpleApplication {
 		settings.setResizable(true);
 		
 		// 启动jME3程序
-		MiniCraftApp app = new MiniCraftApp();
+		TestApplication app = new TestApplication();
 		app.setSettings(settings);// 应用参数
 		app.setShowSettings(false);
 		app.start();
