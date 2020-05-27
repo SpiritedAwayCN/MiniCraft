@@ -1,6 +1,6 @@
 package minicraft.backend.map;
 
-import java.util.LinkedList;
+import java.util.HashSet;
 
 import minicraft.backend.constants.Constant;
 import minicraft.backend.entity.PlayerBackend;
@@ -15,7 +15,7 @@ public class DimensionMap {
     private final int chunkIndexBiasZ;
 
     private PlayerBackend player;
-    private LinkedList<BlockBackend> updateBlockList;
+    private HashSet<BlockBackend> updateBlockSet;
 
 
     private int[][][] initialBlockMap;
@@ -27,7 +27,7 @@ public class DimensionMap {
 
         mapChunks = new Chunk[(Constant.maxX - Constant.minX + 1) / Constant.chunkX][(Constant.maxZ - Constant.minZ + 1) / Constant.chunkZ];
         player = new PlayerBackend();
-        updateBlockList = new LinkedList<>();
+        updateBlockSet = new HashSet<>();
     }
 
     /**
@@ -75,27 +75,64 @@ public class DimensionMap {
 
     /**
      * 需要更新的方块列表，注意前端用完后调用clear，后端没有任何删除此列表元素的操作
-     * @return 待前端更新的方块列表
+     * @return 待前端更新的方块列表，但不会有字段表明具体是该显示还是删除，应结合上下文推断
      */
-    public LinkedList<BlockBackend> getUpdateBlockList() {
-        return updateBlockList;
+    public HashSet<BlockBackend> getUpdateBlockSet() {
+        return updateBlockSet;
     }
 
     /**
      * 通过玩家的位置重新刷新整个世界
-     * 所有应显示的方块全都加入updateBlockList
+     * 所有应显示的方块全都加入updateBlockSet
      * 注：还没写，因为相当难写(考虑到之后有视距问题)，先用一个简单方法弄着
      */
     @Deprecated
-    public void refreshWholeUpdateBlockList(){
+    public void refreshWholeUpdateBlockSet(){
         ChunkCoordinate st = player.toChunkCoordinate();
 
     }
 
     /** 
-     * 注：这是暂时的，最终版会弃用
+     * 注：这是暂时的，最终版会弃用，有很多可用性不强的地方
+     * @return 待更新方块列表
      */
-    public void initializeWholeUpdateBlockListTemp(){
-        
+    public HashSet<BlockBackend> initializeWholeUpdateBlockSetTemp(){
+        for(int i = Constant.minX; i<=Constant.maxX; i++)
+            for(int j = Constant.minZ; j<=Constant.maxZ; j++){
+                updateBlockSet.add(getBlockByCoordinate(new BlockCoordinate(i, 4, j)));
+            }
+        return updateBlockSet;
     }
+
+    /**
+     * 注：只是暂时，效率与沿用性均不佳
+     * 通过方块坐标，得到在该位置放置/破坏后 出现更新的方块(放置/)
+     * @return 待更新方块列表（包括当前）
+     */
+    public HashSet<BlockBackend> updateBlockSetTemp(BlockCoordinate blockCoordinate){
+        if(getBlockByCoordinate(blockCoordinate).isTransparent()){
+            // 透明就只更新当前这个
+            updateBlockSet.add(getBlockByCoordinate(blockCoordinate));
+        }else{
+            updateBlockRecusive(blockCoordinate);
+        }
+        return updateBlockSet;
+    }
+
+    private void updateBlockRecusive(BlockCoordinate blockCoordinate){
+        BlockBackend block = getBlockByCoordinate(blockCoordinate);
+        if(block.getBlockid()==0 || updateBlockSet.contains(block)) return;
+        updateBlockSet.add(block);
+        if(!block.isTransparent()) return;
+
+        int x = blockCoordinate.getX(), y = blockCoordinate.getY(), z = blockCoordinate.getZ();
+        final int dx[] = {1, 0, -1, 0, 0, 0}, dz[] = {0, 1, 0, -1, 0, 0}, dy[]={0, 0, 0, 0, 1, -1};
+        
+        for(int dir = 0; dir < 6; dir++){
+            int tx = x + dx[dir], ty = y + dy[dir], tz = z + dz[dir];
+            updateBlockRecusive(new BlockCoordinate(tx, ty, tz));
+        }
+
+    }
+
 }

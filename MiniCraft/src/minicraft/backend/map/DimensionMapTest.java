@@ -4,6 +4,7 @@ import static org.junit.Assert.*;
 
 import org.junit.Test;
 
+import minicraft.backend.constants.Constant;
 import minicraft.backend.map.block.BlockBackend;
 import minicraft.backend.utils.BlockCoordinate;
 
@@ -59,5 +60,18 @@ public class DimensionMapTest {
         assertEquals("air", map.getBlockByCoordinate(new BlockCoordinate(-110, 3, 82)).getName());
         assertEquals("stone", map.getBlockByCoordinate(new BlockCoordinate(-110, 4, 82)).getName());
 
+    }
+
+    @Test
+    public void foreachTest(){
+        DimensionMap overworld = new DimensionMap("world");
+        overworld.generateFromGenerator(true);
+        for(int x=Constant.minX;x<=Constant.maxX;x++) {
+            for(int y=0;y<Constant.maxY;y++) {
+                for(int z=Constant.minZ;z<=Constant.maxZ;z++) {
+                    overworld.getBlockByCoordinate(new BlockCoordinate(x,y,z));
+                }
+            }
+        }
     }
 }
