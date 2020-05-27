@@ -1,7 +1,7 @@
 package minicraft.backend.map;
 
 import minicraft.backend.constants.Constant;
-import minicraft.backend.map.block.Block;
+import minicraft.backend.map.block.BlockBackend;
 import minicraft.backend.map.generator.*;
 import minicraft.backend.utils.*;
 
@@ -42,7 +42,7 @@ public class DimensionMap {
         return mapChunks[chunkCoordinate.getX() + chunkIndexBiasX][chunkCoordinate.getZ() + chunkIndexBiasZ];
     }
 
-    public Block getBlockByCoordinate(BlockCoordinate blockCoordinate){
+    public BlockBackend getBlockByCoordinate(BlockCoordinate blockCoordinate){
         Chunk chunk = getChunkByCoordinate(blockCoordinate.toChunkCoordnate());
         int bx = blockCoordinate.getX() - chunk.getChunkCoordinate().getX() * Constant.chunkX;
         int by = blockCoordinate.getY();

@@ -1,6 +1,6 @@
 package minicraft.backend.map.block;
 
-public class GrassBlock extends Block{
+public class GrassBlock extends BlockBackend{
     private static final int blockID = 2;
 
     public GrassBlock(){

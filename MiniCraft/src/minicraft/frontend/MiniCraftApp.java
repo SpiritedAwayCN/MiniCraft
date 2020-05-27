@@ -93,10 +93,10 @@ public class MiniCraftApp extends SimpleApplication {
         mat.setFloat("Shininess", 2.0f);
         
         // #3 创造1个方块，应用此材质。
-        geom = new Geometry("文艺方块", new Block(1, 1, 1));
-        geom.setMaterial(mat);
-        
-        rootNode.attachChild(geom);
+        geom = new Geometry("grass", new Block(1, 1, 1));
+		geom.setMaterial(mat);
+		
+		rootNode.attachChild(geom);
         
         // 定向光
         DirectionalLight sun = new DirectionalLight();

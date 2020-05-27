@@ -1,6 +1,6 @@
 package minicraft.backend.map.block;
 
-public class BedrockBlock extends Block{
+public class BedrockBlock extends BlockBackend{
     private static final int blockID = 4;
 
     public BedrockBlock(){

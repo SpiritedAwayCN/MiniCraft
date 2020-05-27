@@ -4,7 +4,7 @@ import static org.junit.Assert.*;
 
 import org.junit.Test;
 
-import minicraft.backend.map.block.Block;
+import minicraft.backend.map.block.BlockBackend;
 import minicraft.backend.utils.BlockCoordinate;
 
 public class DimensionMapTest {
@@ -24,7 +24,7 @@ public class DimensionMapTest {
         DimensionMap map = new DimensionMap("world");
         map.generateFromGenerator(true);
 
-        Block block = Block.getBlockInstanceByID(2); //草方块
+        BlockBackend block = BlockBackend.getBlockInstanceByID(2); //草方块
         block.placeAt(new BlockCoordinate(-17, 8, 66), map);
 
         assertEquals("grass", map.getBlockByCoordinate(new BlockCoordinate(-17, 8, 66)).getName());
@@ -44,7 +44,7 @@ public class DimensionMapTest {
         DimensionMap map = new DimensionMap("world");
         map.generateFromGenerator(true);
 
-        Block block = map.getBlockByCoordinate(new BlockCoordinate(-110, 4, 82));
+        BlockBackend block = map.getBlockByCoordinate(new BlockCoordinate(-110, 4, 82));
         assertEquals("grass", block.getName());
         block.destoryBlock();  //此后这个对象无意义，将在GC后自动丢弃
         assertEquals("air", map.getBlockByCoordinate(new BlockCoordinate(-110, 4, 82)).getName());
@@ -54,7 +54,7 @@ public class DimensionMapTest {
         block.destoryBlock();  //此后这个对象无意义，将在GC后自动丢弃
         assertEquals("air", map.getBlockByCoordinate(new BlockCoordinate(-110, 3, 82)).getName());
 
-        block = Block.getBlockInstanceByID(1); //石头
+        block = BlockBackend.getBlockInstanceByID(1); //石头
         block.placeAt(new BlockCoordinate(-110, 4, 82), map);
         assertEquals("air", map.getBlockByCoordinate(new BlockCoordinate(-110, 3, 82)).getName());
         assertEquals("stone", map.getBlockByCoordinate(new BlockCoordinate(-110, 4, 82)).getName());

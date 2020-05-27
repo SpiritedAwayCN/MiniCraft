@@ -4,16 +4,16 @@ import minicraft.backend.constants.Constant;
 import minicraft.backend.map.*;
 import minicraft.backend.utils.*;
 
-public abstract class Block {
+public abstract class BlockBackend {
     protected BlockCoordinate blockCoordinate;
     protected String name;
     protected Chunk chunk;
 
-    protected Block(String name){
+    protected BlockBackend(String name){
         this.name = name;
     }
 
-    protected Block(BlockCoordinate blockCoordinate, DimensionMap map, String name){
+    protected BlockBackend(BlockCoordinate blockCoordinate, DimensionMap map, String name){
         this.blockCoordinate = blockCoordinate;
         this.chunk = map.getChunkByCoordinate(blockCoordinate.toChunkCoordnate());
         this.name = name;
@@ -43,6 +43,14 @@ public abstract class Block {
         this.chunk = chunk;
     }
 
+    /**
+     * 是否是透明方块(决定是否阻挡渲染)
+     * @return 是则true；否则false
+     */
+    public boolean isTransparent(){
+        return false; //透明方块在子类中重载
+    }
+
 
     /**
      * 破坏这个方块，要求已经放置，否则调用失败
@@ -50,7 +58,7 @@ public abstract class Block {
      */
     public boolean destoryBlock(){
         if(this.chunk == null) return false;
-        Block block = getBlockInstanceByID(0); // air
+        BlockBackend block = getBlockInstanceByID(0); // air
         block.blockCoordinate = this.blockCoordinate;
         block.chunk = this.chunk;
 
@@ -83,10 +91,10 @@ public abstract class Block {
      * @param blockID 方块编号，
      * @return 得到的Block对象(无参构造，除name外没有任何字段经过赋值)，失败则为null
      */
-    public static Block getBlockInstanceByID(int blockID){
-        Block block = null;
+    public static BlockBackend getBlockInstanceByID(int blockID){
+        BlockBackend block = null;
         try {
-            block = (Block)Class.forName("minicraft.backend.map.block." + Constant.BLOCKNAME_STRINGS[blockID] + "Block").newInstance();
+            block = (BlockBackend)Class.forName("minicraft.backend.map.block." + Constant.BLOCKNAME_STRINGS[blockID] + "Block").newInstance();
         } catch (Exception e) {
             e.printStackTrace();
             block = null;
