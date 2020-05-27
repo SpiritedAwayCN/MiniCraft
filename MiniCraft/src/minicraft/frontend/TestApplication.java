@@ -76,25 +76,7 @@ public class TestApplication extends SimpleApplication {
 	public void simpleInitApp() {
 		System.out.println("TestApplication.simpleInitApp()");
 		
-		 // #1 创建一个材料
-        Material mat = new Material(assetManager, "Common/MatDefs/Light/Lighting.j3md");
-
-        // #2 设置纹理贴图
-        assetManager.registerLocator("assets", FileLocator.class);
-        Texture tex = assetManager.loadTexture("texture/grass.bmp");
-        tex.setMagFilter(MagFilter.Nearest);
-        mat.setTexture("DiffuseMap", tex);
-
-        // 法线贴图
-        //tex = assetManager.loadTexture("Textures/Terrain/BrickWall/BrickWall_normal.jpg");
-        //mat.setTexture("NormalMap", tex);
-        
-        // 设置反光度
-        mat.setFloat("Shininess", 2.0f);
-        
-        // #3 创造1个方块，应用此材质。
-        geom = new Geometry("grass", new Box(Vector3f(0,5,0),1,1,1));
-		geom.setMaterial(mat);
+		
 		
 		rootNode.attachChild(geom);
 		

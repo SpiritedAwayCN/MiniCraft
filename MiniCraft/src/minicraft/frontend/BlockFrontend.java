@@ -39,7 +39,7 @@ public class BlockFrontend extends Box {
 	private boolean BLOCK_IS_EMPTY=true;
 	
 	public BlockFrontend(int Blockid) {
-		super(1,1,1);//边长为1
+		super(0.5F,0.5F,0.5F);//边长为1
 		for(int id : BLOCK_ID_TEXTURE_UNUNIFORM) {
 			if(id==Blockid) {
 				BLOCK_TEXTURE_UNIFORM=false;
@@ -48,7 +48,7 @@ public class BlockFrontend extends Box {
 		}
 	}
 	public BlockFrontend() {
-		super(1,1,1);
+		super(0.5f,0.5f,0.5f);
 	}
 	public void setBlockid(int Blockid) {
 		for(int id : BLOCK_ID_TEXTURE_UNUNIFORM) {

@@ -83,26 +83,25 @@ public class MiniCraftApp extends SimpleApplication {
 		
 		DimensionMap overworld=new DimensionMap("overworld");
 		overworld.generateFromGenerator(true);
-		BlockBackend block=BlockBackend.getBlockInstanceByID(1);
-		block.placeAt(new BlockCoordinate(0,1,0), overworld);
+		//BlockBackend block=BlockBackend.getBlockInstanceByID(1);
+		//block.placeAt(new BlockCoordinate(0,1,0), overworld);
 		
 		GeometryBlock.initialize(assetManager);
 		
-		
-		for(int x=Constant.minX;x<=Constant.maxX;x++) {
-			for(int y=Constant.minY;y<=Constant.maxY;y++) {
-				for(int z=Constant.minZ;z<=Constant.maxZ;z++) {
+		BlockBackend block;
+		for(int x=-32;x<=32;x++) {
+			System.out.println(x);
+			for(int y=4;y<5;y++) {
+				for(int z=-32;z<=32;z++) {
+					block=overworld.getBlockByCoordinate(new BlockCoordinate(x,y,z));
+					if(block.getBlockid()==0)
+						continue;
 					geom=new GeometryBlock(overworld.getBlockByCoordinate(new BlockCoordinate(x,y,z)));
 					rootNode.attachChild(geom);
+					rootNode.detachChild(geom);
 				}
 			}
 		}
-		//geom=new GeometryBlock(block);
-
-		//geom.setMaterial();
-		//geom.setMesh(null);
-		
-		//rootNode.attachChild(geom);
 		
         
         // 定向光

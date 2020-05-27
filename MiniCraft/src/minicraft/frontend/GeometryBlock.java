@@ -40,13 +40,11 @@ private static Material[] materails;
 			// 设置受光材质
 			materails[i] = new Material(assetManager, "Common/MatDefs/Light/Lighting.j3md");
 			// 设置纹理贴图
-			if(texFilename[i]==null){
-				materails[i]=null;
-				continue;
+			if(texFilename[i]!=null){
+				Texture tex = assetManager.loadTexture(texFilename[i]);
+	        	tex.setMagFilter(MagFilter.Nearest);
+	        	materails[i].setTexture("DiffuseMap", tex);
 			}
-			Texture tex = assetManager.loadTexture("texture/grass.bmp");
-	        tex.setMagFilter(MagFilter.Nearest);
-	        materails[i].setTexture("DiffuseMap", tex);
 	        
 	        // 设置反光度
 	        materails[i].setFloat("Shininess", 2.0f);
