@@ -74,7 +74,7 @@ public class DimensionMap {
     }
 
     /**
-     * 需要更新的方块列表，注意前端用完后调用clear，后端没有任何删除此列表元素的操作
+     * 需要更新的方块列表，注意前端用完后必须调用clear，后端没有任何删除此集合元素的操作
      * @return 待前端更新的方块列表，但不会有字段表明具体是该显示还是删除，应结合上下文推断
      */
     public HashSet<BlockBackend> getUpdateBlockSet() {
@@ -110,13 +110,14 @@ public class DimensionMap {
      * @return 待更新方块列表（包括当前）
      */
     public HashSet<BlockBackend> updateBlockSetTemp(BlockCoordinate blockCoordinate){
+        HashSet<BlockBackend> localUpdateSet = new HashSet<>();
         if(getBlockByCoordinate(blockCoordinate).isTransparent()){
             // 透明就只更新当前这个
-            updateBlockSet.add(getBlockByCoordinate(blockCoordinate));
+            localUpdateSet.add(getBlockByCoordinate(blockCoordinate));
         }else{
             updateBlockRecusive(blockCoordinate);
         }
-        return updateBlockSet;
+        return localUpdateSet;
     }
 
     private void updateBlockRecusive(BlockCoordinate blockCoordinate){
