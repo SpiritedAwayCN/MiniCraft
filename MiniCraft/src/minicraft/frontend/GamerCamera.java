@@ -41,7 +41,13 @@ public class GamerCamera extends FlyByCamera {
 
 	        CameraInput.FLYCAM_INVERTY
 	    };
-	
+    
+    private MiniCraftApp miniCraftApp;
+    public GamerCamera(Camera cam, MiniCraftApp app){
+        super(cam);
+        this.miniCraftApp = app;
+    }
+
 	public GamerCamera(Camera cam) {
 		super(cam);
 		// TODO Auto-generated constructor stub
@@ -137,7 +143,12 @@ public class GamerCamera extends FlyByCamera {
             pos.addLocal(vel);
 
         cam.setLocation(pos);
+        this.miniCraftApp.overworld.movePlayerTo(pos);
     }
     
-    
+    @Override
+    protected void riseCamera(float value) {
+        super.riseCamera(value);
+        this.miniCraftApp.overworld.movePlayerTo(cam.getLocation());
+    }
 }

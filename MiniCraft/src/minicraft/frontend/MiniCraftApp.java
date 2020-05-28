@@ -63,7 +63,7 @@ public class MiniCraftApp extends SimpleApplication {
 	public void initialize() {
 		super.initialize();
 		if (stateManager.getState(FlyCamAppState.class) != null) {
-            flyCam = new GamerCamera(cam);//我修改的地方
+            flyCam = new GamerCamera(cam, this);//我修改的地方
             flyCam.setMoveSpeed(5f); // odd to set this here but it did it before
             stateManager.getState(FlyCamAppState.class).setCamera( flyCam );
         }
@@ -266,6 +266,8 @@ public class MiniCraftApp extends SimpleApplication {
 			break;
 		}
 	}
+
+	
 
 	public static void main(String[] args) {
 		// 配置参数

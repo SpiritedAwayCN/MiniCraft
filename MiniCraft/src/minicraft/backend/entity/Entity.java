@@ -3,17 +3,20 @@ package minicraft.backend.entity;
 import com.jme3.math.Vector3f;
 
 import minicraft.backend.constants.Constant;
+import minicraft.backend.map.Chunk;
 import minicraft.backend.utils.*;
 
 public abstract class Entity {
     protected Vector3f coordinate;
     protected String name;
+    protected ChunkCoordinate chunkCoordinate;
     // 受重力
     
-    public Entity(){}
+    Entity(){}
 
     public Entity(Vector3f coordinate, String name){
         this.coordinate = coordinate;
+        this.chunkCoordinate = toChunkCoordinate();
     }
 
     public String getName() {
@@ -34,6 +37,14 @@ public abstract class Entity {
 
     public BlockCoordinate toBlockCoordinate(){
         return new BlockCoordinate((int)Math.floor(coordinate.x), (int)Math.floor(coordinate.y), (int)Math.floor(coordinate.z));
+    }
+
+    public ChunkCoordinate getChunkCoordinate() {
+        return chunkCoordinate;
+    }
+
+    public void setChunkCoordinate(ChunkCoordinate chunkCoordinate) {
+        this.chunkCoordinate = chunkCoordinate;
     }
 
 }

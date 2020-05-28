@@ -2,6 +2,8 @@ package minicraft.backend.map;
 
 import java.util.HashSet;
 
+import com.jme3.math.Vector3f;
+
 import minicraft.backend.constants.Constant;
 import minicraft.backend.entity.PlayerBackend;
 import minicraft.backend.map.block.BlockBackend;
@@ -124,10 +126,16 @@ public class DimensionMap {
             chunk.setLoadLevel(1);
     }
 
+    private void setChunkPreLoadIfNot(ChunkCoordinate chunkCoordinate){
+        Chunk chunk= this.getChunkByCoordinate(chunkCoordinate);
+        if(chunk != null && chunk.getLoadLevel() == 0)
+            chunk.setLoadLevel(1);
+    }
+
     private void loadChunkByCoord(ChunkCoordinate chunkCoordinate){
         Chunk chunk = getChunkByCoordinate(chunkCoordinate);
         if(chunk != null && chunk.getLoadLevel() == 1){
-            System.out.printf("%d %d\n", chunkCoordinate.getX(), chunkCoordinate.getZ());
+            System.out.printf("load : %d %d\n", chunkCoordinate.getX(), chunkCoordinate.getZ());
             chunk.loadAllBlocksInChunk();
         }
     }
@@ -280,4 +288,61 @@ public class DimensionMap {
         return false;
     }
 
+    /**
+     * 玩家移动
+     * @param coord 新的坐标
+     * @return 是否导致了区块的加载/卸载，若为true，通常意味着updateSet有更新
+     */
+    public boolean movePlayerTo(Vector3f coord){
+        player.setCoordinate(coord);
+        ChunkCoordinate newcoord = player.toChunkCoordinate(), oldcoord = player.getChunkCoordinate();
+        int ox = oldcoord.getX(), oz = oldcoord.getZ();
+        int nx = newcoord.getX(), nz = newcoord.getZ();
+        if(ox == nx && oz == nz) return false;
+        System.out.printf("old=(%d,%d) new=(%d,%d)\n", ox,oz,nx,nz);
+        updateBlockSet.clear();
+        ChunkCoordinate st = new ChunkCoordinate();
+        for(int dist = 0; dist < Constant.viewChunkDistance; dist++){
+            for(int i = 0; i <= dist; i++){
+                int j = dist - i;
+                unloadIfTooFar(st.setXZ(ox + i, oz + j), nx, nz);
+                unloadIfTooFar(st.setXZ(ox + i, oz - j), nx, nz);
+                unloadIfTooFar(st.setXZ(ox - i, oz + j), nx, nz);
+                unloadIfTooFar(st.setXZ(ox - i, oz - j), nx, nz);
+            }
+        }
+
+        for(int dist = 0; dist < Constant.viewChunkDistance; dist++){
+            for(int i = 0; i <= dist; i++){
+                int j = dist - i;
+                setChunkPreLoadIfNot(st.setXZ(nx + i, nz + j));
+                setChunkPreLoadIfNot(st.setXZ(nx + i, nz - j));
+                setChunkPreLoadIfNot(st.setXZ(nx - i, nz + j));
+                setChunkPreLoadIfNot(st.setXZ(nx - i, nz - j));
+            }
+        }
+
+        for(int dist = 0; dist < Constant.viewChunkDistance; dist++){
+            for(int i = 0; i <= dist; i++){
+                int j = dist - i;
+                loadChunkByCoord(st.setXZ(nx + i, nz + j));
+                loadChunkByCoord(st.setXZ(nx + i, nz - j));
+                loadChunkByCoord(st.setXZ(nx - i, nz + j));
+                loadChunkByCoord(st.setXZ(nx - i, nz - j));
+            }
+        }
+        player.setChunkCoordinate(newcoord);
+        System.out.println(updateBlockSet.size());
+        return true;
+    }
+
+    private void unloadIfTooFar(ChunkCoordinate oldCoordinate, int nx, int nz){
+        if(Math.abs(oldCoordinate.getX() - nx) + Math.abs(oldCoordinate.getZ() - nz) < Constant.viewChunkDistance)
+            return;
+        Chunk chunk = getChunkByCoordinate(oldCoordinate);
+        if(chunk != null && chunk.getLoadLevel() > 0){
+            System.out.printf("unload : %d %d\n", oldCoordinate.getX(), oldCoordinate.getZ());
+            chunk.unloadAllBlocksInChunk();
+        }
+    }
 }
