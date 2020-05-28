@@ -85,11 +85,10 @@ public class DimensionMap {
     }
 
     /**
-     * 通过玩家的位置重新刷新整个世界
+     * 通过玩家的位置刷新整个世界（目前暂不会卸载已加载的）
      * 所有应显示的方块全都加入updateBlockSet
      * 注：还没写，因为相当难写(考虑到之后有视距问题)，先用一个简单方法弄着
      */
-    @Deprecated
     public HashSet<BlockBackend> refreshWholeUpdateBlockSet(){
         ChunkCoordinate st = player.toChunkCoordinate();
         int cx = st.getX(), cz = st.getZ();
@@ -135,8 +134,10 @@ public class DimensionMap {
 
     /** 
      * 注：这是暂时的，最终版会弃用，有很多可用性不强的地方
+     * 更新：已弃用，请改用refreshWholeUpdateBlockSet()
      * @return 待更新方块列表
      */
+    @Deprecated
     public HashSet<BlockBackend> initializeWholeUpdateBlockSetTemp(){
         HashSet<BlockBackend> localUpdateSet = new HashSet<>();
         for(int i = Constant.minX; i<=Constant.maxX; i++)
@@ -147,6 +148,7 @@ public class DimensionMap {
     }
     
     /**
+     * 请用updateBlockSetTemp()
      * @return 返回毗邻的方块（的列表)，下标越界、空气除外
      */
     @Deprecated
@@ -170,6 +172,7 @@ public class DimensionMap {
         return updateBlockSet;
     }
     /**
+     * 请用updateBlockSetTemp()
      * @return 返回一个方块是否和空气毗邻
      */
     @Deprecated
@@ -196,12 +199,13 @@ public class DimensionMap {
     	//else
     	return false;
     }
+
     /**
-     * 注：只是暂时，效率与沿用性均不佳
+     * 注：这是最新版的函数，建议使用这个，如果有BUG立刻联系
      * 通过方块坐标，得到在该位置放置/破坏后 出现更新的方块
      * @param blockCoordinate 坐标
      * @param isBreak 该位置发生了破坏(true)/放置(false)
-     * @return 待更新方块列表（包括当前）
+     * @return 待更新方块列表（包括当前），其中blockbackend.getShouldBeShown可判断是否显示
      */
     public HashSet<BlockBackend> updateBlockSetTemp(BlockCoordinate blockCoordinate, boolean isBreak){
         updateBlockSet.clear();
