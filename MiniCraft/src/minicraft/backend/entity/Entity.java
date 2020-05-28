@@ -36,8 +36,4 @@ public abstract class Entity {
         return new BlockCoordinate((int)Math.floor(coordinate.x), (int)Math.floor(coordinate.y), (int)Math.floor(coordinate.z));
     }
 
-    
-
-    
-
 }
