@@ -26,12 +26,14 @@ import com.jme3.math.Vector3f;
 import com.jme3.renderer.queue.RenderQueue.Bucket;
 import com.jme3.scene.Geometry;
 import com.jme3.scene.Mesh;
+import com.jme3.scene.Spatial;
 import com.jme3.scene.Spatial.CullHint;
 import com.jme3.scene.shape.Box;
 import com.jme3.system.AppSettings;
 import com.jme3.system.JmeContext.Type;
 import com.jme3.texture.Texture;
 import com.jme3.texture.Texture.MagFilter;
+import com.jme3.util.SkyFactory;
 
 import minicraft.backend.constants.Constant;
 import minicraft.backend.map.DimensionMap;
@@ -111,6 +113,8 @@ public class MiniCraftApp extends SimpleApplication {
 		
 		overworld=new DimensionMap("overworld");
 		overworld.generateFromGenerator(true);
+		//should be replaced to stats for player
+		cam.setLocation(new Vector3f(0,5.5f,0));
 		
 		GeometryBlock.initialize(assetManager);
 		geoms=new GeometryBlock[256*64*256];
@@ -148,6 +152,9 @@ public class MiniCraftApp extends SimpleApplication {
         rootNode.addLight(sun);
         rootNode.addLight(ambient);
         
+        //设置天空颜色
+        viewPort.setBackgroundColor(new ColorRGBA(0.2f, 0.4f, 0.6f, 1));
+
 	}
 
 	/**
@@ -187,7 +194,7 @@ public class MiniCraftApp extends SimpleApplication {
 	BlockBackend findBlockByDir(Vector3f r0,Vector3f dir,boolean flagFindAir) {
 		Vector3f r;
 		BlockBackend block=null;
-		for(float d=0;d<=5;d+=0.1f) {//d for distance
+		for(float d=0;d<=7;d+=0.1f) {//d for distance
 			r=r0.add(dir.mult(d));
 			block=overworld.getBlockByVector3f(r);
 			
