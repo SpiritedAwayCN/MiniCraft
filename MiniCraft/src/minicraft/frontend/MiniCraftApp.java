@@ -3,14 +3,20 @@ package minicraft.frontend;
 import com.jme3.app.SimpleApplication;
 import com.jme3.app.StatsAppState;
 import com.jme3.app.state.ConstantVerifierState;
+
+import java.util.HashMap;
+import java.util.HashSet;
+
 import com.jme3.app.DebugKeysAppState;
 //import com.jme3.app.FlyCamAppState;
 //用了minicraft.frontend.FlyCamAppState
 import com.jme3.asset.plugins.FileLocator;
 import com.jme3.audio.AudioListenerState;
 import com.jme3.input.KeyInput;
+import com.jme3.input.MouseInput;
 import com.jme3.input.controls.ActionListener;
 import com.jme3.input.controls.KeyTrigger;
+import com.jme3.input.controls.MouseButtonTrigger;
 import com.jme3.light.AmbientLight;
 import com.jme3.light.DirectionalLight;
 import com.jme3.material.Material;
@@ -39,8 +45,11 @@ import minicraft.backend.utils.BlockCoordinate;
 public class MiniCraftApp extends SimpleApplication {
 	
 	public static final String INPUT_MAPPING_MENU = "MYAPP_Menu";
+	public static final String INPUT_BREAK_BLOCK = "MYAPP_Block_Break";
+	public static final String INPUT_PLACE_BLOCK = "MYAPP_Blace_Block";
 	
-	private Geometry geom;
+	DimensionMap overworld;
+	GeometryBlock[] geoms;//不得已才这么写，待改进
 	
 	
 	MiniCraftApp(){
@@ -71,6 +80,25 @@ public class MiniCraftApp extends SimpleApplication {
 						flyCam.setEnabled(!flyCam.isEnabled());
 				}
 			}, INPUT_MAPPING_MENU);
+			
+			inputManager.addMapping(INPUT_BREAK_BLOCK,new MouseButtonTrigger(MouseInput.BUTTON_LEFT));
+			inputManager.addListener(new ActionListener() {
+				@Override
+		        public void onAction(String name, boolean value, float tpf) {
+					if(value) {
+						breakBlockTemp();
+						//System.out.println("left button hit");
+					}
+				}
+			}, INPUT_BREAK_BLOCK);
+			inputManager.addMapping(INPUT_BREAK_BLOCK,new MouseButtonTrigger(MouseInput.BUTTON_LEFT));
+			inputManager.addListener(new ActionListener() {
+				@Override
+		        public void onAction(String name, boolean value, float tpf) {
+					if(value)
+						placeBlockTemp();
+				}
+			}, INPUT_BREAK_BLOCK);
 		}
 	}
 	
@@ -81,33 +109,33 @@ public class MiniCraftApp extends SimpleApplication {
 	public void simpleInitApp() {
 		System.out.println("MiniCraftApp.simpleInitApp()");
 		
-		DimensionMap overworld=new DimensionMap("overworld");
+		overworld=new DimensionMap("overworld");
 		overworld.generateFromGenerator(true);
-		//BlockBackend block=BlockBackend.getBlockInstanceByID(1);
-		//block.placeAt(new BlockCoordinate(0,1,0), overworld);
 		
 		GeometryBlock.initialize(assetManager);
+		geoms=new GeometryBlock[256*64*256];
 		
-		BlockBackend block;
-		for(int x=-32;x<=32;x++) {
-			System.out.println(x);
-			for(int y=4;y<5;y++) {
-				for(int z=-32;z<=32;z++) {
-					block=overworld.getBlockByCoordinate(new BlockCoordinate(x,y,z));
-					if(block.getBlockid()==0)
-						continue;
-					geom=new GeometryBlock(overworld.getBlockByCoordinate(new BlockCoordinate(x,y,z)));
-					rootNode.attachChild(geom);
-					rootNode.detachChild(geom);
-				}
+		//BlockBackend block;
+		new Thread(()->
+		{
+			HashSet<BlockBackend> blocksToAdd=overworld.initializeWholeUpdateBlockSetTemp();
+			Geometry geom;
+			for(BlockBackend block:blocksToAdd) {
+				if(block.getBlockid()==0)
+					continue;
+				geom=new GeometryBlock(overworld.getBlockByCoordinate(block.getBlockCoordinate()));
+				rootNode.attachChild(geom);
+				geoms[geom.hashCode()]=(GeometryBlock) geom;
+				//只好手写hashSet
 			}
-		}
+			blocksToAdd.clear();
+		}).run();
 		
         
         // 定向光
         DirectionalLight sun = new DirectionalLight();
         sun.setDirection(new Vector3f(-1, -2, -3));
-
+        
         // 环境光
         AmbientLight ambient = new AmbientLight();
 
@@ -121,17 +149,65 @@ public class MiniCraftApp extends SimpleApplication {
         rootNode.addLight(ambient);
         
 	}
-	
+	GeometryBlock getGeomByBlock(BlockBackend block) 
+			throws NullPointerException{
+		if(block==null)
+			throw new NullPointerException();
+		return geoms[new GeometryBlock(block).hashCode()];
+	}
 	/**
 	 * 主循环
 	 */
 	@Override
 	public void simpleUpdate(float deltaTime) {
-		// 旋转速度：每秒360°
-		float speed = FastMath.TWO_PI;
-		// 让方块匀速旋转
-		//geom.rotate(0, deltaTime * speed, 0);
-		//geom.move(0.0f,0.1f*deltaTime,0.0f);
+		
+		
+	}
+	public void breakBlockTemp() {
+		Vector3f vFwd=cam.getDirection();
+		Vector3f vPos=cam.getLocation();
+		Vector3f v;
+		for(float d=0;d<=5;d+=0.1f) {
+			v=vPos.add(vFwd.mult(d));
+			BlockCoordinate r=new BlockCoordinate(
+					(int)Math.round(v.x),(int)Math.round(v.y),(int)Math.round(v.z));
+			//find the block to be break
+			BlockBackend block=overworld.getBlockByCoordinate(r);
+			if(block.getBlockid()!=0) {
+				
+				//因为后端的技术原因...先把这个放在后面
+				block.destoryBlock();
+				block=BlockBackend.getBlockInstanceByID(0);
+				block.placeAt(r, overworld);
+				rootNode.detachChild(getGeomByBlock(block));
+				
+				
+				Geometry geom;
+				
+				//更新周围方块
+				HashSet<BlockBackend> blocksToUpdate=overworld.updateBlockSetTemp(r);
+				System.out.println(blocksToUpdate.size());
+				//更新周围的方块，将其显示
+				for(BlockBackend b:blocksToUpdate) {
+					
+					if(b.getBlockid()==0)//空气不算
+						continue;
+					geom=new GeometryBlock(b);
+					if(geoms[geom.hashCode()]==null) {
+						
+						rootNode.attachChild(geom);
+						geoms[geom.hashCode()]=(GeometryBlock) geom;
+					}
+				}
+				blocksToUpdate.clear();//应后端要求，清空之
+				
+				
+				
+				break;
+			}
+		}
+	}
+	public void placeBlockTemp() {
 		
 	}
 

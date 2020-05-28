@@ -103,7 +103,29 @@ public class DimensionMap {
             }
         return updateBlockSet;
     }
-
+    
+    /**
+     * @return 返回毗邻的方块（的列表)，下标越界、空气除外
+     */
+    public HashSet<BlockBackend> updateAdjacentBlokTemp(BlockCoordinate blockCoord){
+    	final int dx[] = {1, 0, -1, 0, 0, 0}, dz[] = {0, 1, 0, -1, 0, 0}, dy[]={0, 0, 0, 0, 1, -1};
+    	for(int dir = 0; dir < 6; dir++){
+    		BlockCoordinate r=new BlockCoordinate(blockCoord.getX()+dx[dir],
+    				blockCoord.getY()+dy[dir],
+    				blockCoord.getZ()+dz[dir]
+    				);
+    		if(r.getX()<Constant.minX || r.getX()>Constant.maxX ||
+    				r.getY()<Constant.minY || r.getY()>=Constant.maxY ||
+    				r.getZ()<Constant.minZ || r.getZ()>Constant.maxZ)
+    			continue;
+	    	BlockBackend b=this.getBlockByCoordinate(r);
+	    	if(b.getBlockid()==0)//空气不算
+				continue;
+			updateBlockSet.add(b);
+	    }
+    	
+        return updateBlockSet;
+    }
     /**
      * 注：只是暂时，效率与沿用性均不佳
      * 通过方块坐标，得到在该位置放置/破坏后 出现更新的方块(放置/)
@@ -118,7 +140,7 @@ public class DimensionMap {
         }
         return updateBlockSet;
     }
-
+    
     private void updateBlockRecusive(BlockCoordinate blockCoordinate){
         BlockBackend block = getBlockByCoordinate(blockCoordinate);
         if(block.getBlockid()==0 || updateBlockSet.contains(block)) return;
