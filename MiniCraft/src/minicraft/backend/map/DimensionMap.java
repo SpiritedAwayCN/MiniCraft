@@ -102,7 +102,7 @@ public class DimensionMap {
     public HashSet<BlockBackend> refreshWholeUpdateBlockSet(){
         ChunkCoord st = player.toChunkCoordinate();
         int cx = st.getX(), cz = st.getZ();
-
+        
         //全部设为预加载
         for(int dist = 0; dist < Constant.viewChunkDistance; dist++){
             for(int i = 0; i <= dist; i++){
@@ -224,7 +224,8 @@ public class DimensionMap {
      * @return 待更新方块列表（包括当前），其中blockbackend.getShouldBeShown可判断是否显示
      */
     public HashSet<BlockBackend> updateBlockSetTemp(BlockCoord blockCoordinate, boolean isBreak){
-        updateBlockSet.clear();
+        //由前端修改
+    	//updateBlockSet.clear();
         BlockBackend block = getBlockByCoord(blockCoordinate);
         if(block.isTransparent()){
             // 透明就只更新当前这个
@@ -307,7 +308,8 @@ public class DimensionMap {
         int nx = newcoord.getX(), nz = newcoord.getZ();
         if(ox == nx && oz == nz) return false;
         System.out.printf("old=(%d,%d) new=(%d,%d)\n", ox,oz,nx,nz);
-        updateBlockSet.clear();
+        //StarSky修改
+        //updateBlockSet.clear();
         ChunkCoord st = new ChunkCoord();
         for(int dist = 0; dist < Constant.viewChunkDistance; dist++){
             for(int i = 0; i <= dist; i++){

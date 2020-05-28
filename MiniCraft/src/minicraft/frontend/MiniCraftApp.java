@@ -123,7 +123,7 @@ public class MiniCraftApp extends SimpleApplication {
 			for(BlockBackend block:blocksToAdd) {
 				if(block.getBlockid()==0)
 					continue;
-				geom=new GeometryBlock(overworld.getBlockByCoord(block.getBlockCoord()));
+				geom=new GeometryBlock(block);
 				rootNode.attachChild(geom);
 				geoms[geom.hashCode()]=(GeometryBlock) geom;
 				//只好手写hashSet
@@ -149,27 +149,40 @@ public class MiniCraftApp extends SimpleApplication {
         rootNode.addLight(ambient);
         
 	}
-	GeometryBlock getGeomByBlock(BlockBackend block) 
-			throws NullPointerException{
-		if(block==null) {
-			throw new NullPointerException();
-		}
-		if(geoms[block.hashCode()]==null) {
-			geoms[block.hashCode()]=new GeometryBlock(block);
-		}
-		return geoms[block.hashCode()];
-	}
+
 	/**
 	 * 主循环
 	 */
 	@Override
 	public void simpleUpdate(float deltaTime) {
 		updateBlockVisibility();
-		
 	}
 	
 	void updateBlockVisibility() {
-		
+		//更新周围方块，使其显示
+		HashSet<BlockBackend> blocksToUpdate=overworld.getUpdateBlockSet();
+		if(blocksToUpdate.size()>0)
+			System.out.println(blocksToUpdate.size());
+		for(BlockBackend b:blocksToUpdate) {
+			//System.out.println(b.getBlockCoord() + " " + b.getShouldBeShown());
+			if(b.getBlockid()==0)//空气不算
+				continue;
+			if(b.getShouldBeShown() == (geoms[b.hashCode()]!=null)) {
+				continue;//显示状态相同，不用更新
+			}
+			//添加显示
+			if(b.getShouldBeShown()) {
+				GeometryBlock geom=new GeometryBlock(b);
+				rootNode.attachChild(geom);
+				geoms[b.hashCode()]=(GeometryBlock) geom;
+			}else {//不显示
+				System.out.println("rootNode.detaching sth.");
+				rootNode.detachChild(geoms[b.hashCode()]);
+				geoms[b.hashCode()]=null;
+				
+			}
+		}
+		blocksToUpdate.clear();//将更新一笔勾销
 	}
 	/*
 	 * @return 当flag=true,返回找到的最后一个空气方块；flag=false，返回找到的第一个实体方块
@@ -197,39 +210,16 @@ public class MiniCraftApp extends SimpleApplication {
 		return null;
 	}
 	public void breakBlockTemp() {
+		//获得视线指向的方块
 		BlockBackend block=findBlockByDir(cam.getLocation(),cam.getDirection(),false);
 		if(block==null) return;//no block within reach
 		BlockCoord r=block.getBlockCoord();
 		
-		//更新周围方块，使其显示
-		Geometry geom;
-		HashSet<BlockBackend> blocksToUpdate=overworld.updateBlockSetTemp(r, true);
-		// HashSet<BlockBackend> blocksToUpdate=overworld.updateAdjacentBlockTemp(r);
-		System.out.println(blocksToUpdate.size());
-		for(BlockBackend b:blocksToUpdate) {
-			System.out.println(b.getBlockCoord() + " " + b.getShouldBeShown());
-			if(b.getBlockid()==0 || !b.getShouldBeShown())//空气不算
-				continue;
-			geom=new GeometryBlock(b);
-			if(geoms[geom.hashCode()]==null) {
-				rootNode.attachChild(geom);
-				geoms[geom.hashCode()]=(GeometryBlock) geom;
-			}
-		}
-		blocksToUpdate.clear();//应后端要求，清空之
-		
-		//破坏方块本身
-		//因为后端的技术原因...先把这个放在后面
-		if(geoms[block.hashCode()]==null)
-			throw new RuntimeException();
-		rootNode.detachChild(getGeomByBlock(block));
-		geoms[block.hashCode()]=null;
 		block.destoryBlock();
-		// block=BlockBackend.getBlockInstanceByID(0);
-		// block.placeAt(r, overworld);
-			
-		//一次只破坏一个方块
-			
+		overworld.updateBlockSetTemp(r, true);
+		block=overworld.getBlockByCoord(r);
+		//block.setShouldBeShown(false);
+
 	}
 	public void placeBlockTemp() {
 		//System.out.println("app.placeBlockTemp()");
@@ -240,33 +230,7 @@ public class MiniCraftApp extends SimpleApplication {
 		//放置方块
 		block=BlockBackend.getBlockInstanceByID(3);//放泥土
 		block.placeAt(r, overworld);
-		// rootNode.attachChild(getGeomByBlock(block));
-			
-		//更新周围方块的显示状态
-		Geometry geom;
-		HashSet<BlockBackend> blocksToUpdate=overworld.updateBlockSetTemp(r, false);
-		// HashSet<BlockBackend> blocksToUpdate=overworld.updateAdjacentBlockTemp(r);
-		System.out.println(blocksToUpdate.size());
-		for(BlockBackend b:blocksToUpdate) {
-			System.out.println(b.getBlockCoord() + " " + b.getShouldBeShown());
-			if(b.getBlockid()==0)
-				continue;
-			// if(!overworld.isBlockAdjacentToAir(b.getBlockCoordinate())){
-			if(b.getShouldBeShown()){
-				rootNode.attachChild(getGeomByBlock(b));
-			}else{
-				geom=geoms[b.hashCode()];
-				rootNode.detachChild(geom);
-				geoms[geom.hashCode()]=null;
-			}
-			
-				
-			// }
-			
-		}
-		blocksToUpdate.clear();//应后端要求，清空之
-		
-		//一次只放置一个方块
+		overworld.updateBlockSetTemp(r, false);
 
 	}
 
