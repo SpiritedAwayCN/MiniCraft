@@ -183,10 +183,12 @@ public class MiniCraftApp extends SimpleApplication {
 			
 			//更新周围方块，使其显示
 			Geometry geom;
-			HashSet<BlockBackend> blocksToUpdate=overworld.updateAdjacentBlockTemp(r);
-			//System.out.println(blocksToUpdate.size());
+			HashSet<BlockBackend> blocksToUpdate=overworld.updateBlockSetTemp(r, true);
+			// HashSet<BlockBackend> blocksToUpdate=overworld.updateAdjacentBlockTemp(r);
+			System.out.println(blocksToUpdate.size());
 			for(BlockBackend b:blocksToUpdate) {
-				if(b.getBlockid()==0)//空气不算
+				System.out.println(b.getBlockCoordinate() + " " + b.getShouldBeShown());
+				if(b.getBlockid()==0 || !b.getShouldBeShown())//空气不算
 					continue;
 				geom=new GeometryBlock(b);
 				if(geoms[geom.hashCode()]==null) {
@@ -203,8 +205,8 @@ public class MiniCraftApp extends SimpleApplication {
 			rootNode.detachChild(getGeomByBlock(block));
 			geoms[block.hashCode()]=null;
 			block.destoryBlock();
-			block=BlockBackend.getBlockInstanceByID(0);
-			block.placeAt(r, overworld);
+			// block=BlockBackend.getBlockInstanceByID(0);
+			// block.placeAt(r, overworld);
 			
 			//一次只破坏一个方块
 			break;
@@ -234,20 +236,28 @@ public class MiniCraftApp extends SimpleApplication {
 			//放置方块
 			block=BlockBackend.getBlockInstanceByID(3);//放泥土
 			block.placeAt(r, overworld);
-			rootNode.attachChild(getGeomByBlock(block));
+			// rootNode.attachChild(getGeomByBlock(block));
 			
 			//更新周围方块的显示状态
 			Geometry geom;
-			HashSet<BlockBackend> blocksToUpdate=overworld.updateAdjacentBlockTemp(r);
-			//System.out.println(blocksToUpdate.size());
+			HashSet<BlockBackend> blocksToUpdate=overworld.updateBlockSetTemp(r, false);
+			// HashSet<BlockBackend> blocksToUpdate=overworld.updateAdjacentBlockTemp(r);
+			System.out.println(blocksToUpdate.size());
 			for(BlockBackend b:blocksToUpdate) {
+				System.out.println(b.getBlockCoordinate() + " " + b.getShouldBeShown());
 				if(b.getBlockid()==0)
 					continue;
-				if(!overworld.isBlockAdjacentToAir(b.getBlockCoordinate())){
+				// if(!overworld.isBlockAdjacentToAir(b.getBlockCoordinate())){
+				if(b.getShouldBeShown()){
+					rootNode.attachChild(getGeomByBlock(b));
+				}else{
 					geom=geoms[b.hashCode()];
 					rootNode.detachChild(geom);
 					geoms[geom.hashCode()]=null;
 				}
+				
+					
+				// }
 				
 			}
 			blocksToUpdate.clear();//应后端要求，清空之

@@ -10,4 +10,10 @@ public class PlayerBackend extends Entity{
     public PlayerBackend(Vector3f coord, String name){
         super(coord, name);
     }
+
+    @Override
+    public void setCoordinate(Vector3f coordinate) {
+        super.setCoordinate(coordinate);
+        
+    }
 }
