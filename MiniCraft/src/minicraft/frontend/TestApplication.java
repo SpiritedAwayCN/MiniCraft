@@ -3,6 +3,9 @@ package minicraft.frontend;
 import com.jme3.app.SimpleApplication;
 import com.jme3.app.StatsAppState;
 import com.jme3.app.state.ConstantVerifierState;
+
+import java.util.HashSet;
+
 import com.jme3.app.DebugKeysAppState;
 //import com.jme3.app.FlyCamAppState;
 //用了minicraft.frontend.FlyCamAppState
@@ -26,6 +29,10 @@ import com.jme3.system.AppSettings;
 import com.jme3.system.JmeContext.Type;
 import com.jme3.texture.Texture;
 import com.jme3.texture.Texture.MagFilter;
+
+import minicraft.backend.map.DimensionMap;
+import minicraft.backend.map.block.BlockBackend;
+import minicraft.backend.utils.BlockCoordinate;
 
 /**
  * Minicraft主类
@@ -74,18 +81,26 @@ public class TestApplication extends SimpleApplication {
 	 */
 	@Override
 	public void simpleInitApp() {
-		System.out.println("TestApplication.simpleInitApp()");
+		System.out.println("TestApp.simpleInitApp()");
+		
+		DimensionMap map=new DimensionMap("map");
+		map.generateFromGenerator(true);
+		BlockBackend blockb=map.getBlockByCoordinate(new BlockCoordinate(0,4,0));
+		GeometryBlock.initialize(assetManager);
+		
+		System.out.println(new GeometryBlock(blockb).hashCode());
+
 		
 		
 		
-		rootNode.attachChild(geom);
+		
 		
 		
         
         // 定向光
         DirectionalLight sun = new DirectionalLight();
         sun.setDirection(new Vector3f(-1, -2, -3));
-
+        
         // 环境光
         AmbientLight ambient = new AmbientLight();
 
@@ -129,6 +144,10 @@ public class TestApplication extends SimpleApplication {
 		app.setSettings(settings);// 应用参数
 		app.setShowSettings(false);
 		app.start();
-	}
+		
+		
 
+		//Integer[] arr=new Integer[10];
+		//System.out.println((int)Math.floor(-1.));
+	}
 }

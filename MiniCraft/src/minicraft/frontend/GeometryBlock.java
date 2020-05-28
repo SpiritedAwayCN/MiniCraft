@@ -6,6 +6,7 @@ import minicraft.backend.utils.BlockCoordinate;
 
 import com.jme3.asset.AssetManager;
 import com.jme3.asset.AssetNotFoundException;
+import com.jme3.asset.TextureKey;
 import com.jme3.asset.plugins.FileLocator;
 import com.jme3.material.Material;
 import com.jme3.scene.Geometry;
@@ -15,6 +16,8 @@ import com.jme3.texture.Texture.MagFilter;
 public class GeometryBlock extends Geometry {
 	
 private static Material[] materails;
+	
+
 	
 	public static void initialize (AssetManager assetManager)
 			throws AssetNotFoundException
@@ -41,7 +44,10 @@ private static Material[] materails;
 			materails[i] = new Material(assetManager, "Common/MatDefs/Light/Lighting.j3md");
 			// 设置纹理贴图
 			if(texFilename[i]!=null){
-				Texture tex = assetManager.loadTexture(texFilename[i]);
+				TextureKey param=new TextureKey(texFilename[i]);
+				param.setGenerateMips(true);
+				Texture tex = assetManager.loadTexture(param);
+				
 	        	tex.setMagFilter(MagFilter.Nearest);
 	        	materails[i].setTexture("DiffuseMap", tex);
 			}
@@ -57,8 +63,9 @@ private static Material[] materails;
 	//BlockFrontend block;
 	BlockBackend block;
 	
+	@Deprecated
 	public GeometryBlock(BlockCoordinate pos,int Blockid) {
-		super(null, new BlockFrontend(Blockid));
+		super(null, BlockFrontend.getBlockInstanceByID(Blockid));
 		this.setMaterial(materails[Blockid]);
 		this.move(pos.getX(),pos.getY(),pos.getZ());
 	}
@@ -67,9 +74,21 @@ private static Material[] materails;
 		this.block=null;
 	}
 	public GeometryBlock(BlockBackend block) {
-		super(null,new BlockFrontend(block.getBlockid()));
+		super(null,BlockFrontend.getBlockInstanceByID(block.getBlockid()));
 		this.setMaterial(materails[block.getBlockid()]);
 		BlockCoordinate pos=block.getBlockCoordinate();
 		this.move(pos.getX(),pos.getY(),pos.getZ());
+		this.block=block;
+		
+	}
+	
+	@Override
+	public int hashCode() {
+		if(block==null)
+			return -1;
+		BlockCoordinate r=block.getBlockCoordinate();
+		return (r.getX()-Constant.minX)*Constant.maxY*(Constant.maxZ-Constant.minZ)
+				+(r.getY()-Constant.minY)*(Constant.maxZ-Constant.minZ)
+				+(r.getZ()-Constant.minZ);
 	}
 }
