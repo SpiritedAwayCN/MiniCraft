@@ -27,4 +27,9 @@ public class AirBlock extends BlockBackend{
     public static int getBlockidStatic() {
         return blockID;
     }
+
+    @Override
+    public boolean getShouldBeShown() {
+        return false;
+    }
 }

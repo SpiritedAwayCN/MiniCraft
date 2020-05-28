@@ -59,4 +59,9 @@ public class BlockCoordinate {
         if(cz < 0) cz -= Constant.chunkZ - 1;
         return new ChunkCoordinate(cx / Constant.chunkX, cz / Constant.chunkZ);
     }
+
+    @Override
+    public String toString() {
+        return "(" + x + "," + y + "," + z + ")";
+    }
 }

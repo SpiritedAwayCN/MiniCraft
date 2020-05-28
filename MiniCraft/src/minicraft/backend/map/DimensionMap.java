@@ -46,11 +46,13 @@ public class DimensionMap {
     }
 
     public Chunk getChunkByCoordinate(ChunkCoordinate chunkCoordinate){
+        if(!chunkCoordinate.isValid()) return null;
         return mapChunks[chunkCoordinate.getX() + chunkIndexBiasX][chunkCoordinate.getZ() + chunkIndexBiasZ];
     }
 
     public BlockBackend getBlockByCoordinate(BlockCoordinate blockCoordinate){
         Chunk chunk = getChunkByCoordinate(blockCoordinate.toChunkCoordnate());
+        if(chunk == null) return null;
         int bx = blockCoordinate.getX() - chunk.getChunkCoordinate().getX() * Constant.chunkX;
         int by = blockCoordinate.getY();
         int bz = blockCoordinate.getZ() - chunk.getChunkCoordinate().getZ() * Constant.chunkZ;
@@ -87,9 +89,22 @@ public class DimensionMap {
      * 注：还没写，因为相当难写(考虑到之后有视距问题)，先用一个简单方法弄着
      */
     @Deprecated
-    public void refreshWholeUpdateBlockSet(){
+    public HashSet<BlockBackend> refreshWholeUpdateBlockSet(){
         ChunkCoordinate st = player.toChunkCoordinate();
         int cx = st.getX(), cz = st.getZ();
+
+        //全部设为预加载
+        for(int dist = 0; dist < Constant.viewChunkDistance; dist++){
+            for(int i = 0; i <= dist; i++){
+                int j = dist - i;
+                setChunkPreLoad(st.setXZ(cx + i, cz + j));
+                setChunkPreLoad(st.setXZ(cx + i, cz - j));
+                setChunkPreLoad(st.setXZ(cx - i, cz + j));
+                setChunkPreLoad(st.setXZ(cx - i, cz - j));
+            }
+        }
+
+        //再开始变强加载
         for(int dist = 0; dist < Constant.viewChunkDistance; dist++){
             for(int i = 0; i <= dist; i++){
                 int j = dist - i;
@@ -99,11 +114,22 @@ public class DimensionMap {
                 loadChunkByCoord(st.setXZ(cx - i, cz - j));
             }
         }
+
+        return this.updateBlockSet;
+    }
+
+    private void setChunkPreLoad(ChunkCoordinate chunkCoordinate){
+        Chunk chunk= this.getChunkByCoordinate(chunkCoordinate);
+        if(chunk != null)
+            chunk.setLoadLevel(1);
     }
 
     private void loadChunkByCoord(ChunkCoordinate chunkCoordinate){
-        if(!chunkCoordinate.isValid()) return;
         Chunk chunk = getChunkByCoordinate(chunkCoordinate);
+        if(chunk != null && chunk.getLoadLevel() == 1){
+            System.out.printf("%d %d\n", chunkCoordinate.getX(), chunkCoordinate.getZ());
+            chunk.loadAllBlocksInChunk();
+        }
     }
 
     /** 

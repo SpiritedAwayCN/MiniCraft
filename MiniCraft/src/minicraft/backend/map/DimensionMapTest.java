@@ -2,6 +2,8 @@ package minicraft.backend.map;
 
 import static org.junit.Assert.*;
 
+import java.util.HashSet;
+
 import org.junit.Test;
 
 import minicraft.backend.constants.Constant;
@@ -73,5 +75,20 @@ public class DimensionMapTest {
                 }
             }
         }
+    }
+
+    @Test
+    public void initUpdateTest(){
+        DimensionMap overworld = new DimensionMap("world");
+        overworld.generateFromGenerator(true);
+
+        HashSet<BlockBackend> blockset = overworld.refreshWholeUpdateBlockSet();
+
+        assertEquals(6400, blockset.size());
+
+        for(BlockBackend b: blockset){
+            assertEquals(4, b.getBlockCoordinate().getY());
+        }
+
     }
 }
