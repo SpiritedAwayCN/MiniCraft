@@ -5,7 +5,7 @@ import minicraft.backend.map.block.BlockBackend;
 import minicraft.backend.utils.*;
 
 public class Chunk {
-    private ChunkCoordinate chunkCoordinate;
+    private ChunkCoord chunkCoordinate;
     private BlockBackend[][][] blocks;
     private DimensionMap map;
 
@@ -13,7 +13,7 @@ public class Chunk {
 
     private int loadLevel = 0;  //0 不加载 1 准备加载  2已加载
 
-    public Chunk(ChunkCoordinate chunkCoordinate, int[][][] initialBlockMap, DimensionMap map){
+    public Chunk(ChunkCoord chunkCoordinate, int[][][] initialBlockMap, DimensionMap map){
         this.chunkCoordinate = chunkCoordinate;
         blocks = new BlockBackend[Constant.chunkX][Constant.maxY][Constant.chunkZ];
 
@@ -25,7 +25,7 @@ public class Chunk {
                 for(int k = 0; k < Constant.chunkZ; k++){
                     this.blocks[i][j][k] = BlockBackend.getBlockInstanceByID(initialBlockMap[i + biasX - Constant.minX][j][k + biasZ - Constant.minZ]);
                     this.blocks[i][j][k].setChunk(this);
-                    this.blocks[i][j][k].setBlockCoordinate(new BlockCoordinate(i + biasX, j, k + biasZ));
+                    this.blocks[i][j][k].setBlockCoord(new BlockCoord(i + biasX, j, k + biasZ));
 
                 }
         
@@ -33,7 +33,7 @@ public class Chunk {
         this.map = map;
     }
 
-    public ChunkCoordinate getChunkCoordinate() {
+    public ChunkCoord getChunkCoordinate() {
         return chunkCoordinate;
     }
 
@@ -44,10 +44,10 @@ public class Chunk {
      * @return 成功放置为true，失败则false
      */
     public boolean setBlockInChunk(BlockBackend block){
-        if (block.getBlockCoordinate() == null) return false;
-        int cx = block.getBlockCoordinate().getX() - this.chunkCoordinate.getX() * Constant.chunkX;
-        int cy = block.getBlockCoordinate().getY();
-        int cz = block.getBlockCoordinate().getZ() - this.chunkCoordinate.getZ() * Constant.chunkZ;
+        if (block.getBlockCoord() == null) return false;
+        int cx = block.getBlockCoord().getX() - this.chunkCoordinate.getX() * Constant.chunkX;
+        int cy = block.getBlockCoord().getY();
+        int cz = block.getBlockCoord().getZ() - this.chunkCoordinate.getZ() * Constant.chunkZ;
 
         if(cx < 0 || cx >= Constant.chunkX || cy < 0 || cy >= Constant.maxY || cz < 0 || cz >= Constant.chunkZ)
             return false;
@@ -107,7 +107,7 @@ public class Chunk {
         boolean flag = indexValid(x, z);
         if(y < 0 || y >= Constant.maxY) return;
         if(!flag){
-            block = map.getBlockByCoordinate(new BlockCoordinate(x+biasX, y, z+biasZ));
+            block = map.getBlockByCoord(new BlockCoord(x+biasX, y, z+biasZ));
             // 当且仅当相邻区块中 有透明且未被渲染的透明方块才继续
             if(block == null || block.getChunk().getLoadLevel() < 2 || block.getBlockid()==0) return;
             if(!(block.isTransparent() && block.getShouldBeShown() == false)){

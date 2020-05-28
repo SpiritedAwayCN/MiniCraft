@@ -2,7 +2,7 @@ package minicraft.frontend;
 
 import minicraft.backend.constants.*;
 import minicraft.backend.map.block.BlockBackend;
-import minicraft.backend.utils.BlockCoordinate;
+import minicraft.backend.utils.BlockCoord;
 
 import com.jme3.asset.AssetManager;
 import com.jme3.asset.AssetNotFoundException;
@@ -64,7 +64,7 @@ private static Material[] materails;
 	BlockBackend block;
 	
 	@Deprecated
-	public GeometryBlock(BlockCoordinate pos,int Blockid) {
+	public GeometryBlock(BlockCoord pos,int Blockid) {
 		super(null, BlockFrontend.getBlockInstanceByID(Blockid));
 		this.setMaterial(materails[Blockid]);
 		this.move(pos.getX(),pos.getY(),pos.getZ());
@@ -76,7 +76,7 @@ private static Material[] materails;
 	public GeometryBlock(BlockBackend block) {
 		super(null,BlockFrontend.getBlockInstanceByID(block.getBlockid()));
 		this.setMaterial(materails[block.getBlockid()]);
-		BlockCoordinate pos=block.getBlockCoordinate();
+		BlockCoord pos=block.getBlockCoord();
 		this.move(pos.getX(),pos.getY(),pos.getZ());
 		this.block=block;
 		
@@ -86,7 +86,7 @@ private static Material[] materails;
 	public int hashCode() {
 		if(block==null)
 			return -1;
-		BlockCoordinate r=block.getBlockCoordinate();
+		BlockCoord r=block.getBlockCoord();
 		return (r.getX()-Constant.minX)*Constant.maxY*(Constant.maxZ-Constant.minZ)
 				+(r.getY()-Constant.minY)*(Constant.maxZ-Constant.minZ)
 				+(r.getZ()-Constant.minZ);

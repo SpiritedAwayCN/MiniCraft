@@ -5,27 +5,27 @@ import minicraft.backend.map.*;
 import minicraft.backend.utils.*;
 
 public abstract class BlockBackend {
-    protected BlockCoordinate blockCoordinate;
+    protected BlockCoord blockCoord;
     protected String name;
     protected Chunk chunk;
     protected boolean shouldBeShown;
-
+    
     protected BlockBackend(String name){
         this.name = name;
         this.shouldBeShown = false;
     }
 
-    protected BlockBackend(BlockCoordinate blockCoordinate, DimensionMap map, String name){
-        this.blockCoordinate = blockCoordinate;
-        this.chunk = map.getChunkByCoordinate(blockCoordinate.toChunkCoordnate());
+    protected BlockBackend(BlockCoord blockCoordinate, DimensionMap map, String name){
+        this.blockCoord = blockCoordinate;
+        this.chunk = map.getChunkByCoord(blockCoordinate.toChunkCoord());
         this.name = name;
         this.shouldBeShown = false;
     }
 
     public abstract int getBlockid();
 
-    public BlockCoordinate getBlockCoordinate() {
-        return blockCoordinate;
+    public BlockCoord getBlockCoord() {
+        return blockCoord;
     }
 
     public String getName() {
@@ -45,8 +45,8 @@ public abstract class BlockBackend {
     }
 
     @Deprecated
-    public void setBlockCoordinate(BlockCoordinate blockCoordinate) {
-        this.blockCoordinate = blockCoordinate;
+    public void setBlockCoord(BlockCoord blockCoord) {
+        this.blockCoord = blockCoord;
     }
 
     @Deprecated
@@ -70,14 +70,14 @@ public abstract class BlockBackend {
     public boolean destoryBlock(){
         if(this.chunk == null) return false;
         BlockBackend block = getBlockInstanceByID(0); // air
-        block.blockCoordinate = this.blockCoordinate;
+        block.blockCoord = this.blockCoord;
         block.chunk = this.chunk;
 
         if(this.chunk.setBlockInChunk(block) == false)
             return false;
         
         this.chunk = null;
-        this.blockCoordinate = null;
+        this.blockCoord = null;
         return true;
     }
 
@@ -87,10 +87,10 @@ public abstract class BlockBackend {
      * @param map 维度地图
      * @return 成功则true，否则为false
      */
-    public boolean placeAt(BlockCoordinate blockCoordinate, DimensionMap map){
-        if(this.blockCoordinate != null) return false;
-        this.blockCoordinate = blockCoordinate;
-        this.chunk = map.getChunkByCoordinate(blockCoordinate.toChunkCoordnate());
+    public boolean placeAt(BlockCoord blockCoordinate, DimensionMap map){
+        if(this.blockCoord != null) return false;
+        this.blockCoord = blockCoordinate;
+        this.chunk = map.getChunkByCoord(blockCoordinate.toChunkCoord());
 
         return this.chunk.setBlockInChunk(this);
     }
@@ -114,7 +114,7 @@ public abstract class BlockBackend {
     }
     @Override
 	public int hashCode() {
-		BlockCoordinate r=this.blockCoordinate;
+		BlockCoord r=this.blockCoord;
 		return (r.getX()-Constant.minX)*Constant.maxY*(Constant.maxZ-Constant.minZ)
 				+(r.getY()-Constant.minY)*(Constant.maxZ-Constant.minZ)
 				+(r.getZ()-Constant.minZ);

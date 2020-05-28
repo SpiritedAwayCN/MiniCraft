@@ -36,7 +36,7 @@ import com.jme3.texture.Texture.MagFilter;
 import minicraft.backend.constants.Constant;
 import minicraft.backend.map.DimensionMap;
 import minicraft.backend.map.block.BlockBackend;
-import minicraft.backend.utils.BlockCoordinate;
+import minicraft.backend.utils.BlockCoord;
 
 /**
  * Minicraft主类
@@ -123,7 +123,7 @@ public class MiniCraftApp extends SimpleApplication {
 			for(BlockBackend block:blocksToAdd) {
 				if(block.getBlockid()==0)
 					continue;
-				geom=new GeometryBlock(overworld.getBlockByCoordinate(block.getBlockCoordinate()));
+				geom=new GeometryBlock(overworld.getBlockByCoord(block.getBlockCoord()));
 				rootNode.attachChild(geom);
 				geoms[geom.hashCode()]=(GeometryBlock) geom;
 				//只好手写hashSet
@@ -164,107 +164,110 @@ public class MiniCraftApp extends SimpleApplication {
 	 */
 	@Override
 	public void simpleUpdate(float deltaTime) {
-		
+		updateBlockVisibility();
 		
 	}
-	public void breakBlockTemp() {
-		Vector3f vFwd=cam.getDirection();
-		Vector3f vPos=cam.getLocation();
-		Vector3f v;
-		for(float d=0;d<=5;d+=0.1f) {
-			v=vPos.add(vFwd.mult(d));
-			BlockCoordinate r=new BlockCoordinate(
-					(int)Math.round(v.x),(int)Math.round(v.y),(int)Math.round(v.z));
-			//find the block to be break
-			BlockBackend block=overworld.getBlockByCoordinate(r);
+	
+	void updateBlockVisibility() {
+		
+	}
+	/*
+	 * @return 当flag=true,返回找到的最后一个空气方块；flag=false，返回找到的第一个实体方块
+	 */
+	BlockBackend findBlockByDir(Vector3f r0,Vector3f dir,boolean flagFindAir) {
+		Vector3f r;
+		BlockBackend block=null;
+		for(float d=0;d<=5;d+=0.1f) {//d for distance
+			r=r0.add(dir.mult(d));
+			block=overworld.getBlockByVector3f(r);
+			//跳过空气
 			if(block.getBlockid()==0) {
 				continue;
 			}
 			
-			//更新周围方块，使其显示
-			Geometry geom;
-			HashSet<BlockBackend> blocksToUpdate=overworld.updateBlockSetTemp(r, true);
-			// HashSet<BlockBackend> blocksToUpdate=overworld.updateAdjacentBlockTemp(r);
-			System.out.println(blocksToUpdate.size());
-			for(BlockBackend b:blocksToUpdate) {
-				System.out.println(b.getBlockCoordinate() + " " + b.getShouldBeShown());
-				if(b.getBlockid()==0 || !b.getShouldBeShown())//空气不算
-					continue;
-				geom=new GeometryBlock(b);
-				if(geoms[geom.hashCode()]==null) {
-					rootNode.attachChild(geom);
-					geoms[geom.hashCode()]=(GeometryBlock) geom;
-				}
+			//找到了实体方块
+			if(flagFindAir) {
+				//回滚到前一位位置，即要放方块的空气处
+				r=r.subtract(dir.mult(0.1f));
+				block=overworld.getBlockByVector3f(r);
 			}
-			blocksToUpdate.clear();//应后端要求，清空之
-			
-			//破坏方块本身
-			//因为后端的技术原因...先把这个放在后面
-			if(geoms[block.hashCode()]==null)
-				throw new RuntimeException();
-			rootNode.detachChild(getGeomByBlock(block));
-			geoms[block.hashCode()]=null;
-			block.destoryBlock();
-			// block=BlockBackend.getBlockInstanceByID(0);
-			// block.placeAt(r, overworld);
-			
-			//一次只破坏一个方块
-			break;
+			//else ...
+			return block;
 		}
+		return null;
+	}
+	public void breakBlockTemp() {
+		BlockBackend block=findBlockByDir(cam.getLocation(),cam.getDirection(),false);
+		if(block==null) return;//no block within reach
+		BlockCoord r=block.getBlockCoord();
+		
+		//更新周围方块，使其显示
+		Geometry geom;
+		HashSet<BlockBackend> blocksToUpdate=overworld.updateBlockSetTemp(r, true);
+		// HashSet<BlockBackend> blocksToUpdate=overworld.updateAdjacentBlockTemp(r);
+		System.out.println(blocksToUpdate.size());
+		for(BlockBackend b:blocksToUpdate) {
+			System.out.println(b.getBlockCoord() + " " + b.getShouldBeShown());
+			if(b.getBlockid()==0 || !b.getShouldBeShown())//空气不算
+				continue;
+			geom=new GeometryBlock(b);
+			if(geoms[geom.hashCode()]==null) {
+				rootNode.attachChild(geom);
+				geoms[geom.hashCode()]=(GeometryBlock) geom;
+			}
+		}
+		blocksToUpdate.clear();//应后端要求，清空之
+		
+		//破坏方块本身
+		//因为后端的技术原因...先把这个放在后面
+		if(geoms[block.hashCode()]==null)
+			throw new RuntimeException();
+		rootNode.detachChild(getGeomByBlock(block));
+		geoms[block.hashCode()]=null;
+		block.destoryBlock();
+		// block=BlockBackend.getBlockInstanceByID(0);
+		// block.placeAt(r, overworld);
+			
+		//一次只破坏一个方块
+			
 	}
 	public void placeBlockTemp() {
 		//System.out.println("app.placeBlockTemp()");
-		Vector3f vFwd=cam.getDirection();
-		Vector3f vPos=cam.getLocation();
-		Vector3f v;
-		for(float d=0;d<=5;d+=0.1f) {
-			v=vPos.add(vFwd.mult(d));
-			BlockCoordinate r=new BlockCoordinate(
-					(int)Math.round(v.x),(int)Math.round(v.y),(int)Math.round(v.z));
-			//find the block to be break
-			BlockBackend block=overworld.getBlockByCoordinate(r);
-			if(block.getBlockid()==0) {
+		BlockBackend block=findBlockByDir(cam.getLocation(),cam.getDirection(),true);
+		if(block==null) return;//no block within reach
+		BlockCoord r=block.getBlockCoord();
+		
+		//放置方块
+		block=BlockBackend.getBlockInstanceByID(3);//放泥土
+		block.placeAt(r, overworld);
+		// rootNode.attachChild(getGeomByBlock(block));
+			
+		//更新周围方块的显示状态
+		Geometry geom;
+		HashSet<BlockBackend> blocksToUpdate=overworld.updateBlockSetTemp(r, false);
+		// HashSet<BlockBackend> blocksToUpdate=overworld.updateAdjacentBlockTemp(r);
+		System.out.println(blocksToUpdate.size());
+		for(BlockBackend b:blocksToUpdate) {
+			System.out.println(b.getBlockCoord() + " " + b.getShouldBeShown());
+			if(b.getBlockid()==0)
 				continue;
+			// if(!overworld.isBlockAdjacentToAir(b.getBlockCoordinate())){
+			if(b.getShouldBeShown()){
+				rootNode.attachChild(getGeomByBlock(b));
+			}else{
+				geom=geoms[b.hashCode()];
+				rootNode.detachChild(geom);
+				geoms[geom.hashCode()]=null;
 			}
-			//else: block.id!=air
-			//回滚到前一位位置，即要放方块的空气处
-			v=v.subtract(vFwd.mult(0.1f));
-			r=new BlockCoordinate(
-					(int)Math.round(v.x),(int)Math.round(v.y),(int)Math.round(v.z));
-			block=overworld.getBlockByCoordinate(r);
 			
-			//放置方块
-			block=BlockBackend.getBlockInstanceByID(3);//放泥土
-			block.placeAt(r, overworld);
-			// rootNode.attachChild(getGeomByBlock(block));
-			
-			//更新周围方块的显示状态
-			Geometry geom;
-			HashSet<BlockBackend> blocksToUpdate=overworld.updateBlockSetTemp(r, false);
-			// HashSet<BlockBackend> blocksToUpdate=overworld.updateAdjacentBlockTemp(r);
-			System.out.println(blocksToUpdate.size());
-			for(BlockBackend b:blocksToUpdate) {
-				System.out.println(b.getBlockCoordinate() + " " + b.getShouldBeShown());
-				if(b.getBlockid()==0)
-					continue;
-				// if(!overworld.isBlockAdjacentToAir(b.getBlockCoordinate())){
-				if(b.getShouldBeShown()){
-					rootNode.attachChild(getGeomByBlock(b));
-				}else{
-					geom=geoms[b.hashCode()];
-					rootNode.detachChild(geom);
-					geoms[geom.hashCode()]=null;
-				}
 				
-					
-				// }
-				
-			}
-			blocksToUpdate.clear();//应后端要求，清空之
+			// }
 			
-			//一次只放置一个方块
-			break;
 		}
+		blocksToUpdate.clear();//应后端要求，清空之
+		
+		//一次只放置一个方块
+
 	}
 
 	

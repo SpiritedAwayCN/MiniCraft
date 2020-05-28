@@ -18,10 +18,10 @@ public class DimensionMap {
 
     private PlayerBackend player;
     private HashSet<BlockBackend> updateBlockSet;
-
-
+    
+    
     private int[][][] initialBlockMap;
-
+    
     public DimensionMap(String name){
         this.name = name;
         chunkIndexBiasX = -Constant.minX / Constant.chunkX;
@@ -40,26 +40,34 @@ public class DimensionMap {
         Generator generator = new FlatGenerator();
         generator.generateBlockMap();
         initialBlockMap = generator.getBlockMap();
-
+        
         for(int i = 0; i < mapChunks.length; i++)
             for(int j = 0; j < mapChunks[i].length; j++){
-                mapChunks[i][j] = new Chunk(new ChunkCoordinate(i - chunkIndexBiasX, j - chunkIndexBiasZ), initialBlockMap, this);
+                mapChunks[i][j] = new Chunk(new ChunkCoord(i - chunkIndexBiasX, j - chunkIndexBiasZ), initialBlockMap, this);
             }
     }
 
-    public Chunk getChunkByCoordinate(ChunkCoordinate chunkCoordinate){
-        if(!chunkCoordinate.isValid()) return null;
-        return mapChunks[chunkCoordinate.getX() + chunkIndexBiasX][chunkCoordinate.getZ() + chunkIndexBiasZ];
+    public Chunk getChunkByCoord(ChunkCoord chunkCoord){
+        if(!chunkCoord.isValid()) return null;
+        return mapChunks[chunkCoord.getX() + chunkIndexBiasX][chunkCoord.getZ() + chunkIndexBiasZ];
     }
+  
 
-    public BlockBackend getBlockByCoordinate(BlockCoordinate blockCoordinate){
-        Chunk chunk = getChunkByCoordinate(blockCoordinate.toChunkCoordnate());
+    public BlockBackend getBlockByCoord(BlockCoord blockCoord){
+        Chunk chunk = getChunkByCoord(blockCoord.toChunkCoord());
         if(chunk == null) return null;
-        int bx = blockCoordinate.getX() - chunk.getChunkCoordinate().getX() * Constant.chunkX;
-        int by = blockCoordinate.getY();
-        int bz = blockCoordinate.getZ() - chunk.getChunkCoordinate().getZ() * Constant.chunkZ;
+        int bx = blockCoord.getX() - chunk.getChunkCoordinate().getX() * Constant.chunkX;
+        int by = blockCoord.getY();
+        int bz = blockCoord.getZ() - chunk.getChunkCoordinate().getZ() * Constant.chunkZ;
         if(by < 0 || by >=Constant.maxY) return null;
         return chunk.getBlocks()[bx][by][bz];
+    }
+    public BlockBackend getBlockByVector3f(Vector3f r) {
+    	return this.getBlockByCoord(
+				new BlockCoord(
+					(int)Math.round(r.x),
+					(int)Math.round(r.y),
+					(int)Math.round(r.z)));//四舍五入
     }
 
     public String getName() {
@@ -92,7 +100,7 @@ public class DimensionMap {
      * 注：还没写，因为相当难写(考虑到之后有视距问题)，先用一个简单方法弄着
      */
     public HashSet<BlockBackend> refreshWholeUpdateBlockSet(){
-        ChunkCoordinate st = player.toChunkCoordinate();
+        ChunkCoord st = player.toChunkCoordinate();
         int cx = st.getX(), cz = st.getZ();
 
         //全部设为预加载
@@ -120,20 +128,20 @@ public class DimensionMap {
         return this.updateBlockSet;
     }
 
-    private void setChunkPreLoad(ChunkCoordinate chunkCoordinate){
-        Chunk chunk= this.getChunkByCoordinate(chunkCoordinate);
+    private void setChunkPreLoad(ChunkCoord chunkCoordinate){
+        Chunk chunk= this.getChunkByCoord(chunkCoordinate);
         if(chunk != null)
             chunk.setLoadLevel(1);
     }
 
-    private void setChunkPreLoadIfNot(ChunkCoordinate chunkCoordinate){
-        Chunk chunk= this.getChunkByCoordinate(chunkCoordinate);
+    private void setChunkPreLoadIfNot(ChunkCoord chunkCoordinate){
+        Chunk chunk= this.getChunkByCoord(chunkCoordinate);
         if(chunk != null && chunk.getLoadLevel() == 0)
             chunk.setLoadLevel(1);
     }
 
-    private void loadChunkByCoord(ChunkCoordinate chunkCoordinate){
-        Chunk chunk = getChunkByCoordinate(chunkCoordinate);
+    private void loadChunkByCoord(ChunkCoord chunkCoordinate){
+        Chunk chunk = getChunkByCoord(chunkCoordinate);
         if(chunk != null && chunk.getLoadLevel() == 1){
             System.out.printf("load : %d %d\n", chunkCoordinate.getX(), chunkCoordinate.getZ());
             chunk.loadAllBlocksInChunk();
@@ -150,7 +158,7 @@ public class DimensionMap {
         HashSet<BlockBackend> localUpdateSet = new HashSet<>();
         for(int i = Constant.minX; i<=Constant.maxX; i++)
             for(int j = Constant.minZ; j<=Constant.maxZ; j++){
-                localUpdateSet.add(getBlockByCoordinate(new BlockCoordinate(i, 4, j)));
+                localUpdateSet.add(getBlockByCoord(new BlockCoord(i, 4, j)));
             }
         return localUpdateSet;
     }
@@ -160,10 +168,10 @@ public class DimensionMap {
      * @return 返回毗邻的方块（的列表)，下标越界、空气除外
      */
     @Deprecated
-    public HashSet<BlockBackend> updateAdjacentBlockTemp(BlockCoordinate blockCoord){
+    public HashSet<BlockBackend> updateAdjacentBlockTemp(BlockCoord blockCoord){
     	final int dx[] = {1, 0, -1, 0, 0, 0}, dz[] = {0, 1, 0, -1, 0, 0}, dy[]={0, 0, 0, 0, 1, -1};
     	for(int dir = 0; dir < 6; dir++){
-    		BlockCoordinate r=new BlockCoordinate(blockCoord.getX()+dx[dir],
+    		BlockCoord r=new BlockCoord(blockCoord.getX()+dx[dir],
     				blockCoord.getY()+dy[dir],
     				blockCoord.getZ()+dz[dir]
     				);
@@ -171,7 +179,7 @@ public class DimensionMap {
     				r.getY()<Constant.minY || r.getY()>=Constant.maxY ||
     				r.getZ()<Constant.minZ || r.getZ()>Constant.maxZ)
     			continue;
-	    	BlockBackend b=this.getBlockByCoordinate(r);
+	    	BlockBackend b=this.getBlockByCoord(r);
 	    	if(b.getBlockid()==0)//空气不算
 				continue;
 			updateBlockSet.add(b);
@@ -184,12 +192,12 @@ public class DimensionMap {
      * @return 返回一个方块是否和空气毗邻
      */
     @Deprecated
-    synchronized public Boolean isBlockAdjacentToAir(BlockCoordinate blockCoord) {
+    synchronized public Boolean isBlockAdjacentToAir(BlockCoord blockCoord) {
     	
     	final int dx[] = {1, 0, -1, 0, 0, 0}, dz[] = {0, 1, 0, -1, 0, 0}, dy[]={0, 0, 0, 0, 1, -1};
-    	BlockCoordinate r=blockCoord;
+    	BlockCoord r=blockCoord;
     	for(int dir = 0; dir < 6; dir++){
-    		BlockCoordinate r2=new BlockCoordinate(r.getX()+dx[dir],
+    		BlockCoord r2=new BlockCoord(r.getX()+dx[dir],
     				r.getY()+dy[dir],
     				r.getZ()+dz[dir]
     				);
@@ -197,7 +205,7 @@ public class DimensionMap {
     				r2.getY()<Constant.minY || r2.getY()>=Constant.maxY ||
     				r2.getZ()<Constant.minZ || r2.getZ()>Constant.maxZ)
     			continue;
-	    	BlockBackend b=this.getBlockByCoordinate(r2);
+	    	BlockBackend b=this.getBlockByCoord(r2);
 	    	//以上为迭代器
     	
     		if(b.getBlockid()==0) {
@@ -215,9 +223,9 @@ public class DimensionMap {
      * @param isBreak 该位置发生了破坏(true)/放置(false)
      * @return 待更新方块列表（包括当前），其中blockbackend.getShouldBeShown可判断是否显示
      */
-    public HashSet<BlockBackend> updateBlockSetTemp(BlockCoordinate blockCoordinate, boolean isBreak){
+    public HashSet<BlockBackend> updateBlockSetTemp(BlockCoord blockCoordinate, boolean isBreak){
         updateBlockSet.clear();
-        BlockBackend block = getBlockByCoordinate(blockCoordinate);
+        BlockBackend block = getBlockByCoord(blockCoordinate);
         if(block.isTransparent()){
             // 透明就只更新当前这个
             if(block.getBlockid() != 0){
@@ -235,17 +243,17 @@ public class DimensionMap {
             updateBlockSet.add(block);
             for(int dir = 0; dir < 6; dir++){
                 int tx = x + dx[dir], ty = y + dy[dir], tz = z + dz[dir];
-                updateBlockRecusivePlace(new BlockCoordinate(tx, ty, tz), true);
+                updateBlockRecusivePlace(new BlockCoord(tx, ty, tz), true);
             }
         }
         return updateBlockSet;
     }
 
 
-    private void updateBlockRecusiveBreak(BlockCoordinate blockCoordinate, boolean root){
+    private void updateBlockRecusiveBreak(BlockCoord blockCoordinate, boolean root){
     	
     	BlockBackend block;
-    	block = getBlockByCoordinate(blockCoordinate);
+    	block = getBlockByCoord(blockCoordinate);
         if(block == null || block.getChunk().getLoadLevel() < 2) return;
         if(!root){
             if(block.getBlockid()==0 || updateBlockSet.contains(block) || block.getShouldBeShown()) return;
@@ -259,14 +267,13 @@ public class DimensionMap {
         
         for(int dir = 0; dir < 6; dir++){
             int tx = x + dx[dir], ty = y + dy[dir], tz = z + dz[dir];
-            updateBlockRecusiveBreak(new BlockCoordinate(tx, ty, tz), false);
+            updateBlockRecusiveBreak(new BlockCoord(tx, ty, tz), false);
         }
-
     }
 
-    private boolean updateBlockRecusivePlace(BlockCoordinate blockCoordinate, boolean root){
+    private boolean updateBlockRecusivePlace(BlockCoord blockCoordinate, boolean root){
         BlockBackend block;
-    	block = getBlockByCoordinate(blockCoordinate);
+    	block = getBlockByCoord(blockCoordinate);
         if(block == null || block.getChunk().getLoadLevel() < 2) return false;
         if(block.getBlockid() == 0) return true;
         if(!root && (!block.getShouldBeShown() || updateBlockSet.contains(block))) return false;
@@ -277,7 +284,7 @@ public class DimensionMap {
         
         for(int dir = 0; dir < 6; dir++){
             int tx = x + dx[dir], ty = y + dy[dir], tz = z + dz[dir];
-            if(updateBlockRecusivePlace(new BlockCoordinate(tx, ty, tz), false)){
+            if(updateBlockRecusivePlace(new BlockCoord(tx, ty, tz), false)){
                 return true;
             }
         }
@@ -295,13 +302,13 @@ public class DimensionMap {
      */
     public boolean movePlayerTo(Vector3f coord){
         player.setCoordinate(coord);
-        ChunkCoordinate newcoord = player.toChunkCoordinate(), oldcoord = player.getChunkCoordinate();
+        ChunkCoord newcoord = player.toChunkCoordinate(), oldcoord = player.getChunkCoordinate();
         int ox = oldcoord.getX(), oz = oldcoord.getZ();
         int nx = newcoord.getX(), nz = newcoord.getZ();
         if(ox == nx && oz == nz) return false;
         System.out.printf("old=(%d,%d) new=(%d,%d)\n", ox,oz,nx,nz);
         updateBlockSet.clear();
-        ChunkCoordinate st = new ChunkCoordinate();
+        ChunkCoord st = new ChunkCoord();
         for(int dist = 0; dist < Constant.viewChunkDistance; dist++){
             for(int i = 0; i <= dist; i++){
                 int j = dist - i;
@@ -311,7 +318,7 @@ public class DimensionMap {
                 unloadIfTooFar(st.setXZ(ox - i, oz - j), nx, nz);
             }
         }
-
+        
         for(int dist = 0; dist < Constant.viewChunkDistance; dist++){
             for(int i = 0; i <= dist; i++){
                 int j = dist - i;
@@ -336,10 +343,10 @@ public class DimensionMap {
         return true;
     }
 
-    private void unloadIfTooFar(ChunkCoordinate oldCoordinate, int nx, int nz){
+    private void unloadIfTooFar(ChunkCoord oldCoordinate, int nx, int nz){
         if(Math.abs(oldCoordinate.getX() - nx) + Math.abs(oldCoordinate.getZ() - nz) < Constant.viewChunkDistance)
             return;
-        Chunk chunk = getChunkByCoordinate(oldCoordinate);
+        Chunk chunk = getChunkByCoord(oldCoordinate);
         if(chunk != null && chunk.getLoadLevel() > 0){
             System.out.printf("unload : %d %d\n", oldCoordinate.getX(), oldCoordinate.getZ());
             chunk.unloadAllBlocksInChunk();

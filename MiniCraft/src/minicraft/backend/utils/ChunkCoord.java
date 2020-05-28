@@ -2,14 +2,14 @@ package minicraft.backend.utils;
 
 import minicraft.backend.constants.Constant;
 
-public class ChunkCoordinate {
+public class ChunkCoord {
     private int x;
     private int z;
 
-    public ChunkCoordinate(){
+    public ChunkCoord(){
         x = z = 0;
     }
-    public ChunkCoordinate(int x, int z){
+    public ChunkCoord(int x, int z){
         this.x = x;
         this.z = z;
     }
@@ -30,13 +30,13 @@ public class ChunkCoordinate {
         this.z = z;
     }
 
-    public ChunkCoordinate addXZ(int addX, int addZ){
+    public ChunkCoord addXZ(int addX, int addZ){
         this.x += addX;
         this.z += addZ;
         return this;
     }
 
-    public ChunkCoordinate setXZ(int x, int z){
+    public ChunkCoord setXZ(int x, int z){
         this.x = x;
         this.z = z;
         return this;

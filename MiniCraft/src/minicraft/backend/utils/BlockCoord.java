@@ -2,16 +2,16 @@ package minicraft.backend.utils;
 
 import minicraft.backend.constants.Constant;
 
-public class BlockCoordinate {
+public class BlockCoord {
     private int x;
     private int y;
     private int z;
 
-    public BlockCoordinate(){
+    public BlockCoord(){
         x = y = z = 0;
     }
 
-    public BlockCoordinate(int x, int y, int z){
+    public BlockCoord(int x, int y, int z){
         this.x = x;
         this.y = y;
         this.z = z;
@@ -53,11 +53,11 @@ public class BlockCoordinate {
         this.z = z;
     }
 
-    public ChunkCoordinate toChunkCoordnate(){
+    public ChunkCoord toChunkCoord(){
         int cx = x , cz = z;
         if(cx < 0) cx -= Constant.chunkX - 1;
         if(cz < 0) cz -= Constant.chunkZ - 1;
-        return new ChunkCoordinate(cx / Constant.chunkX, cz / Constant.chunkZ);
+        return new ChunkCoord(cx / Constant.chunkX, cz / Constant.chunkZ);
     }
 
     @Override

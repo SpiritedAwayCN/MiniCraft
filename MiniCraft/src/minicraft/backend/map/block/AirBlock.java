@@ -1,7 +1,7 @@
 package minicraft.backend.map.block;
 
 import minicraft.backend.map.DimensionMap;
-import minicraft.backend.utils.BlockCoordinate;
+import minicraft.backend.utils.BlockCoord;
 
 public class AirBlock extends BlockBackend{
     private static final int blockID = 0;
@@ -10,7 +10,7 @@ public class AirBlock extends BlockBackend{
         super("air");
     }
 
-    AirBlock(BlockCoordinate blockCoordinate, DimensionMap map){
+    AirBlock(BlockCoord blockCoordinate, DimensionMap map){
         super(blockCoordinate, map, "air");
     }
 

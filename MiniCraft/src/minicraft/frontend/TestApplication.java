@@ -32,7 +32,7 @@ import com.jme3.texture.Texture.MagFilter;
 
 import minicraft.backend.map.DimensionMap;
 import minicraft.backend.map.block.BlockBackend;
-import minicraft.backend.utils.BlockCoordinate;
+import minicraft.backend.utils.BlockCoord;
 
 /**
  * Minicraft主类
@@ -85,7 +85,7 @@ public class TestApplication extends SimpleApplication {
 		
 		DimensionMap map=new DimensionMap("map");
 		map.generateFromGenerator(true);
-		BlockBackend blockb=map.getBlockByCoordinate(new BlockCoordinate(0,4,0));
+		BlockBackend blockb=map.getBlockByCoord(new BlockCoord(0,4,0));
 		GeometryBlock.initialize(assetManager);
 		
 		System.out.println(new GeometryBlock(blockb).hashCode());

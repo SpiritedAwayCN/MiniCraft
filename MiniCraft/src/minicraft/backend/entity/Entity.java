@@ -9,7 +9,7 @@ import minicraft.backend.utils.*;
 public abstract class Entity {
     protected Vector3f coordinate;
     protected String name;
-    protected ChunkCoordinate chunkCoordinate;
+    protected ChunkCoord chunkCoordinate;
     // 受重力
     
     Entity(){}
@@ -31,19 +31,19 @@ public abstract class Entity {
         this.coordinate = coordinate;
     }
 
-    public ChunkCoordinate toChunkCoordinate(){
-        return new ChunkCoordinate((int)Math.floor(coordinate.x / Constant.chunkX), (int)Math.floor(coordinate.z / Constant.chunkZ));
+    public ChunkCoord toChunkCoordinate(){
+        return new ChunkCoord((int)Math.floor(coordinate.x / Constant.chunkX), (int)Math.floor(coordinate.z / Constant.chunkZ));
     }
 
-    public BlockCoordinate toBlockCoordinate(){
-        return new BlockCoordinate((int)Math.floor(coordinate.x), (int)Math.floor(coordinate.y), (int)Math.floor(coordinate.z));
+    public BlockCoord toBlockCoordinate(){
+        return new BlockCoord((int)Math.floor(coordinate.x), (int)Math.floor(coordinate.y), (int)Math.floor(coordinate.z));
     }
 
-    public ChunkCoordinate getChunkCoordinate() {
+    public ChunkCoord getChunkCoordinate() {
         return chunkCoordinate;
     }
 
-    public void setChunkCoordinate(ChunkCoordinate chunkCoordinate) {
+    public void setChunkCoordinate(ChunkCoord chunkCoordinate) {
         this.chunkCoordinate = chunkCoordinate;
     }
 
