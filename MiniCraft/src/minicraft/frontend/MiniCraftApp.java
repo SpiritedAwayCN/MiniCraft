@@ -91,14 +91,14 @@ public class MiniCraftApp extends SimpleApplication {
 					}
 				}
 			}, INPUT_BREAK_BLOCK);
-			inputManager.addMapping(INPUT_BREAK_BLOCK,new MouseButtonTrigger(MouseInput.BUTTON_LEFT));
+			inputManager.addMapping(INPUT_PLACE_BLOCK,new MouseButtonTrigger(MouseInput.BUTTON_RIGHT));
 			inputManager.addListener(new ActionListener() {
 				@Override
 		        public void onAction(String name, boolean value, float tpf) {
 					if(value)
 						placeBlockTemp();
 				}
-			}, INPUT_BREAK_BLOCK);
+			}, INPUT_PLACE_BLOCK);
 		}
 	}
 	
@@ -151,9 +151,13 @@ public class MiniCraftApp extends SimpleApplication {
 	}
 	GeometryBlock getGeomByBlock(BlockBackend block) 
 			throws NullPointerException{
-		if(block==null)
+		if(block==null) {
 			throw new NullPointerException();
-		return geoms[new GeometryBlock(block).hashCode()];
+		}
+		if(geoms[block.hashCode()]==null) {
+			geoms[block.hashCode()]=new GeometryBlock(block);
+		}
+		return geoms[block.hashCode()];
 	}
 	/**
 	 * 主循环
@@ -173,42 +177,84 @@ public class MiniCraftApp extends SimpleApplication {
 					(int)Math.round(v.x),(int)Math.round(v.y),(int)Math.round(v.z));
 			//find the block to be break
 			BlockBackend block=overworld.getBlockByCoordinate(r);
-			if(block.getBlockid()!=0) {
-				
-				//因为后端的技术原因...先把这个放在后面
-				block.destoryBlock();
-				block=BlockBackend.getBlockInstanceByID(0);
-				block.placeAt(r, overworld);
-				rootNode.detachChild(getGeomByBlock(block));
-				
-				
-				Geometry geom;
-				
-				//更新周围方块
-				HashSet<BlockBackend> blocksToUpdate=overworld.updateBlockSetTemp(r);
-				System.out.println(blocksToUpdate.size());
-				//更新周围的方块，将其显示
-				for(BlockBackend b:blocksToUpdate) {
-					
-					if(b.getBlockid()==0)//空气不算
-						continue;
-					geom=new GeometryBlock(b);
-					if(geoms[geom.hashCode()]==null) {
-						
-						rootNode.attachChild(geom);
-						geoms[geom.hashCode()]=(GeometryBlock) geom;
-					}
-				}
-				blocksToUpdate.clear();//应后端要求，清空之
-				
-				
-				
-				break;
+			if(block.getBlockid()==0) {
+				continue;
 			}
+			
+			//更新周围方块，使其显示
+			Geometry geom;
+			HashSet<BlockBackend> blocksToUpdate=overworld.updateAdjacentBlockTemp(r);
+			//System.out.println(blocksToUpdate.size());
+			for(BlockBackend b:blocksToUpdate) {
+				if(b.getBlockid()==0)//空气不算
+					continue;
+				geom=new GeometryBlock(b);
+				if(geoms[geom.hashCode()]==null) {
+					rootNode.attachChild(geom);
+					geoms[geom.hashCode()]=(GeometryBlock) geom;
+				}
+			}
+			blocksToUpdate.clear();//应后端要求，清空之
+			
+			//破坏方块本身
+			//因为后端的技术原因...先把这个放在后面
+			if(geoms[block.hashCode()]==null)
+				throw new RuntimeException();
+			rootNode.detachChild(getGeomByBlock(block));
+			geoms[block.hashCode()]=null;
+			block.destoryBlock();
+			block=BlockBackend.getBlockInstanceByID(0);
+			block.placeAt(r, overworld);
+			
+			//一次只破坏一个方块
+			break;
 		}
 	}
 	public void placeBlockTemp() {
-		
+		//System.out.println("app.placeBlockTemp()");
+		Vector3f vFwd=cam.getDirection();
+		Vector3f vPos=cam.getLocation();
+		Vector3f v;
+		for(float d=0;d<=5;d+=0.1f) {
+			v=vPos.add(vFwd.mult(d));
+			BlockCoordinate r=new BlockCoordinate(
+					(int)Math.round(v.x),(int)Math.round(v.y),(int)Math.round(v.z));
+			//find the block to be break
+			BlockBackend block=overworld.getBlockByCoordinate(r);
+			if(block.getBlockid()==0) {
+				continue;
+			}
+			//else: block.id!=air
+			//回滚到前一位位置，即要放方块的空气处
+			v=v.subtract(vFwd.mult(0.1f));
+			r=new BlockCoordinate(
+					(int)Math.round(v.x),(int)Math.round(v.y),(int)Math.round(v.z));
+			block=overworld.getBlockByCoordinate(r);
+			
+			//放置方块
+			block=BlockBackend.getBlockInstanceByID(3);//放泥土
+			block.placeAt(r, overworld);
+			rootNode.attachChild(getGeomByBlock(block));
+			
+			//更新周围方块的显示状态
+			Geometry geom;
+			HashSet<BlockBackend> blocksToUpdate=overworld.updateAdjacentBlockTemp(r);
+			//System.out.println(blocksToUpdate.size());
+			for(BlockBackend b:blocksToUpdate) {
+				if(b.getBlockid()==0)
+					continue;
+				if(!overworld.isBlockAdjacentToAir(b.getBlockCoordinate())){
+					geom=geoms[b.hashCode()];
+					rootNode.detachChild(geom);
+					geoms[geom.hashCode()]=null;
+				}
+				
+			}
+			blocksToUpdate.clear();//应后端要求，清空之
+			
+			//一次只放置一个方块
+			break;
+		}
 	}
 
 	public static void main(String[] args) {

@@ -122,7 +122,7 @@ public class DimensionMap {
     /**
      * @return 返回毗邻的方块（的列表)，下标越界、空气除外
      */
-    public HashSet<BlockBackend> updateAdjacentBlokTemp(BlockCoordinate blockCoord){
+    public HashSet<BlockBackend> updateAdjacentBlockTemp(BlockCoordinate blockCoord){
     	final int dx[] = {1, 0, -1, 0, 0, 0}, dz[] = {0, 1, 0, -1, 0, 0}, dy[]={0, 0, 0, 0, 1, -1};
     	for(int dir = 0; dir < 6; dir++){
     		BlockCoordinate r=new BlockCoordinate(blockCoord.getX()+dx[dir],
@@ -142,6 +142,32 @@ public class DimensionMap {
         return updateBlockSet;
     }
     /**
+     * @return 返回一个方块是否和空气毗邻
+     */
+    synchronized public Boolean isBlockAdjacentToAir(BlockCoordinate blockCoord) {
+    	
+    	final int dx[] = {1, 0, -1, 0, 0, 0}, dz[] = {0, 1, 0, -1, 0, 0}, dy[]={0, 0, 0, 0, 1, -1};
+    	BlockCoordinate r=blockCoord;
+    	for(int dir = 0; dir < 6; dir++){
+    		BlockCoordinate r2=new BlockCoordinate(r.getX()+dx[dir],
+    				r.getY()+dy[dir],
+    				r.getZ()+dz[dir]
+    				);
+    		if(r2.getX()<Constant.minX || r2.getX()>Constant.maxX ||
+    				r2.getY()<Constant.minY || r2.getY()>=Constant.maxY ||
+    				r2.getZ()<Constant.minZ || r2.getZ()>Constant.maxZ)
+    			continue;
+	    	BlockBackend b=this.getBlockByCoordinate(r2);
+	    	//以上为迭代器
+    	
+    		if(b.getBlockid()==0) {
+    			return true;
+    		}
+    	}
+    	//else
+    	return false;
+    }
+    /**
      * 注：只是暂时，效率与沿用性均不佳
      * 通过方块坐标，得到在该位置放置/破坏后 出现更新的方块(放置/)
      * @return 待更新方块列表（包括当前）
@@ -158,8 +184,13 @@ public class DimensionMap {
 
 
     private void updateBlockRecusive(BlockCoordinate blockCoordinate, boolean root){
-
-        BlockBackend block = getBlockByCoordinate(blockCoordinate);
+    	
+    	BlockBackend block;
+    	try {//防止下标越界
+    		block = getBlockByCoordinate(blockCoordinate);
+    	}catch(IndexOutOfBoundsException ex) {
+    		return;
+    	}
         if(!root && (block.getBlockid()==0 || updateBlockSet.contains(block))) return;
         updateBlockSet.add(block);
         if(!root && !block.isTransparent()) return;

@@ -112,4 +112,11 @@ public abstract class BlockBackend {
         }
         return block;
     }
+    @Override
+	public int hashCode() {
+		BlockCoordinate r=this.blockCoordinate;
+		return (r.getX()-Constant.minX)*Constant.maxY*(Constant.maxZ-Constant.minZ)
+				+(r.getY()-Constant.minY)*(Constant.maxZ-Constant.minZ)
+				+(r.getZ()-Constant.minZ);
+	}
 }
