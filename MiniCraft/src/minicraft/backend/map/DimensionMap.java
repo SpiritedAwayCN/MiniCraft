@@ -136,7 +136,7 @@ public class DimensionMap {
 
     private void updateBlockRecusive(BlockCoordinate blockCoordinate, boolean root){
         BlockBackend block = getBlockByCoordinate(blockCoordinate);
-        if(block.getBlockid()==0 || updateBlockSet.contains(block)) return;
+        if(!root && (block.getBlockid()==0 || updateBlockSet.contains(block))) return;
         updateBlockSet.add(block);
         if(!root && !block.isTransparent()) return;
 
