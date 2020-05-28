@@ -161,12 +161,9 @@ public class MiniCraftApp extends SimpleApplication {
 	void updateBlockVisibility() {
 		//更新周围方块，使其显示
 		HashSet<BlockBackend> blocksToUpdate=overworld.getUpdateBlockSet();
-		if(blocksToUpdate.size()>0)
-			System.out.println(blocksToUpdate.size());
+		//if(blocksToUpdate.size()>0)
+			//System.out.println(blocksToUpdate.size());
 		for(BlockBackend b:blocksToUpdate) {
-			//System.out.println(b.getBlockCoord() + " " + b.getShouldBeShown());
-			if(b.getBlockid()==0)//空气不算
-				continue;
 			if(b.getShouldBeShown() == (geoms[b.hashCode()]!=null)) {
 				continue;//显示状态相同，不用更新
 			}
@@ -176,7 +173,7 @@ public class MiniCraftApp extends SimpleApplication {
 				rootNode.attachChild(geom);
 				geoms[b.hashCode()]=(GeometryBlock) geom;
 			}else {//不显示
-				System.out.println("rootNode.detaching sth.");
+				//System.out.println("rootNode.detaching sth.");
 				rootNode.detachChild(geoms[b.hashCode()]);
 				geoms[b.hashCode()]=null;
 				
@@ -193,8 +190,9 @@ public class MiniCraftApp extends SimpleApplication {
 		for(float d=0;d<=5;d+=0.1f) {//d for distance
 			r=r0.add(dir.mult(d));
 			block=overworld.getBlockByVector3f(r);
-			//跳过空气
-			if(block.getBlockid()==0) {
+			
+			//跳过空气，以及跳过视线探出地图的情况
+			if(block==null || block.getBlockid()==0) {
 				continue;
 			}
 			
