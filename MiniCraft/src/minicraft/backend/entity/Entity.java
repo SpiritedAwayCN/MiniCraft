@@ -24,6 +24,10 @@ public abstract class Entity {
         return coordinate;
     }
 
+    public void setCoordinate(Vector3f coordinate) {
+        this.coordinate = coordinate;
+    }
+
     public ChunkCoordinate toChunkCoordinate(){
         return new ChunkCoordinate((int)Math.floor(coordinate.x / Constant.chunkX), (int)Math.floor(coordinate.z / Constant.chunkZ));
     }
@@ -31,5 +35,9 @@ public abstract class Entity {
     public BlockCoordinate toBlockCoordinate(){
         return new BlockCoordinate((int)Math.floor(coordinate.x), (int)Math.floor(coordinate.y), (int)Math.floor(coordinate.z));
     }
+
+    
+
+    
 
 }

@@ -118,7 +118,7 @@ public class MiniCraftApp extends SimpleApplication {
 		//BlockBackend block;
 		new Thread(()->
 		{
-			HashSet<BlockBackend> blocksToAdd=overworld.initializeWholeUpdateBlockSetTemp();
+			HashSet<BlockBackend> blocksToAdd=overworld.refreshWholeUpdateBlockSet();
 			Geometry geom;
 			for(BlockBackend block:blocksToAdd) {
 				if(block.getBlockid()==0)

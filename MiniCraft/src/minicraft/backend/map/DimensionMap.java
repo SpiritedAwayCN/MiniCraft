@@ -56,6 +56,7 @@ public class DimensionMap {
         int bx = blockCoordinate.getX() - chunk.getChunkCoordinate().getX() * Constant.chunkX;
         int by = blockCoordinate.getY();
         int bz = blockCoordinate.getZ() - chunk.getChunkCoordinate().getZ() * Constant.chunkZ;
+        if(by < 0 || by >=Constant.maxY) return null;
         return chunk.getBlocks()[bx][by][bz];
     }
 
@@ -216,7 +217,8 @@ public class DimensionMap {
     		block = getBlockByCoordinate(blockCoordinate);
     	}catch(IndexOutOfBoundsException ex) {
     		return;
-    	}
+        }
+        if(block == null) return;
         if(!root && (block.getBlockid()==0 || updateBlockSet.contains(block))) return;
         updateBlockSet.add(block);
         if(!root && !block.isTransparent()) return;
