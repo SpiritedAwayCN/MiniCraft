@@ -89,7 +89,21 @@ public class DimensionMap {
     @Deprecated
     public void refreshWholeUpdateBlockSet(){
         ChunkCoordinate st = player.toChunkCoordinate();
+        int cx = st.getX(), cz = st.getZ();
+        for(int dist = 0; dist < Constant.viewChunkDistance; dist++){
+            for(int i = 0; i <= dist; i++){
+                int j = dist - i;
+                loadChunkByCoord(st.setXZ(cx + i, cz + j));
+                loadChunkByCoord(st.setXZ(cx + i, cz - j));
+                loadChunkByCoord(st.setXZ(cx - i, cz + j));
+                loadChunkByCoord(st.setXZ(cx - i, cz - j));
+            }
+        }
+    }
 
+    private void loadChunkByCoord(ChunkCoordinate chunkCoordinate){
+        if(!chunkCoordinate.isValid()) return;
+        Chunk chunk = getChunkByCoordinate(chunkCoordinate);
     }
 
     /** 
@@ -97,11 +111,12 @@ public class DimensionMap {
      * @return 待更新方块列表
      */
     public HashSet<BlockBackend> initializeWholeUpdateBlockSetTemp(){
+        HashSet<BlockBackend> localUpdateSet = new HashSet<>();
         for(int i = Constant.minX; i<=Constant.maxX; i++)
             for(int j = Constant.minZ; j<=Constant.maxZ; j++){
-                updateBlockSet.add(getBlockByCoordinate(new BlockCoordinate(i, 4, j)));
+                localUpdateSet.add(getBlockByCoordinate(new BlockCoordinate(i, 4, j)));
             }
-        return updateBlockSet;
+        return localUpdateSet;
     }
 
     /**
@@ -110,28 +125,27 @@ public class DimensionMap {
      * @return 待更新方块列表（包括当前）
      */
     public HashSet<BlockBackend> updateBlockSetTemp(BlockCoordinate blockCoordinate){
-        HashSet<BlockBackend> localUpdateSet = new HashSet<>();
         if(getBlockByCoordinate(blockCoordinate).isTransparent()){
             // 透明就只更新当前这个
-            localUpdateSet.add(getBlockByCoordinate(blockCoordinate));
+            updateBlockSet.add(getBlockByCoordinate(blockCoordinate));
         }else{
-            updateBlockRecusive(blockCoordinate);
+            updateBlockRecusive(blockCoordinate, true);
         }
-        return localUpdateSet;
+        return updateBlockSet;
     }
 
-    private void updateBlockRecusive(BlockCoordinate blockCoordinate){
+    private void updateBlockRecusive(BlockCoordinate blockCoordinate, boolean root){
         BlockBackend block = getBlockByCoordinate(blockCoordinate);
         if(block.getBlockid()==0 || updateBlockSet.contains(block)) return;
         updateBlockSet.add(block);
-        if(!block.isTransparent()) return;
+        if(!root && !block.isTransparent()) return;
 
         int x = blockCoordinate.getX(), y = blockCoordinate.getY(), z = blockCoordinate.getZ();
         final int dx[] = {1, 0, -1, 0, 0, 0}, dz[] = {0, 1, 0, -1, 0, 0}, dy[]={0, 0, 0, 0, 1, -1};
         
         for(int dir = 0; dir < 6; dir++){
             int tx = x + dx[dir], ty = y + dy[dir], tz = z + dz[dir];
-            updateBlockRecusive(new BlockCoordinate(tx, ty, tz));
+            updateBlockRecusive(new BlockCoordinate(tx, ty, tz), false);
         }
 
     }

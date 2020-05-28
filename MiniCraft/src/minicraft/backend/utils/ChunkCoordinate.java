@@ -1,5 +1,7 @@
 package minicraft.backend.utils;
 
+import minicraft.backend.constants.Constant;
+
 public class ChunkCoordinate {
     private int x;
     private int z;
@@ -28,13 +30,19 @@ public class ChunkCoordinate {
         this.z = z;
     }
 
-    public void addXZ(int addX, int addZ){
+    public ChunkCoordinate addXZ(int addX, int addZ){
         this.x += addX;
         this.z += addZ;
+        return this;
     }
 
-    public void setXZ(int x, int z){
+    public ChunkCoordinate setXZ(int x, int z){
         this.x = x;
         this.z = z;
+        return this;
+    }
+    public boolean isValid(){
+        return x >= Constant.chunkMinCoordX && x <= Constant.chunkMaxCoordX
+            && z >= Constant.chunkMinCoordZ && z <= Constant.chunkMaxCoordZ;
     }
 }

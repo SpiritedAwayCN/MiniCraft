@@ -8,15 +8,18 @@ public abstract class BlockBackend {
     protected BlockCoordinate blockCoordinate;
     protected String name;
     protected Chunk chunk;
+    protected boolean shouldBeShown;
 
     protected BlockBackend(String name){
         this.name = name;
+        this.shouldBeShown = false;
     }
 
     protected BlockBackend(BlockCoordinate blockCoordinate, DimensionMap map, String name){
         this.blockCoordinate = blockCoordinate;
         this.chunk = map.getChunkByCoordinate(blockCoordinate.toChunkCoordnate());
         this.name = name;
+        this.shouldBeShown = false;
     }
 
     public abstract int getBlockid();
@@ -31,6 +34,14 @@ public abstract class BlockBackend {
 
     public Chunk getChunk() {
         return chunk;
+    }
+
+    public boolean getShouldBeShown(){
+        return shouldBeShown;
+    }
+
+    public void setShouldBeShown(boolean shouldBeShown) {
+        this.shouldBeShown = shouldBeShown;
     }
 
     @Deprecated

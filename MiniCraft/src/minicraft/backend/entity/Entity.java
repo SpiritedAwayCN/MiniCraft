@@ -25,11 +25,11 @@ public abstract class Entity {
     }
 
     public ChunkCoordinate toChunkCoordinate(){
-        return new ChunkCoordinate((int)(coordinate.x / Constant.chunkX), (int)(coordinate.z / Constant.chunkZ));
+        return new ChunkCoordinate((int)Math.floor(coordinate.x / Constant.chunkX), (int)Math.floor(coordinate.z / Constant.chunkZ));
     }
 
     public BlockCoordinate toBlockCoordinate(){
-        return new BlockCoordinate((int)coordinate.x, (int)coordinate.y, (int)coordinate.z);
+        return new BlockCoordinate((int)Math.floor(coordinate.x), (int)Math.floor(coordinate.y), (int)Math.floor(coordinate.z));
     }
 
 }
