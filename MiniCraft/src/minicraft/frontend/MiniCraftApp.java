@@ -33,12 +33,21 @@ import com.jme3.system.AppSettings;
 import com.jme3.system.JmeContext.Type;
 import com.jme3.texture.Texture;
 import com.jme3.texture.Texture.MagFilter;
+import com.jme3.ui.Picture;
 import com.jme3.util.SkyFactory;
+import com.simsilica.lemur.Button;
+import com.simsilica.lemur.Command;
+import com.simsilica.lemur.Container;
+import com.simsilica.lemur.GuiGlobals;
+import com.simsilica.lemur.Label;
+import com.simsilica.lemur.style.BaseStyles;
 
 import minicraft.backend.constants.Constant;
 import minicraft.backend.map.DimensionMap;
 import minicraft.backend.map.block.BlockBackend;
 import minicraft.backend.utils.BlockCoord;
+import minicraft.frontend.gui.BlockBox;
+import minicraft.frontend.gui.BlockList;
 
 /**
  * Minicraft主类
@@ -69,6 +78,9 @@ public class MiniCraftApp extends SimpleApplication {
             flyCam.setMoveSpeed(5f); // odd to set this here but it did it before
             stateManager.getState(FlyCamAppState.class).setCamera( flyCam );
         }
+		registerInputMapping();
+	}
+	private void registerInputMapping() {
 		//将esc的作用改写为释放/隐藏鼠标，便于用鼠标调整窗口大小
 		if (inputManager!=null) {
 			inputManager.deleteMapping(INPUT_MAPPING_EXIT);
@@ -111,12 +123,22 @@ public class MiniCraftApp extends SimpleApplication {
 	public void simpleInitApp() {
 		System.out.println("MiniCraftApp.simpleInitApp()");
 		
+		
 		overworld=new DimensionMap("overworld");
 		overworld.generateFromGenerator(true);
 		//should be replaced to stats for player
 		cam.setLocation(new Vector3f(0,5.5f,0));
 		
-		GeometryBlock.initialize(assetManager);
+		Assets.initialize(assetManager);
+		//初始化场景及相关类
+		initScene();
+        
+        //设置天空颜色
+        viewPort.setBackgroundColor(new ColorRGBA(0.2f, 0.4f, 0.6f, 1));
+
+        initGUI();
+	}
+	private void initScene() {
 		geoms=new GeometryBlock[256*64*256];
 		
 		//BlockBackend block;
@@ -151,11 +173,61 @@ public class MiniCraftApp extends SimpleApplication {
         // #3 将模型和光源添加到场景图中
         rootNode.addLight(sun);
         rootNode.addLight(ambient);
-        
-        //设置天空颜色
-        viewPort.setBackgroundColor(new ColorRGBA(0.2f, 0.4f, 0.6f, 1));
-
 	}
+	private void initGUI() {
+		// 初始化Lemur GUI
+        /*GuiGlobals.initialize(this);
+        // 加载 'glass' 样式
+        BaseStyles.loadGlassStyle();
+        // 将'glass'设置为GUI默认样式
+        GuiGlobals.getInstance().getStyles().setDefaultStyle("glass");
+        
+        // 创建一个Container作为窗口中其他GUI元素的容器
+    	Container myWindow = new Container();
+    	guiNode.attachChild(myWindow);
+
+    	// 设置窗口在屏幕上的坐标
+    	// 注意：Lemur的GUI元素是以控件左上角为原点，向右、向下生成的。
+    	// 然而，作为一个Spatial，它在GuiNode中的坐标原点依然是屏幕的左下角。
+    	myWindow.setLocalTranslation(300, 300, 0);
+
+    	// 添加一个Label控件
+    	myWindow.addChild(new Label("Hello, World."));
+    	
+    	// 添加一个Button控件
+    	Button clickMe = myWindow.addChild(new Button("Click Me"));
+    	clickMe.addClickCommands(new Command<Button>() {
+    		@Override
+    		public void execute(Button source) {
+    			System.out.println("The world is yours.");
+    		}
+    	});*/
+		//Picture pic = new Picture("picture");
+
+        // 设置图片
+        //pic.setImage(assetManager, "gui/block_box.png", true);
+
+        
+        //pic.setWidth(80);
+        //pic.setHeight(80);
+
+        // 将图片后移一个单位，避免遮住状态界面。
+        //pic.setLocalTranslation(cam.getWidth()/2-80/2, 0, -1);
+        blockList=new BlockList(this);    
+        guiNode.attachChild(blockList);
+        
+	}
+	BlockList blockList;
+	
+	/*
+	 * 在窗口大小变化时，gui也需随之变化
+	 */
+	@Override
+	public void reshape(int w,int h) {
+		super.reshape(w, h);
+		blockList.reshape(w,h);
+	}
+
 
 	/**
 	 * 主循环
@@ -163,6 +235,8 @@ public class MiniCraftApp extends SimpleApplication {
 	@Override
 	public void simpleUpdate(float deltaTime) {
 		updateBlockVisibility();
+		
+		
 	}
 	
 	void updateBlockVisibility() {
@@ -233,8 +307,9 @@ public class MiniCraftApp extends SimpleApplication {
 		BlockCoord r=block.getBlockCoord();
 		
 		//放置方块
-		block=BlockBackend.getBlockInstanceByID(3);//放泥土
-		block.placeAt(r, overworld);
+		int blockid=blockList.getSelectedBlockid();
+		if(blockid==-1) return;
+		block=BlockBackend.getBlockInstanceByID(blockList.getSelectedBlockid());	block.placeAt(r, overworld);
 		overworld.updateBlockSetTemp(r, false);
 
 	}
