@@ -1,5 +1,6 @@
 package minicraft.backend.map;
 
+import com.jme3.renderer.queue.RenderQueue.Bucket;
 import com.jme3.scene.Node;
 
 import minicraft.backend.constants.Constant;
@@ -185,6 +186,8 @@ public class Chunk extends Node{
             this.detachChild(geometryBlock);
         }
         GeometryBlock geom = new GeometryBlock(block);
+        if(block.isTransparent())
+            geom.setQueueBucket(Bucket.Transparent);
         this.attachChild(geom);
         map.inChildBlockList.put(block.getBlockCoord(), geom);
     }

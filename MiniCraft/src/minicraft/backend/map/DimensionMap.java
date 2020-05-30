@@ -321,7 +321,7 @@ public class DimensionMap {
         int ox = oldcoord.getX(), oz = oldcoord.getZ();
         int nx = newcoord.getX(), nz = newcoord.getZ();
         if(ox == nx && oz == nz) return false;
-        System.out.printf("old=(%d,%d) new=(%d,%d)\n", ox,oz,nx,nz);
+        // System.out.printf("old=(%d,%d) new=(%d,%d)\n", ox,oz,nx,nz);
         //StarSky修改
         //updateBlockSet.clear();
         ChunkCoord st = new ChunkCoord();
