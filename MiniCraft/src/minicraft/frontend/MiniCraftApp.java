@@ -242,9 +242,10 @@ public class MiniCraftApp extends SimpleApplication {
 	void updateBlockVisibility() {
 		//更新周围方块，使其显示
 		HashSet<BlockBackend> blocksToUpdate=overworld.getUpdateBlockSet();
-		//if(blocksToUpdate.size()>0)
-			//System.out.println(blocksToUpdate.size());
+		// if(blocksToUpdate.size()>0)
+		// 	System.out.println(blocksToUpdate.size());
 		for(BlockBackend b:blocksToUpdate) {
+			// System.out.println(b.getBlockCoord() + " " + b.getShouldBeShown());
 			if(b.getShouldBeShown() == (geoms[b.hashCode()]!=null)) {
 				continue;//显示状态相同，不用更新
 			}

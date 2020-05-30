@@ -139,7 +139,7 @@ public class DimensionMap {
     private void loadChunkByCoord(ChunkCoord chunkCoordinate){
         Chunk chunk = getChunkByCoord(chunkCoordinate);
         if(chunk != null && chunk.getLoadLevel() == 1){
-            System.out.printf("load : %d %d\n", chunkCoordinate.getX(), chunkCoordinate.getZ());
+            // System.out.printf("load : %d %d\n", chunkCoordinate.getX(), chunkCoordinate.getZ());
             chunk.loadAllBlocksInChunk();
         }
     }
@@ -226,7 +226,7 @@ public class DimensionMap {
         if(block.isTransparent()){
             // 透明就只更新当前这个
             if(block.getBlockid() != 0){
-                block.setShouldBeShown(isBreak);
+                block.setShouldBeShown(!isBreak);
                 updateBlockSet.add(block);
             }
         }else if(isBreak){
@@ -238,9 +238,10 @@ public class DimensionMap {
             final int dx[] = {1, 0, -1, 0, 0, 0}, dz[] = {0, 1, 0, -1, 0, 0}, dy[]={0, 0, 0, 0, 1, -1};
             block.setShouldBeShown(true);
             updateBlockSet.add(block);
+            HashSet<BlockBackend> vis = new HashSet<>();
             for(int dir = 0; dir < 6; dir++){
                 int tx = x + dx[dir], ty = y + dy[dir], tz = z + dz[dir];
-                updateBlockRecusivePlace(new BlockCoord(tx, ty, tz), true);
+                updateBlockRecusivePlace(new BlockCoord(tx, ty, tz), true, vis);
             }
         }
         return updateBlockSet;
@@ -268,20 +269,22 @@ public class DimensionMap {
         }
     }
 
-    private boolean updateBlockRecusivePlace(BlockCoord blockCoordinate, boolean root){
+    private boolean updateBlockRecusivePlace(BlockCoord blockCoordinate, boolean root, HashSet<BlockBackend> vis){
         BlockBackend block;
     	block = getBlockByCoord(blockCoordinate);
         if(block == null || block.getChunk().getLoadLevel() < 2) return false;
         if(block.getBlockid() == 0) return true;
-        if(!root && (!block.getShouldBeShown() || updateBlockSet.contains(block))) return false;
-        if(!root && !block.isTransparent()) return false;
-
+        if(!root && (!block.getShouldBeShown() || vis.contains(block) ||updateBlockSet.contains(block))) return false;
+        if(!root && !block.isTransparent()){
+            return false;
+        } 
+        vis.add(block);
         int x = blockCoordinate.getX(), y = blockCoordinate.getY(), z = blockCoordinate.getZ();
         final int dx[] = {1, 0, -1, 0, 0, 0}, dz[] = {0, 1, 0, -1, 0, 0}, dy[]={0, 0, 0, 0, 1, -1};
         
         for(int dir = 0; dir < 6; dir++){
             int tx = x + dx[dir], ty = y + dy[dir], tz = z + dz[dir];
-            if(updateBlockRecusivePlace(new BlockCoord(tx, ty, tz), false)){
+            if(updateBlockRecusivePlace(new BlockCoord(tx, ty, tz), false, vis)){
                 return true;
             }
         }
@@ -303,7 +306,7 @@ public class DimensionMap {
         int ox = oldcoord.getX(), oz = oldcoord.getZ();
         int nx = newcoord.getX(), nz = newcoord.getZ();
         if(ox == nx && oz == nz) return false;
-        System.out.printf("old=(%d,%d) new=(%d,%d)\n", ox,oz,nx,nz);
+        // System.out.printf("old=(%d,%d) new=(%d,%d)\n", ox,oz,nx,nz);
         //StarSky修改
         //updateBlockSet.clear();
         ChunkCoord st = new ChunkCoord();
@@ -325,7 +328,7 @@ public class DimensionMap {
             }
         }
         player.setChunkCoordinate(newcoord);
-        System.out.println(updateBlockSet.size());
+        // System.out.println(updateBlockSet.size());
         return true;
     }
 
@@ -334,7 +337,7 @@ public class DimensionMap {
             return;
         Chunk chunk = getChunkByCoord(oldCoordinate);
         if(chunk != null && chunk.getLoadLevel() > 0){
-            System.out.printf("unload : %d %d\n", oldCoordinate.getX(), oldCoordinate.getZ());
+            // System.out.printf("unload : %d %d\n", oldCoordinate.getX(), oldCoordinate.getZ());
             chunk.unloadAllBlocksInChunk();
         }
     }
