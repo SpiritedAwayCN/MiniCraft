@@ -23,8 +23,7 @@ import minicraft.frontend.GamerCamera;
 
 public class TestApp extends SimpleApplication {
 
-    private String txtB =
-    "ABCDEFGHIKLMNOPQRSTUVWXYZ1234567890`~!@#$%^&*()-=_+[]\\;',./{}|:<>?";
+   
 
     public static void main(String[] args){
         TestApp app = new TestApp();
@@ -39,17 +38,38 @@ public class TestApp extends SimpleApplication {
     	Assets.initialize(assetManager);
 
     	
-    	Button l=new Button("hello");
-    	//l.setLocalTranslation(0, 100, 0);
-    	//Quad q=new Quad(792,72);
-		//Geometry pic = new Geometry(null,q);
-		//Material mat = Assets.MATERIAL_UNSHADED.clone();
-		//mat.setTexture("ColorMap", Assets.BLOCK_BOX);
-		//pic.setMaterial(mat);
-		//pic.setLocalTranslation(0,0,-1);
-		//this.attachChild(pic);
-    	l.setLocalTranslation(100,100,0);
-        guiNode.attachChild(l);
+    	p=new Panel(this);
+    	Button b1=new Button("button a");
+    	b1.addActionListener(new ActionListener() {
+    		@Override
+    		public void onAction(String arg0,boolean arg1,float arg2) {
+    			System.out.println("button a clicked!");
+    		}
+    	});
+    	p.addComponent(b1);
+    	Button b2=new Button("button b");
+    	b2.addActionListener(new ActionListener() {
+    		@Override
+    		public void onAction(String arg0,boolean arg1,float arg2) {
+    			System.out.println("button b clicked!");
+    		}
+    	});
+    	p.addComponent(b2);
+    	Button b3=new Button("button c");
+    	b3.addActionListener(new ActionListener() {
+    		@Override
+    		public void onAction(String arg0,boolean arg1,float arg2) {
+    			System.out.println("button c clicked!");
+    		}
+    	});
+    	p.addComponent(b3);
+        guiNode.attachChild(p);
+    }
+    Panel p;
+    @Override
+    public void reshape(int w,int h) {
+    	super.reshape(w, h);
+    	p.reshape(w,h);
     }
     @Override
 	public void initialize() {

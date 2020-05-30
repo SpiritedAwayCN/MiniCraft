@@ -175,7 +175,7 @@ public class MiniCraftApp extends SimpleApplication {
         // 定向光
         DirectionalLight sun = new DirectionalLight();
         sun.setDirection(new Vector3f(-1, -2, -3));
-        
+   
         // 环境光
         AmbientLight ambient = new AmbientLight();
 
