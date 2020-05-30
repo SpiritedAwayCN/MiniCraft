@@ -64,4 +64,10 @@ public class BlockCoord {
     public String toString() {
         return "(" + x + "," + y + "," + z + ")";
     }
+
+    @Override
+    public boolean equals(Object obj) {
+        BlockCoord bc = (BlockCoord)obj;
+        return x == bc.x && y == bc.y && z == bc.z;
+    }
 }

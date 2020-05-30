@@ -47,4 +47,10 @@ public class GeometryBlock extends Geometry {
 				+(r.getY()-Constant.minY)*(Constant.maxZ-Constant.minZ)
 				+(r.getZ()-Constant.minZ);
 	}
+
+	@Override
+	public boolean equals(Object obj) {
+		BlockBackend bbe = ((GeometryBlock)obj).block;
+		return block.getBlockCoord().equals(bbe.getBlockCoord());
+	}
 }
