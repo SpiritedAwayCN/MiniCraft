@@ -2,11 +2,12 @@ package minicraft.backend.map.block;
 
 import minicraft.backend.constants.Constant;
 
-public class GrassBlock extends BlockBackend{
-    private static final int blockID = Constant.BLOCK_GRASS;
+public class SpruceLogBlock extends BlockBackend {
 
-    public GrassBlock(){
-        super("grass");
+	private static final int blockID = Constant.BLOCK_SPRUCE_LOG;
+
+    public SpruceLogBlock(){
+        super("spruce_log");
     }
 
     @Override
@@ -18,8 +19,9 @@ public class GrassBlock extends BlockBackend{
     public boolean isTextureUniform() {
     	return false;
     }
-
+    
     public static int getBlockidStatic() {
         return blockID;
     }
+
 }

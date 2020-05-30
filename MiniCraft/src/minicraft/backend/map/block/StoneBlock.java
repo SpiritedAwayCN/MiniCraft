@@ -1,7 +1,9 @@
 package minicraft.backend.map.block;
 
+import minicraft.backend.constants.Constant;
+
 public class StoneBlock extends BlockBackend{
-    private static final int blockID = 1;
+    private static final int blockID = Constant.BLOCK_STONE;
 
     public StoneBlock(){
         super("stone");

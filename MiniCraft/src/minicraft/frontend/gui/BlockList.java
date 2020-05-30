@@ -13,12 +13,13 @@ import minicraft.frontend.Assets;
 
 public class BlockList extends Node {
 	private BlockBox[] boxes;
+	private int size=8;
 	int selectedBoxIdx;
 	
 	public BlockList(SimpleApplication app) {
 		//初始化每个格子
-		boxes=new BlockBox[6];
-		for(int i=0;i<6;i++) {
+		boxes=new BlockBox[size];
+		for(int i=0;i<size;i++) {
 			boxes[i]=new BlockBox();
 			if(Assets.BLOCK_IMAGE[i]!=null) {
 				boxes[i].setBlockByID(i);
@@ -36,7 +37,7 @@ public class BlockList extends Node {
 		registryMapping(app.getInputManager());
 	}
 	public void reshape(int w,int h) {
-		this.setLocalTranslation(w/2-BlockBox.width*(6/2), 0, 0);
+		this.setLocalTranslation(w/2-BlockBox.width*(size/2), 0, 0);
 	}
 	
 	final static String[] MAPPINGS_BOX_SELECTED= {"box_0_selected",
@@ -45,6 +46,10 @@ public class BlockList extends Node {
 			"box_3_selected",
 			"box_4_selected",
 			"box_5_selected",
+			"box_6_selected",
+			"box_7_selected",
+			"box_8_selected",
+			"box_9_selected",
 	};
 	private void registryMapping(InputManager inputManager) {
 		inputManager.addMapping(MAPPINGS_BOX_SELECTED[0], new KeyTrigger(KeyInput.KEY_1));
@@ -53,6 +58,9 @@ public class BlockList extends Node {
 		inputManager.addMapping(MAPPINGS_BOX_SELECTED[3], new KeyTrigger(KeyInput.KEY_4));
 		inputManager.addMapping(MAPPINGS_BOX_SELECTED[4], new KeyTrigger(KeyInput.KEY_5));
 		inputManager.addMapping(MAPPINGS_BOX_SELECTED[5], new KeyTrigger(KeyInput.KEY_6));
+		inputManager.addMapping(MAPPINGS_BOX_SELECTED[6], new KeyTrigger(KeyInput.KEY_7));
+		inputManager.addMapping(MAPPINGS_BOX_SELECTED[7], new KeyTrigger(KeyInput.KEY_8));
+		
 		inputManager.addListener(new ActionListener() {
 			@Override
 	        public void onAction(String name, boolean value, float tpf) {

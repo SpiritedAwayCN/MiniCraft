@@ -42,22 +42,9 @@ public class BlockFrontend extends Box {
     //protected BlockFrontend(){
     //    super();
     //}
-	
-	
-	
-    private static final int[] BLOCK_LIST_TEXTURE_UNUNIFORM= {
-			2
-	};
 
     public static BlockFrontend getBlockInstanceByID(int Blockid){
-        boolean blockTexUniform=true;
-    	for(int id : BLOCK_LIST_TEXTURE_UNUNIFORM) {
-			if(id==Blockid) {
-				blockTexUniform=false;
-				break;
-			}	
-		}
-    	if(blockTexUniform)
+    	if(BlockBackend.getBlockInstanceByID(Blockid).isTextureUniform())
     		return new BlockFrontend();
     	else
     		return new BlockFrontendTexUnuniform();

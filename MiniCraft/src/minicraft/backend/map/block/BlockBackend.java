@@ -59,7 +59,13 @@ public abstract class BlockBackend {
     public boolean isTransparent(){
         return false; //透明方块在子类中重载
     }
-
+    
+    /*
+     * 返回是否是各面相同的材质，默认为true
+     */
+    public boolean isTextureUniform() {
+    	return true;
+    }
 
     /**
      * 破坏这个方块，要求已经放置，否则调用失败

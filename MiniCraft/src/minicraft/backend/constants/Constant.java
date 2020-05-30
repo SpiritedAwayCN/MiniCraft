@@ -16,7 +16,7 @@ public class Constant {
     // 一行5个，方便数数
     public static final String[] BLOCKNAME_STRINGS = {
         "Air", "Stone", "Grass", "Dirt", "Bedrock",
-        "Glass"};
+        "Glass","SpruceLog","OakLeaves"};
     //方块id常量
     public static final int BLOCK_AIR=0;
     public static final int BLOCK_STONE=1;
@@ -24,8 +24,10 @@ public class Constant {
     public static final int BLOCK_DIRT=3;
     public static final int BLOCK_BEDROCK=4;
     public static final int BLOCK_GLASS=5;
-    //共六种方块
-    public static final int BLOCK_TYPE_NUM=6;
+    public static final int BLOCK_SPRUCE_LOG=6;
+    public static final int BLOCK_OAK_LEAVES=7;
+    //方块种类数
+    public static final int BLOCK_TYPE_NUM=BLOCKNAME_STRINGS.length;
     
     public static final int chunkMinCoordX = (int)Math.floor(minX / chunkX);
     public static final int chunkMaxCoordX = (int)Math.floor(maxX / chunkX);

@@ -1,7 +1,9 @@
 package minicraft.backend.map.block;
 
+import minicraft.backend.constants.Constant;
+
 public class GlassBlock extends BlockBackend{
-    private static final int blockID = 5;
+    private static final int blockID = Constant.BLOCK_GLASS;
 
     public GlassBlock(){
         super("glass");
@@ -11,6 +13,8 @@ public class GlassBlock extends BlockBackend{
     public boolean isTransparent() {
         return true;
     }
+    
+    
 
     @Override
     public int getBlockid() {

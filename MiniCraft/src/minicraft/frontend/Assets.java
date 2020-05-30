@@ -29,10 +29,12 @@ public class Assets {
 		final String[] blockTexFilepath= {
 				null,//air
 				"texture/stone.bmp",
-				"texture/grass.bmp",
+				"texture/grass.png",
 				"texture/dirt.bmp",
 				"texture/bedrock.bmp",
-				"texture/glass.png"//glass
+				"texture/glass.png",
+				"texture/spruce_log.png",
+				"texture/oak_leaves.png"
 		};
 		final String[] blockImageFilepath= {
 				null,//air
@@ -40,7 +42,9 @@ public class Assets {
 				"gui/block_grass.png",
 				"gui/block_dirt.png",
 				"gui/block_bedrock.png",
-				"gui/block_glass.png"//glass
+				"gui/block_glass.png",
+				"gui/block_spruce_log.png",
+				"gui/block_oak_leaves.png"
 		};
 		
 
