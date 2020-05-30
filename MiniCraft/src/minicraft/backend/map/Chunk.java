@@ -153,24 +153,24 @@ public class Chunk extends Node{
                     if(j == Constant.maxY - 1 || blocks[i][j][k].getBlockid() == 0){
                         updateRucusive(i, j, k, masks, true);
                     }else{
-                        if(i == 0 && chunkWest != null && chunkWest.getLoadLevel() >= 2){
+                        if(i == 0 && chunkWest != null){
                             BlockBackend block = chunkWest.getBlocks()[Constant.chunkX-1][j][k];
                             if(block.getBlockid() == 0 || (block.getShouldBeShown() && block.isTransparent()))
                                 updateRucusive(i, j, k, masks, false);
                         }
-                        if(i == Constant.chunkX-1 && chunkEast != null && chunkEast.getLoadLevel() >= 2){
+                        if(i == Constant.chunkX-1 && chunkEast != null){
                             
                             BlockBackend block = chunkEast.getBlocks()[0][j][k];
                             if(block.getBlockid() == 0 || (block.getShouldBeShown() && block.isTransparent()))
                                 updateRucusive(i, j, k, masks, false);
                         }
-                        if(k == 0 && chunkNorth != null && chunkNorth.getLoadLevel() >= 2){
+                        if(k == 0 && chunkNorth != null){
                             BlockBackend block = chunkNorth.getBlocks()[i][j][Constant.chunkZ-1];
                             if(block.getBlockid() == 0 || (block.getShouldBeShown() && block.isTransparent())){
                                 updateRucusive(i, j, k, masks, false);
                             }
                         }
-                        if(k == Constant.chunkZ-1 && chunkSouth != null && chunkSouth.getLoadLevel() >= 2){
+                        if(k == Constant.chunkZ-1 && chunkSouth != null){
                             BlockBackend block = chunkSouth.getBlocks()[i][j][0];
                             if(block.getBlockid() == 0 || (block.getShouldBeShown() && block.isTransparent()))
                                 updateRucusive(i, j, k, masks, false);
