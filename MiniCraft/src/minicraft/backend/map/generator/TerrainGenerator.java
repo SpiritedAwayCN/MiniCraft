@@ -8,7 +8,7 @@ import minicraft.backend.map.generator.perlin.Perlin;
 
 public class TerrainGenerator extends Generator {
     public TerrainGenerator(){
-        this.random = new Random(1);
+        this.random = new Random();
     }
 
     @Override

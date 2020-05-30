@@ -99,8 +99,6 @@ public class Chunk extends Node{
             initialized = true;
         }
         this.map.miniCraftApp.getRootNode().attachChild(this);
-        if(chunkCoordinate.getX() == -5 && chunkCoordinate.getZ() == -2)
-            System.out.println("jjj");
         this.loadLevel = 2;
     }
 
@@ -160,8 +158,6 @@ public class Chunk extends Node{
                             if(block.getBlockid() == 0 || (block.getShouldBeShown() && block.isTransparent()))
                                 updateRucusive(i, j, k, masks, false);
                         }
-                        if(i == Constant.chunkX-1 && chunkCoordinate.getX() == -6 && chunkCoordinate.getZ() == -2 && blocks[i][j][k].getBlockid()==3)
-                            System.out.println("-6 -2");
                         if(i == Constant.chunkX-1 && chunkEast != null && chunkEast.getLoadLevel() >= 2){
                             
                             BlockBackend block = chunkEast.getBlocks()[0][j][k];

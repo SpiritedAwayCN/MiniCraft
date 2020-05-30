@@ -13,8 +13,8 @@ public class Perlin {
         this.zeroBound = zeroBound;
         perlinNoise = new double[h][w];
         perlinGradients = new double[h+1][w+1][2];
-        // this.biasX = Math.random() * 15603;
-        // this.biasZ = Math.random() * 11592;
+        this.biasX = Math.random() * 15603;
+        this.biasZ = Math.random() * 11592;
         // generateGradients();
         generateMapByGradient();
         normalize();
