@@ -252,8 +252,12 @@ public class MiniCraftApp extends SimpleApplication {
 			//添加显示
 			if(b.getShouldBeShown()) {
 				GeometryBlock geom=new GeometryBlock(b);
+				if(b.isTransparent()) {
+					geom.setQueueBucket(Bucket.Transparent);
+				}
 				rootNode.attachChild(geom);
 				geoms[b.hashCode()]=(GeometryBlock) geom;
+				
 			}else {//不显示
 				//System.out.println("rootNode.detaching sth.");
 				rootNode.detachChild(geoms[b.hashCode()]);
