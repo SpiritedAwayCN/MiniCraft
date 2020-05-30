@@ -333,7 +333,7 @@ public class DimensionMap {
     }
 
     private void unloadIfTooFar(ChunkCoord oldCoordinate, int nx, int nz){
-        if(Math.abs(oldCoordinate.getX() - nx) + Math.abs(oldCoordinate.getZ() - nz) < Constant.viewChunkDistance)
+        if(Math.min(Math.abs(oldCoordinate.getX() - nx), Math.abs(oldCoordinate.getZ() - nz)) <= Constant.viewChunkDistance)
             return;
         Chunk chunk = getChunkByCoord(oldCoordinate);
         if(chunk != null && chunk.getLoadLevel() > 0){
