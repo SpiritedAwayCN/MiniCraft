@@ -120,7 +120,7 @@ public class Chunk {
         if(block.getBlockid() != 0){
             block.setShouldBeShown(true);
             map.getUpdateBlockSet().add(block);
-            return;
+            if(!block.isTransparent()) return;
         }
         if(!root && (block.getBlockid()==0 || !block.isTransparent())) return;
         if(flag) masks[x][y][z] = true;

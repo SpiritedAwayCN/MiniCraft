@@ -58,20 +58,20 @@ public class TerrainGenerator extends Generator {
                     for(int jj = -treeMinDist; jj <=treeMinDist; jj++){
                         int x = rx + ii, z = rz + jj;
                         if(x < 0 || x >= heightMap.length || z < 0 || z >= heightMap[0].length) continue;
-                        if(blockMap[x][heightMap[x][z] + 1][z] == SpruceLogBlock.getBlockidStatic()) continue outer;
+                        if(blockMap[x][heightMap[x][z]+1][z] == SpruceLogBlock.getBlockidStatic()) continue outer;
                     }
                 int h = random.nextInt(4) + 4;
-                for(int bh = 1; bh <= h + 1; bh++){
+                for(int bh = 1; bh <= h+1; bh++){
                     if(heightMap[rx][rz] >= Constant.maxY) break;
-                    if(bh <= h)
+                    if(bh < h + 1)
                         blockMap[rx][heightMap[rx][rz] + bh][rz] = SpruceLogBlock.getBlockidStatic();
                     if(bh > h - 1){
                         for(int ii = -1; ii <= 1; ii++)
                             for(int jj = -1; jj <= 1; jj++){
                                 int lx = rx + ii, lz = rz + jj;
                                 if(lx < 0 || lz < 0 || lx >= heightMap.length || lz>=heightMap[0].length) continue;
-                                if(blockMap[lx][heightMap[lx][lz] + bh][lz] == 0)
-                                    blockMap[lx][heightMap[lx][lz] + bh][lz] = OakLeavesBlock.getBlockidStatic();
+                                if(blockMap[lx][heightMap[rx][rz] + bh][lz] == 0)
+                                    blockMap[lx][heightMap[rx][rz] + bh][lz] = OakLeavesBlock.getBlockidStatic();
                             }
                                 
                     }else if(bh > h-3 || (h > 5 && bh > h-4)){
@@ -79,8 +79,8 @@ public class TerrainGenerator extends Generator {
                             for(int jj = -2; jj <= 2; jj++){
                                 int lx = rx + ii, lz = rz + jj;
                                 if(lx < 0 || lz < 0 || lx >= heightMap.length || lz>=heightMap[0].length) continue;
-                                if(blockMap[lx][heightMap[lx][lz] + bh][lz] == 0)
-                                    blockMap[lx][heightMap[lx][lz] + bh][lz] = OakLeavesBlock.getBlockidStatic();
+                                if(blockMap[lx][heightMap[rx][rz] + bh][lz] == 0)
+                                    blockMap[lx][heightMap[rx][rz] + bh][lz] = OakLeavesBlock.getBlockidStatic();
                             }
                     }
                 }
