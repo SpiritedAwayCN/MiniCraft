@@ -17,6 +17,13 @@ public class Constant {
     public static final String[] BLOCKNAME_STRINGS = {
         "Air", "Stone", "Grass", "Dirt", "Bedrock",
         "Glass"};
+    //方块id常量
+    public static final int BLOCK_AIR=0;
+    public static final int BLOCK_STONE=1;
+    public static final int BLOCK_GRASS=2;
+    public static final int BLOCK_DIRT=3;
+    public static final int BLOCK_BEDROCK=4;
+    public static final int BLOCK_GLASS=5;
     //共六种方块
     public static final int BLOCK_TYPE_NUM=6;
     

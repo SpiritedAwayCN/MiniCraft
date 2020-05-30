@@ -17,48 +17,24 @@ public class GeometryBlock extends Geometry {
 	
 private static Material[] materails;
 	
-
-	
-	public static void initialize (AssetManager assetManager)
-			throws AssetNotFoundException
-	{
-		loadMaterial(assetManager);
-	}
-	private static void loadMaterial(AssetManager assetManager) 
-			throws AssetNotFoundException{
+	static {
+		if(!Assets.initialized)
+			throw new RuntimeException();
+		
 		materails=new Material[Constant.BLOCK_TYPE_NUM];
-		
-		//待修改——改为map
-		final String[] texFilename= {
-				null,//air
-				"texture/stone.bmp",
-				"texture/grass.bmp",
-				"texture/dirt.bmp",
-				"texture/bedrock.bmp",
-				null//glass
-		};
-		
-		assetManager.registerLocator("assets", FileLocator.class);
-		for(int i=0;i<materails.length;i++) {
+
+		for(int Blockid=0;Blockid<Constant.BLOCK_TYPE_NUM;Blockid++) {
 			// 设置受光材质
-			materails[i] = new Material(assetManager, "Common/MatDefs/Light/Lighting.j3md");
+			materails[Blockid] = Assets.MATERIAL_LIGHTING.clone();
+			
 			// 设置纹理贴图
-			if(texFilename[i]!=null){
-				TextureKey param=new TextureKey(texFilename[i]);
-				param.setGenerateMips(true);
-				Texture tex = assetManager.loadTexture(param);
-				
-	        	tex.setMagFilter(MagFilter.Nearest);
-	        	materails[i].setTexture("DiffuseMap", tex);
-			}
-	        
+	        materails[Blockid].setTexture("DiffuseMap", Assets.BLOCK_TEXTURE[Blockid]);
+
 	        // 设置反光度
-	        materails[i].setFloat("Shininess", 2.0f);
+	        materails[Blockid].setFloat("Shininess", 2.0f);
 		}      
-        // #3 创造1个方块，应用此材质。
-        //geom = new Geometry("grass", new Block(1, 1, 1));
-		//geom.setMaterial(mat);
 	}
+	
 	
 	//BlockFrontend block;
 	BlockBackend block;

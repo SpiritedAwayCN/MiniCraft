@@ -1,5 +1,6 @@
 package minicraft.frontend;
 
+
 import com.jme3.collision.MotionAllowedListener;
 import com.jme3.input.CameraInput;
 import com.jme3.input.FlyByCamera;
