@@ -4,14 +4,17 @@ import com.jme3.asset.AssetManager;
 import com.jme3.asset.TextureKey;
 import com.jme3.asset.plugins.FileLocator;
 import com.jme3.material.Material;
+import com.jme3.material.RenderState.BlendMode;
 import com.jme3.texture.Texture;
 import com.jme3.texture.Texture.MagFilter;
 
 import minicraft.backend.constants.Constant;
+import minicraft.backend.map.block.BlockBackend;
 
 public class Assets {
 	public static Texture[] BLOCK_TEXTURE;
 	public static Texture[] BLOCK_IMAGE;
+	public static Material[] BLOCK_MATERIAL;
 	public static Texture BLOCK_BOX,BLOCK_BOX_SELECTED;
 	public static Texture NULL_TEXTURE;
 	
@@ -29,7 +32,7 @@ public class Assets {
 				"texture/grass.bmp",
 				"texture/dirt.bmp",
 				"texture/bedrock.bmp",
-				null//glass
+				"texture/glass.png"//glass
 		};
 		final String[] blockImageFilepath= {
 				null,//air
@@ -37,7 +40,7 @@ public class Assets {
 				"gui/block_grass.png",
 				"gui/block_dirt.png",
 				"gui/block_bedrock.png",
-				null//glass
+				"gui/block_glass.png"//glass
 		};
 		
 
@@ -69,6 +72,20 @@ public class Assets {
 		MATERIAL_LIGHTING=new Material(assetManager, "Common/MatDefs/Light/Lighting.j3md");
 		MATERIAL_UNSHADED=new Material(assetManager, "Common/MatDefs/Misc/Unshaded.j3md");
 		
+		
+		BLOCK_MATERIAL=new Material[Constant.BLOCK_TYPE_NUM];
+		for(int Blockid=0;Blockid<Constant.BLOCK_TYPE_NUM;Blockid++) {
+			// 设置受光材质
+			BLOCK_MATERIAL[Blockid] = Assets.MATERIAL_LIGHTING.clone();
+			// 设置纹理贴图
+			BLOCK_MATERIAL[Blockid].setTexture("DiffuseMap", Assets.BLOCK_TEXTURE[Blockid]);
+	        // 设置反光度
+			BLOCK_MATERIAL[Blockid].setFloat("Shininess", 2.0f);
+			if(BlockBackend.getBlockInstanceByID(Blockid).isTransparent()) {
+				BLOCK_MATERIAL[Blockid].getAdditionalRenderState().setBlendMode(BlendMode.Alpha);
+		
+			}    
+		}
 		
 		initialized=true;
 	}

@@ -15,26 +15,6 @@ import com.jme3.texture.Texture.MagFilter;
 
 public class GeometryBlock extends Geometry {
 	
-private static Material[] materails;
-	
-	static {
-		if(!Assets.initialized)
-			throw new RuntimeException();
-		
-		materails=new Material[Constant.BLOCK_TYPE_NUM];
-
-		for(int Blockid=0;Blockid<Constant.BLOCK_TYPE_NUM;Blockid++) {
-			// 设置受光材质
-			materails[Blockid] = Assets.MATERIAL_LIGHTING.clone();
-			
-			// 设置纹理贴图
-	        materails[Blockid].setTexture("DiffuseMap", Assets.BLOCK_TEXTURE[Blockid]);
-
-	        // 设置反光度
-	        materails[Blockid].setFloat("Shininess", 2.0f);
-		}      
-	}
-	
 	
 	//BlockFrontend block;
 	BlockBackend block;
@@ -42,7 +22,7 @@ private static Material[] materails;
 	@Deprecated
 	public GeometryBlock(BlockCoord pos,int Blockid) {
 		super(null, BlockFrontend.getBlockInstanceByID(Blockid));
-		this.setMaterial(materails[Blockid]);
+		this.setMaterial(Assets.BLOCK_MATERIAL[Blockid]);
 		this.move(pos.getX(),pos.getY(),pos.getZ());
 	}
 	public GeometryBlock() {
@@ -51,7 +31,7 @@ private static Material[] materails;
 	}
 	public GeometryBlock(BlockBackend block) {
 		super(null,BlockFrontend.getBlockInstanceByID(block.getBlockid()));
-		this.setMaterial(materails[block.getBlockid()]);
+		this.setMaterial(Assets.BLOCK_MATERIAL[block.getBlockid()]);
 		BlockCoord pos=block.getBlockCoord();
 		this.move(pos.getX(),pos.getY(),pos.getZ());
 		this.block=block;
