@@ -12,6 +12,7 @@ import com.jme3.app.DebugKeysAppState;
 //用了minicraft.frontend.FlyCamAppState
 import com.jme3.asset.plugins.FileLocator;
 import com.jme3.audio.AudioListenerState;
+import com.jme3.cursors.plugins.JmeCursor;
 import com.jme3.input.KeyInput;
 import com.jme3.input.MouseInput;
 import com.jme3.input.controls.ActionListener;
@@ -23,12 +24,16 @@ import com.jme3.material.Material;
 import com.jme3.math.ColorRGBA;
 import com.jme3.math.FastMath;
 import com.jme3.math.Vector3f;
+import com.jme3.post.FilterPostProcessor;
 import com.jme3.renderer.queue.RenderQueue.Bucket;
+import com.jme3.renderer.queue.RenderQueue.ShadowMode;
 import com.jme3.scene.Geometry;
 import com.jme3.scene.Mesh;
 import com.jme3.scene.Spatial;
 import com.jme3.scene.Spatial.CullHint;
 import com.jme3.scene.shape.Box;
+import com.jme3.shadow.DirectionalLightShadowFilter;
+import com.jme3.shadow.DirectionalLightShadowRenderer;
 import com.jme3.system.AppSettings;
 import com.jme3.system.JmeContext.Type;
 import com.jme3.texture.Texture;
@@ -36,11 +41,16 @@ import com.jme3.texture.Texture.MagFilter;
 import com.jme3.ui.Picture;
 import com.jme3.util.SkyFactory;
 import com.simsilica.lemur.Button;
+import com.simsilica.lemur.Checkbox;
 import com.simsilica.lemur.Command;
 import com.simsilica.lemur.Container;
 import com.simsilica.lemur.GuiGlobals;
 import com.simsilica.lemur.Label;
+import com.simsilica.lemur.Panel;
+import com.simsilica.lemur.Slider;
+import com.simsilica.lemur.component.QuadBackgroundComponent;
 import com.simsilica.lemur.style.BaseStyles;
+import com.simsilica.lemur.style.Styles;
 
 import minicraft.backend.constants.Constant;
 import minicraft.backend.map.DimensionMap;
@@ -150,6 +160,10 @@ public class MiniCraftApp extends SimpleApplication {
 				if(block.getBlockid()==0)
 					continue;
 				geom=new GeometryBlock(block);
+				//透明方块特判
+				if(block.isTransparent()) {
+					geom.setQueueBucket(Bucket.Transparent);
+				}
 				rootNode.attachChild(geom);
 				geoms[geom.hashCode()]=(GeometryBlock) geom;
 				//只好手写hashSet
@@ -170,20 +184,44 @@ public class MiniCraftApp extends SimpleApplication {
         sun.setColor(lightColor.mult(0.8f));
         ambient.setColor(lightColor.mult(0.2f));
         
+        
+        
         // #3 将模型和光源添加到场景图中
         rootNode.addLight(sun);
         rootNode.addLight(ambient);
+        
+        /* 产生阴影 */
+        final int SHADOWMAP_SIZE=1024;
+
+        DirectionalLightShadowFilter dlsf = new DirectionalLightShadowFilter(assetManager, SHADOWMAP_SIZE, 1);
+        dlsf.setLight(sun);
+        dlsf.setEnabled(true);
+        FilterPostProcessor fpp = new FilterPostProcessor(assetManager);
+        fpp.addFilter(dlsf);
+        viewPort.addProcessor(fpp);
+        rootNode.setShadowMode(ShadowMode.CastAndReceive);
 	}
 	private void initGUI() {
+		//设置鼠标
+		JmeCursor cur = (JmeCursor) assetManager.loadAsset("gui/cursor.cur");
+		inputManager.setMouseCursor(cur);
+		
+		
 		// 初始化Lemur GUI
-        /*GuiGlobals.initialize(this);
-        // 加载 'glass' 样式
-        BaseStyles.loadGlassStyle();
-        // 将'glass'设置为GUI默认样式
-        GuiGlobals.getInstance().getStyles().setDefaultStyle("glass");
+        GuiGlobals.initialize(this);
+        Styles styles = GuiGlobals.getInstance().getStyles();
+        styles.getSelector( Slider.THUMB_ID, "glass" ).set( "text", "[]", false );
+        styles.getSelector( Panel.ELEMENT_ID, "glass" ).set( "background",
+                                new QuadBackgroundComponent(new ColorRGBA(0, 0.25f, 0.25f, 0.5f)) );
+        styles.getSelector( Button.ELEMENT_ID, "glass" ).set( "background",
+                                new QuadBackgroundComponent(new ColorRGBA(0, 0.5f, 0.5f, 0.5f)) );
+        styles.getSelector( Label.ELEMENT_ID, "glass" ).set( "background",
+                new QuadBackgroundComponent(new ColorRGBA(0, 0.5f, 0.5f, 0.5f)) );
+
+
         
         // 创建一个Container作为窗口中其他GUI元素的容器
-    	Container myWindow = new Container();
+    	Container myWindow = new Container("glass");
     	guiNode.attachChild(myWindow);
 
     	// 设置窗口在屏幕上的坐标
@@ -192,16 +230,16 @@ public class MiniCraftApp extends SimpleApplication {
     	myWindow.setLocalTranslation(300, 300, 0);
 
     	// 添加一个Label控件
-    	myWindow.addChild(new Label("Hello, World."));
+    	myWindow.addChild(new Label("Hello, World.","glass"));
     	
     	// 添加一个Button控件
-    	Button clickMe = myWindow.addChild(new Button("Click Me"));
+    	Button clickMe = myWindow.addChild(new Button("Click Me","glass"));
     	clickMe.addClickCommands(new Command<Button>() {
     		@Override
     		public void execute(Button source) {
     			System.out.println("The world is yours.");
     		}
-    	});*/
+    	});
 		//Picture pic = new Picture("picture");
 
         // 设置图片
@@ -252,6 +290,7 @@ public class MiniCraftApp extends SimpleApplication {
 			//添加显示
 			if(b.getShouldBeShown()) {
 				GeometryBlock geom=new GeometryBlock(b);
+				//透明方块特判
 				if(b.isTransparent()) {
 					geom.setQueueBucket(Bucket.Transparent);
 				}
