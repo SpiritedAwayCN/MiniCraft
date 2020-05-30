@@ -37,7 +37,11 @@ public class DimensionMap {
      * @param flat 是否超平坦（现在只能超平坦）
      */
     public void generateFromGenerator(boolean flat){
-        Generator generator = new FlatGenerator();
+        Generator generator;
+        if(flat)
+            generator = new FlatGenerator();
+        else
+            generator = new TerrainGenerator();
         generator.generateBlockMap();
         initialBlockMap = generator.getBlockMap();
         
@@ -104,24 +108,16 @@ public class DimensionMap {
         int cx = st.getX(), cz = st.getZ();
         
         //全部设为预加载
-        for(int dist = 0; dist < Constant.viewChunkDistance; dist++){
-            for(int i = 0; i <= dist; i++){
-                int j = dist - i;
+        for(int i = -Constant.viewChunkDistance; i <= Constant.viewChunkDistance; i++){
+            for(int j = -Constant.viewChunkDistance; j <= Constant.viewChunkDistance; j++){
                 setChunkPreLoad(st.setXZ(cx + i, cz + j));
-                setChunkPreLoad(st.setXZ(cx + i, cz - j));
-                setChunkPreLoad(st.setXZ(cx - i, cz + j));
-                setChunkPreLoad(st.setXZ(cx - i, cz - j));
             }
         }
 
         //再开始变强加载
-        for(int dist = 0; dist < Constant.viewChunkDistance; dist++){
-            for(int i = 0; i <= dist; i++){
-                int j = dist - i;
+        for(int i = -Constant.viewChunkDistance; i <= Constant.viewChunkDistance; i++){
+            for(int j = -Constant.viewChunkDistance; j <= Constant.viewChunkDistance; j++){
                 loadChunkByCoord(st.setXZ(cx + i, cz + j));
-                loadChunkByCoord(st.setXZ(cx + i, cz - j));
-                loadChunkByCoord(st.setXZ(cx - i, cz + j));
-                loadChunkByCoord(st.setXZ(cx - i, cz - j));
             }
         }
 
@@ -311,33 +307,21 @@ public class DimensionMap {
         //StarSky修改
         //updateBlockSet.clear();
         ChunkCoord st = new ChunkCoord();
-        for(int dist = 0; dist < Constant.viewChunkDistance; dist++){
-            for(int i = 0; i <= dist; i++){
-                int j = dist - i;
+        for(int i = -Constant.viewChunkDistance; i <= Constant.viewChunkDistance; i++){
+            for(int j = -Constant.viewChunkDistance; j <= Constant.viewChunkDistance; j++){
                 unloadIfTooFar(st.setXZ(ox + i, oz + j), nx, nz);
-                unloadIfTooFar(st.setXZ(ox + i, oz - j), nx, nz);
-                unloadIfTooFar(st.setXZ(ox - i, oz + j), nx, nz);
-                unloadIfTooFar(st.setXZ(ox - i, oz - j), nx, nz);
             }
         }
         
-        for(int dist = 0; dist < Constant.viewChunkDistance; dist++){
-            for(int i = 0; i <= dist; i++){
-                int j = dist - i;
+        for(int i = -Constant.viewChunkDistance; i <= Constant.viewChunkDistance; i++){
+            for(int j = -Constant.viewChunkDistance; j <= Constant.viewChunkDistance; j++){
                 setChunkPreLoadIfNot(st.setXZ(nx + i, nz + j));
-                setChunkPreLoadIfNot(st.setXZ(nx + i, nz - j));
-                setChunkPreLoadIfNot(st.setXZ(nx - i, nz + j));
-                setChunkPreLoadIfNot(st.setXZ(nx - i, nz - j));
             }
         }
 
-        for(int dist = 0; dist < Constant.viewChunkDistance; dist++){
-            for(int i = 0; i <= dist; i++){
-                int j = dist - i;
+        for(int i = -Constant.viewChunkDistance; i <= Constant.viewChunkDistance; i++){
+            for(int j = -Constant.viewChunkDistance; j <= Constant.viewChunkDistance; j++){
                 loadChunkByCoord(st.setXZ(nx + i, nz + j));
-                loadChunkByCoord(st.setXZ(nx + i, nz - j));
-                loadChunkByCoord(st.setXZ(nx - i, nz + j));
-                loadChunkByCoord(st.setXZ(nx - i, nz - j));
             }
         }
         player.setChunkCoordinate(newcoord);

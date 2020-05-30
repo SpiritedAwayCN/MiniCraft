@@ -92,9 +92,6 @@ public class Chunk {
      */
     public void loadAllBlocksInChunk(){
         updateSurface();
-
-        //TODO 区块边界透明方块处理
-
         this.loadLevel = 2;
     }
 
@@ -137,11 +134,38 @@ public class Chunk {
 
     private void updateSurface(){
         boolean[][][] masks = new boolean[Constant.chunkX][Constant.maxY][Constant.chunkZ];
+        Chunk chunkEast = map.getChunkByCoord(new ChunkCoord(chunkCoordinate.getX() + 1, chunkCoordinate.getZ()));
+        Chunk chunkSouth = map.getChunkByCoord(new ChunkCoord(chunkCoordinate.getX(), chunkCoordinate.getZ() + 1));
+        Chunk chunkWest = map.getChunkByCoord(new ChunkCoord(chunkCoordinate.getX() - 1, chunkCoordinate.getZ()));
+        Chunk chunkNorth = map.getChunkByCoord(new ChunkCoord(chunkCoordinate.getX(), chunkCoordinate.getZ() - 1));
         for(int i = 0; i < Constant.chunkX; i++)
             for(int j = 0; j < Constant.maxY; j++)
                 for(int k = 0; k < Constant.chunkZ; k++){
-                    if(j == Constant.maxY - 1 || blocks[i][j][k].getBlockid() == 0)
+                    if(j == Constant.maxY - 1 || blocks[i][j][k].getBlockid() == 0){
                         updateRucusive(i, j, k, masks, true);
+                    }else{
+                        if(i == 0 && chunkWest != null && chunkWest.getLoadLevel() >= 2){
+                            BlockBackend block = chunkWest.getBlocks()[Constant.chunkX-1][j][k];
+                            if(block.getBlockid() == 0 || (block.getShouldBeShown() && block.isTransparent()))
+                                updateRucusive(i, j, k, masks, false);
+                        }
+                        if(i == Constant.chunkX-1 && chunkEast != null && chunkEast.getLoadLevel() >= 2){
+                            BlockBackend block = chunkEast.getBlocks()[0][j][k];
+                            if(block.getBlockid() == 0 || (block.getShouldBeShown() && block.isTransparent()))
+                                updateRucusive(i, j, k, masks, false);
+                        }
+                        if(k == 0 && chunkNorth != null && chunkNorth.getLoadLevel() >= 2){
+                            BlockBackend block = chunkNorth.getBlocks()[i][j][Constant.chunkZ-1];
+                            if(block.getBlockid() == 0 || (block.getShouldBeShown() && block.isTransparent())){
+                                updateRucusive(i, j, k, masks, false);
+                            }
+                        }
+                        if(k == Constant.chunkZ-1 && chunkSouth != null && chunkSouth.getLoadLevel() >= 2){
+                            BlockBackend block = chunkSouth.getBlocks()[i][j][0];
+                            if(block.getBlockid() == 0 || (block.getShouldBeShown() && block.isTransparent()))
+                                updateRucusive(i, j, k, masks, false);
+                        }
+                    }
                 }
     }
 

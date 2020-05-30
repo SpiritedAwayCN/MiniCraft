@@ -44,12 +44,10 @@ public abstract class BlockBackend {
         this.shouldBeShown = shouldBeShown;
     }
 
-    @Deprecated
     public void setBlockCoord(BlockCoord blockCoord) {
         this.blockCoord = blockCoord;
     }
 
-    @Deprecated
     public void setChunk(Chunk chunk) {
         this.chunk = chunk;
     }

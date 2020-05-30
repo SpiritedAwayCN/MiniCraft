@@ -112,7 +112,7 @@ public class MiniCraftApp extends SimpleApplication {
 		System.out.println("MiniCraftApp.simpleInitApp()");
 		
 		overworld=new DimensionMap("overworld");
-		overworld.generateFromGenerator(true);
+		overworld.generateFromGenerator(false);
 		//should be replaced to stats for player
 		cam.setLocation(new Vector3f(0,5.5f,0));
 		
