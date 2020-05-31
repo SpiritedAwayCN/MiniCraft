@@ -24,7 +24,7 @@ public class Button extends Node {
 	Button(){
 		this("");
 	}
-	Button(String caption){
+	public Button(String caption){
 		border=new Border(this);
 		this.attachChild(border);
 		
@@ -40,6 +40,10 @@ public class Button extends Node {
 		text.setLocalTranslation(width/2-text.getWidth()/2, height/2-text.getHeight()/2, 0);
 		this.attachChild(text);
 	
+	}
+	public Button(String caption,ActionListener listener) {
+		this(caption);
+		this.addActionListener(listener);
 	}
 	public int getWidth() {
 		return width;
@@ -65,6 +69,9 @@ public class Button extends Node {
 		}
 			
 		clicking=arg;
+	}
+	public void setText(String caption) {
+		text.setText(caption);
 	}
 	public boolean isClicking() {
 		return clicking;

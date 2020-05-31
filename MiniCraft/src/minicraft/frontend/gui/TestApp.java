@@ -32,7 +32,8 @@ public class TestApp extends SimpleApplication {
         app.setSettings(settings);// 应用参数
         app.start();
     }
-
+    
+    
     @Override
     public void simpleInitApp() {
     	Assets.initialize(assetManager);

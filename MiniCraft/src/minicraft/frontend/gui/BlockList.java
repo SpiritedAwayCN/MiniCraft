@@ -11,13 +11,17 @@ import com.jme3.ui.Picture;
 
 import minicraft.frontend.Assets;
 
-public class BlockList extends Node {
+public class BlockList extends Node implements ActionListener{
 	private BlockBox[] boxes;
 	private int size=8;
-	int selectedBoxIdx;
+	private int selectedBoxIdx;
+	private boolean enabled=true;
+	private int prevWidth,prevHeight;//窗口长宽
+	private SimpleApplication app;
 	
 	public BlockList(SimpleApplication app) {
 		//初始化每个格子
+		this.app=app;
 		boxes=new BlockBox[size];
 		for(int i=0;i<size;i++) {
 			boxes[i]=new BlockBox();
@@ -38,8 +42,25 @@ public class BlockList extends Node {
 	}
 	public void reshape(int w,int h) {
 		this.setLocalTranslation(w/2-BlockBox.width*(size/2), 0, 0);
+		prevWidth=w;
+		prevHeight=h;
 	}
-	
+	public void setEnabled(boolean enabled) {
+		if(this.enabled==enabled) return;
+		if(!enabled) {
+			this.detachAllChildren();
+		}else {
+			for(int i=0;i<size;i++) {
+				this.attachChild(boxes[i]);
+			}
+			this.reshape(app.getCamera().getWidth(),app.getCamera().getHeight());
+		}
+		
+		this.enabled=enabled;
+	}
+	public boolean isEnabled() {
+		return enabled;
+	}
 	final static String[] MAPPINGS_BOX_SELECTED= {"box_0_selected",
 			"box_1_selected",
 			"box_2_selected",
@@ -61,21 +82,20 @@ public class BlockList extends Node {
 		inputManager.addMapping(MAPPINGS_BOX_SELECTED[6], new KeyTrigger(KeyInput.KEY_7));
 		inputManager.addMapping(MAPPINGS_BOX_SELECTED[7], new KeyTrigger(KeyInput.KEY_8));
 		
-		inputManager.addListener(new ActionListener() {
-			@Override
-	        public void onAction(String name, boolean value, float tpf) {
-				if(!value)
-					return;
-				//find mapping
-				int idx=0;
-				for(;idx<MAPPINGS_BOX_SELECTED.length;idx++) {
-					if(name.equals(MAPPINGS_BOX_SELECTED[idx]))
-						break;
-				}
-				selectBox(idx);
-			}
-		}, MAPPINGS_BOX_SELECTED);
+		inputManager.addListener(this, MAPPINGS_BOX_SELECTED);
 		
+	}
+	@Override
+    public void onAction(String name, boolean value, float tpf) {
+		if(!enabled || !value)
+			return;
+		//find mapping
+		int idx=0;
+		for(;idx<MAPPINGS_BOX_SELECTED.length;idx++) {
+			if(name.equals(MAPPINGS_BOX_SELECTED[idx]))
+				break;
+		}
+		selectBox(idx);
 	}
 	private void selectBox(int idx) {
 		boxes[selectedBoxIdx].setSelected(false);

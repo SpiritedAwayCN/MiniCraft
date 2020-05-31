@@ -7,6 +7,8 @@ import com.jme3.app.state.ConstantVerifierState;
 import java.util.HashMap;
 import java.util.HashSet;
 
+import javax.swing.JOptionPane;
+
 import com.jme3.app.DebugKeysAppState;
 //import com.jme3.app.FlyCamAppState;
 //用了minicraft.frontend.FlyCamAppState
@@ -21,6 +23,7 @@ import com.jme3.input.controls.MouseButtonTrigger;
 import com.jme3.light.AmbientLight;
 import com.jme3.light.DirectionalLight;
 import com.jme3.material.Material;
+import com.jme3.material.RenderState.BlendMode;
 import com.jme3.math.ColorRGBA;
 import com.jme3.math.FastMath;
 import com.jme3.math.Vector3f;
@@ -40,24 +43,16 @@ import com.jme3.texture.Texture;
 import com.jme3.texture.Texture.MagFilter;
 import com.jme3.ui.Picture;
 import com.jme3.util.SkyFactory;
-import com.simsilica.lemur.Button;
-import com.simsilica.lemur.Checkbox;
-import com.simsilica.lemur.Command;
-import com.simsilica.lemur.Container;
-import com.simsilica.lemur.GuiGlobals;
-import com.simsilica.lemur.Label;
-import com.simsilica.lemur.Panel;
-import com.simsilica.lemur.Slider;
-import com.simsilica.lemur.component.QuadBackgroundComponent;
-import com.simsilica.lemur.style.BaseStyles;
-import com.simsilica.lemur.style.Styles;
 
 import minicraft.backend.constants.Constant;
 import minicraft.backend.map.DimensionMap;
 import minicraft.backend.map.block.BlockBackend;
 import minicraft.backend.utils.BlockCoord;
+import minicraft.frontend.gui.Background;
 import minicraft.frontend.gui.BlockBox;
 import minicraft.frontend.gui.BlockList;
+import minicraft.frontend.gui.Button;
+import minicraft.frontend.gui.Panel;
 
 /**
  * Minicraft主类
@@ -68,6 +63,19 @@ public class MiniCraftApp extends SimpleApplication {
 	public static final String INPUT_MAPPING_MENU = "MYAPP_Menu";
 	public static final String INPUT_BREAK_BLOCK = "MYAPP_Block_Break";
 	public static final String INPUT_PLACE_BLOCK = "MYAPP_Blace_Block";
+	
+	private static final String START_MENU="START_MENU";
+    private static final String INGAME="INGAME";
+    private static final String INGAME_MENU="INGAME_MENU";
+    private static final String ABOUT_PANEL="ABOUT_PANEL";
+    private static final String OPTIONS_PANEL="OPTIONS_PANEL";
+    
+    private Panel startMenu,ingameMenu,optionsPanel,aboutPanel;
+    BlockList blockList;
+    //游戏进入，显示开始菜单
+    private String appStatus=START_MENU;
+    
+    private boolean renderShadow,renderTransparentLeaves;
 	
 	DimensionMap overworld;
 	GeometryBlock[] geoms;//不得已才这么写，待改进
@@ -88,6 +96,7 @@ public class MiniCraftApp extends SimpleApplication {
             flyCam.setMoveSpeed(5f); // odd to set this here but it did it before
             stateManager.getState(FlyCamAppState.class).setCamera( flyCam );
         }
+		flyCam.setEnabled(false);//初始为不使用——开始菜单。
 		registerInputMapping();
 	}
 	private void registerInputMapping() {
@@ -98,10 +107,12 @@ public class MiniCraftApp extends SimpleApplication {
 			inputManager.addListener(new ActionListener() {
 				@Override
 		        public void onAction(String name, boolean value, float tpf) {
-	            //if (name.equals(INPUT_MAPPING_EXIT))
-					//System.out.println("esc action triggered");
-					if(value)
-						flyCam.setEnabled(!flyCam.isEnabled());
+					if(value==false) return;
+					
+					if(appStatus.equals(INGAME))
+						switchAppStatus(INGAME_MENU);
+					else if(appStatus.equals(INGAME_MENU))
+						switchAppStatus(INGAME);
 				}
 			}, INPUT_MAPPING_MENU);
 			
@@ -132,23 +143,19 @@ public class MiniCraftApp extends SimpleApplication {
 	@Override
 	public void simpleInitApp() {
 		System.out.println("MiniCraftApp.simpleInitApp()");
-		
-		
-		overworld=new DimensionMap("overworld");
-		overworld.generateFromGenerator(false);
-		//should be replaced to stats for player
-		cam.setLocation(new Vector3f(0,5.5f,0));
-		
+		//加载材质
 		Assets.initialize(assetManager);
-		//初始化场景及相关类
-		initScene();
+		
+		initGUI();
+		
+		
         
         //设置天空颜色
         viewPort.setBackgroundColor(new ColorRGBA(0.2f, 0.4f, 0.6f, 1));
 
-        initGUI();
+        
 	}
-	private void initScene() {
+	private void initScene(boolean firstInit) {
 		geoms=new GeometryBlock[256*64*256];
 		
 		//BlockBackend block;
@@ -171,6 +178,7 @@ public class MiniCraftApp extends SimpleApplication {
 			blocksToAdd.clear();
 		}).run();
 		
+		if(!firstInit) return;
         
         // 定向光
         DirectionalLight sun = new DirectionalLight();
@@ -178,7 +186,7 @@ public class MiniCraftApp extends SimpleApplication {
    
         // 环境光
         AmbientLight ambient = new AmbientLight();
-
+        
         // 调整光照亮度
         ColorRGBA lightColor = new ColorRGBA();
         sun.setColor(lightColor.mult(0.8f));
@@ -190,16 +198,45 @@ public class MiniCraftApp extends SimpleApplication {
         rootNode.addLight(sun);
         rootNode.addLight(ambient);
         
+        
+        
         /* 产生阴影 */
         final int SHADOWMAP_SIZE=1024;
-
+        
         DirectionalLightShadowFilter dlsf = new DirectionalLightShadowFilter(assetManager, SHADOWMAP_SIZE, 1);
         dlsf.setLight(sun);
         dlsf.setEnabled(true);
         FilterPostProcessor fpp = new FilterPostProcessor(assetManager);
         fpp.addFilter(dlsf);
         viewPort.addProcessor(fpp);
-        rootNode.setShadowMode(ShadowMode.CastAndReceive);
+        
+        //rootNode.setShadowMode(ShadowMode.CastAndReceive);
+        
+	}
+	private void switchRenderShadow() {
+		renderShadow=!renderShadow;
+		if(renderShadow) {
+			rootNode.setShadowMode(ShadowMode.CastAndReceive);
+		}else {
+			rootNode.setShadowMode(ShadowMode.Off);
+		}
+	}
+	private void switchRenderTransparentLeaves() {
+		renderTransparentLeaves=!renderTransparentLeaves;
+		if(renderTransparentLeaves) {
+			minicraft.backend.map.block
+			.OakLeavesBlock.setTransparent(false);
+			Assets.BLOCK_MATERIAL[Constant.BLOCK_OAK_LEAVES]
+			.getAdditionalRenderState().setBlendMode(BlendMode.Off);
+		}else {
+			minicraft.backend.map.block
+			.OakLeavesBlock.setTransparent(true);
+			Assets.BLOCK_MATERIAL[Constant.BLOCK_OAK_LEAVES]
+			.getAdditionalRenderState().setBlendMode(BlendMode.Alpha);
+		}
+		rootNode.detachAllChildren();
+		if(appStatus.equals(INGAME) || appStatus.equals(INGAME_MENU))
+			initScene(false);
 	}
 	private void initGUI() {
 		//设置鼠标
@@ -207,55 +244,151 @@ public class MiniCraftApp extends SimpleApplication {
 		inputManager.setMouseCursor(cur);
 		
 		
-		// 初始化Lemur GUI
-        GuiGlobals.initialize(this);
-        Styles styles = GuiGlobals.getInstance().getStyles();
-        styles.getSelector( Slider.THUMB_ID, "glass" ).set( "text", "[]", false );
-        styles.getSelector( Panel.ELEMENT_ID, "glass" ).set( "background",
-                                new QuadBackgroundComponent(new ColorRGBA(0, 0.25f, 0.25f, 0.5f)) );
-        styles.getSelector( Button.ELEMENT_ID, "glass" ).set( "background",
-                                new QuadBackgroundComponent(new ColorRGBA(0, 0.5f, 0.5f, 0.5f)) );
-        styles.getSelector( Label.ELEMENT_ID, "glass" ).set( "background",
-                new QuadBackgroundComponent(new ColorRGBA(0, 0.5f, 0.5f, 0.5f)) );
-
-
-        
-        // 创建一个Container作为窗口中其他GUI元素的容器
-    	Container myWindow = new Container("glass");
-    	guiNode.attachChild(myWindow);
-
-    	// 设置窗口在屏幕上的坐标
-    	// 注意：Lemur的GUI元素是以控件左上角为原点，向右、向下生成的。
-    	// 然而，作为一个Spatial，它在GuiNode中的坐标原点依然是屏幕的左下角。
-    	myWindow.setLocalTranslation(300, 300, 0);
-
-    	// 添加一个Label控件
-    	myWindow.addChild(new Label("Hello, World.","glass"));
-    	
-    	// 添加一个Button控件
-    	Button clickMe = myWindow.addChild(new Button("Click Me","glass"));
-    	clickMe.addClickCommands(new Command<Button>() {
-    		@Override
-    		public void execute(Button source) {
-    			System.out.println("The world is yours.");
-    		}
-    	});
-		//Picture pic = new Picture("picture");
-
-        // 设置图片
-        //pic.setImage(assetManager, "gui/block_box.png", true);
-
-        
-        //pic.setWidth(80);
-        //pic.setHeight(80);
-
+		//private Panel startMenu,ingameMenu,optionsPanel,aboutPanel;
+		startMenu=new Panel(this);
+		startMenu.addComponent(new Button("Quit",new ActionListener() {
+			@Override
+	        public void onAction(String name, boolean value, float tpf) {
+	            stop();
+			}
+		}));
+		startMenu.addComponent(new Button("About",new ActionListener() {
+			@Override
+	        public void onAction(String name, boolean value, float tpf) {
+	            //System.out.println("startMenu.About hit");
+	            JOptionPane.showMessageDialog(null, 
+	            		"作者：\n石淳安/Spirited_Away\n李辰剑/IcyChlorine\n2020-5,copyright reserved.");
+			}
+		}));
+		startMenu.addComponent(new Button("Options",new ActionListener() {
+			@Override
+	        public void onAction(String name, boolean value, float tpf) {
+	            //System.out.println("startMenu.Options hit");
+				switchAppStatus(OPTIONS_PANEL);
+			}
+		}));
+		Button gameStart=new Button("Start Game");
+		gameStart.addActionListener(new ActionListener() {
+			@Override
+	        public void onAction(String name, boolean value, float tpf) {
+	            //System.out.println("startMenu.GameStart hit");
+	            gameStart.setText("Loading...");//无法正常显示，待修
+	            switchAppStatus(INGAME);
+	            gameStart.setText("Start Game");
+			}
+		});
+		startMenu.addComponent(gameStart);
+		Background bg1=new Background(Assets.GUI_START_MENU_BACKGROUND,1920,1080);
+		bg1.reshape(cam.getWidth(), cam.getHeight());
+		
+		startMenu.setBackground(bg1);
+		guiNode.attachChild(startMenu);
+		
+		optionsPanel=new Panel(this);
+		optionsPanel.setEnabled(false);
+		optionsPanel.addComponent(new Button("Back",new ActionListener() {
+			@Override
+	        public void onAction(String name, boolean value, float tpf) {
+	            //System.out.println("ingameMenu.About hit");
+	            switchAppStatus(START_MENU);
+			}
+		}));
+		optionsPanel.addComponent(new Button("Switch Render Shadow",new ActionListener() {
+			@Override
+	        public void onAction(String name, boolean value, float tpf) {
+	            //System.out.println("startMenu.Options hit");
+	            switchRenderShadow();
+			}
+		}));
+		optionsPanel.addComponent(new Button("Switch Render Transparent Leaves",new ActionListener() {
+			@Override
+	        public void onAction(String name, boolean value, float tpf) {
+	            //System.out.println("startMenu.Options hit");
+	            switchRenderTransparentLeaves();
+			}
+		}));
+		optionsPanel.setBackground(bg1);
+		guiNode.attachChild(optionsPanel);
+		
+		ingameMenu=new Panel(this);
+		ingameMenu.setEnabled(false);
+		ingameMenu.addComponent(new Button("Start Menu",new ActionListener() {
+			@Override
+	        public void onAction(String name, boolean value, float tpf) {
+	            //System.out.println("ingameMenu.About hit");
+	            switchAppStatus(START_MENU);
+			}
+		}));
+		ingameMenu.addComponent(new Button("Switch Render Shadow",new ActionListener() {
+			@Override
+	        public void onAction(String name, boolean value, float tpf) {
+	            //System.out.println("startMenu.Options hit");
+	            switchRenderShadow();
+			}
+		}));
+		ingameMenu.addComponent(new Button("Switch Render Transparent Leaves",new ActionListener() {
+			@Override
+	        public void onAction(String name, boolean value, float tpf) {
+	            //System.out.println("startMenu.Options hit");
+	            switchRenderTransparentLeaves();
+			}
+		}));
+		Background bg2=new Background(new ColorRGBA(1,1,1,0.35f),cam.getWidth(),cam.getHeight());
+		ingameMenu.setBackground(bg2);
+		guiNode.attachChild(ingameMenu);
+		
         // 将图片后移一个单位，避免遮住状态界面。
-        //pic.setLocalTranslation(cam.getWidth()/2-80/2, 0, -1);
-        blockList=new BlockList(this);    
+		blockList=new BlockList(this); 
+        blockList.setEnabled(false);
+       
         guiNode.attachChild(blockList);
         
 	}
-	BlockList blockList;
+	private void switchAppStatus(String appStatusNew) {
+		if(appStatus.equals(appStatusNew)) return;
+		//关掉些什么
+		if(appStatus.equals(START_MENU)) {
+			startMenu.setEnabled(false);
+		}else if(appStatus.equals(OPTIONS_PANEL)) {
+			optionsPanel.setEnabled(false);
+		}else if(appStatus.equals(INGAME_MENU)) {
+			ingameMenu.setEnabled(false);
+			
+			blockList.setEnabled(false);
+			flyCam.setEnabled(false);
+			if(appStatusNew.equals(START_MENU)) {//回到主菜单，把所以地图相关移除
+				rootNode.detachAllChildren();
+			}
+		}
+		//------------>打开些什么
+		if(appStatusNew.equals(START_MENU)) {
+			startMenu.setEnabled(true);
+		}
+		if(appStatusNew.equals(INGAME)) {
+			if(appStatus.equals(START_MENU)) {//从开始菜单来
+			//世界第一次
+				if(overworld==null) {
+					overworld=new DimensionMap("overworld");
+					overworld.generateFromGenerator(false);
+					//should be replaced to stats for player
+					cam.setLocation(new Vector3f(0,5.5f,0));
+					initScene(true);
+				}else {
+					initScene(false);
+				}
+				
+				
+			}
+			blockList.setEnabled(true);
+			flyCam.setEnabled(true);//隐藏指针
+		}else if(appStatusNew.equals(OPTIONS_PANEL)) {
+			optionsPanel.setEnabled(true);
+		}else if(appStatusNew.equals(INGAME_MENU)) {
+			flyCam.setEnabled(false);//释放鼠标
+			ingameMenu.setEnabled(true);
+		}
+		appStatus=appStatusNew;
+	}
 	
 	/*
 	 * 在窗口大小变化时，gui也需随之变化
@@ -263,7 +396,21 @@ public class MiniCraftApp extends SimpleApplication {
 	@Override
 	public void reshape(int w,int h) {
 		super.reshape(w, h);
-		blockList.reshape(w,h);
+		if(appStatus.equals(START_MENU) && startMenu!=null) {
+			startMenu.reshape(w,h);
+		}
+		if(appStatus.equals(INGAME) && blockList!=null) {
+			blockList.reshape(w,h);
+		}
+		if(appStatus.equals(INGAME_MENU) && ingameMenu!=null) {
+			ingameMenu.reshape(w,h);
+		}
+		if(appStatus.equals(OPTIONS_PANEL) && optionsPanel!=null) {
+			optionsPanel.reshape(w,h);
+		}
+		if(appStatus.equals(ABOUT_PANEL) && aboutPanel!=null) {
+			aboutPanel.reshape(w,h);
+		}
 	}
 
 
@@ -272,8 +419,8 @@ public class MiniCraftApp extends SimpleApplication {
 	 */
 	@Override
 	public void simpleUpdate(float deltaTime) {
-		updateBlockVisibility();
-		
+		if(appStatus.equals(INGAME))
+			updateBlockVisibility();
 		
 	}
 	
@@ -333,6 +480,8 @@ public class MiniCraftApp extends SimpleApplication {
 		return null;
 	}
 	public void breakBlockTemp() {
+		if(!appStatus.equals(INGAME)) return;
+		System.out.println("app.breakBlockTemp()");
 		//获得视线指向的方块
 		BlockBackend block=findBlockByDir(cam.getLocation(),cam.getDirection(),false);
 		if(block==null) return;//no block within reach
@@ -345,6 +494,7 @@ public class MiniCraftApp extends SimpleApplication {
 
 	}
 	public void placeBlockTemp() {
+		if(!appStatus.equals(INGAME)) return;
 		//System.out.println("app.placeBlockTemp()");
 		BlockBackend block=findBlockByDir(cam.getLocation(),cam.getDirection(),true);
 		if(block==null) return;//no block within reach

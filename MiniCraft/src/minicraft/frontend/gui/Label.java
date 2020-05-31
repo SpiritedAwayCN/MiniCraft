@@ -24,10 +24,10 @@ public class Label extends Node {
 		return this.text.getText();
 	}
 	
-	Label(){
+	public Label(){
 		this("");
 	}
-	Label(String text){
+	public Label(String text){
 		this.text = new BitmapText(guiFont, false);
 		this.text.setText(text);
 		this.text.setSize(guiFont.getPreferredSize() * 2f);
@@ -38,7 +38,7 @@ public class Label extends Node {
 		return (int) text.getHeight();
 	}
 	public int getWidth() {
-		return text.getText().length()*10;
+		return text.getText().length()*15;
 	}
 	
 }

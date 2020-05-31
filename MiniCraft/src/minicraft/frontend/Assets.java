@@ -19,6 +19,7 @@ public class Assets {
 	public static Texture NULL_TEXTURE;
 	
 	public static Texture GUI_BUTTON;
+	public static Texture GUI_START_MENU_BACKGROUND;
 	
 	public static Material MATERIAL_LIGHTING;
 	public static Material MATERIAL_UNSHADED;
@@ -77,6 +78,7 @@ public class Assets {
 		BLOCK_BOX_SELECTED=assetManager.loadTexture("gui/block_box_selected.png");
 		NULL_TEXTURE=assetManager.loadTexture("gui/empty.png");
 		GUI_BUTTON=assetManager.loadTexture("gui/button.png");
+		GUI_START_MENU_BACKGROUND=assetManager.loadTexture("gui/menu_background.png");
 		BLOCK_BOX.setMagFilter(MagFilter.Nearest);
 		BLOCK_BOX_SELECTED.setMagFilter(MagFilter.Nearest);
 		GUI_BUTTON.setMagFilter(MagFilter.Nearest);

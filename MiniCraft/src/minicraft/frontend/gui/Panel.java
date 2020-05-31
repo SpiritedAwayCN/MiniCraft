@@ -21,27 +21,39 @@ import com.jme3.scene.Node;
 
 public class Panel extends Node implements ActionListener,AnalogListener{
 	private List<Button> buttons=new ArrayList<Button>();
+	private Background background;
 	private boolean enabled=true;
-	
+	private int prevWidth,prevHeight;
+	private SimpleApplication app;
 	
 	public Panel(SimpleApplication app) {
-		this.inputManager=app.getInputManager();
-		registerWithInput(inputManager);
-		this.reshape(app.getCamera().getWidth(), app.getCamera().getHeight());
+		this.app=app;
+		
+		registerWithInput(app.getInputManager());
+		prevWidth=app.getCamera().getWidth();
+		prevHeight=app.getCamera().getHeight();
+		this.reshape(prevWidth,prevHeight);
 	}
 	public void addComponent(Button button) {
 		buttons.add(button);
 		if(enabled) this.attachChild(button);
+		this.reshape(prevWidth,prevHeight);
 	}
 	public void reshape(int w,int h) {
 		int idx=0;
 		for(Button button:buttons) {
 			button.setLocalTranslation(w/2-button.getWidth()/2,
-					(float) (h*0.2+idx*(button.getHeight()+20)),
+					(float) (h*0.35+(idx-buttons.size()/2f)*(button.getHeight()+20)),
 					0);
 			idx++;
 			
 		}
+		if(background!=null)
+		{
+			background.reshape(w, h);
+		}
+		prevWidth=w;
+		prevHeight=h;
 	}
 	public void setEnabled(boolean enabled) {
 		if(this.enabled==enabled) return;
@@ -51,6 +63,10 @@ public class Panel extends Node implements ActionListener,AnalogListener{
 			for(Button button:buttons) {
 				this.attachChild(button);
 			}
+			if(background!=null) {
+				this.attachChild(background);
+			}
+			this.reshape(app.getCamera().getWidth(), app.getCamera().getHeight());
 		}
 		this.enabled=enabled;
 	}
@@ -63,11 +79,10 @@ public class Panel extends Node implements ActionListener,AnalogListener{
      *
      * @param inputManager
      */
-	InputManager inputManager;
 	private static final String MAPPING_MOUSE_MOVE="MAPPING_MOUSE_MOVE";
 	private static final String MAPPING_MOUSE_CLICK="MAPPING_MOUSE_CLICK";
     public void registerWithInput(InputManager inputManager){
-        this.inputManager = inputManager;
+     
 
         // both mouse and button - rotation of cam
         inputManager.addMapping(MAPPING_MOUSE_MOVE, 
@@ -96,7 +111,7 @@ public class Panel extends Node implements ActionListener,AnalogListener{
 		//System.out.println("panel.onAnalog");
 		if(!enabled) return;
 		for(Button button:buttons) {
-			if(pointInButton(inputManager.getCursorPosition(),button)) {
+			if(pointInButton(app.getInputManager().getCursorPosition(),button)) {
 				button.setCursorPassing(true);
 			}else {
 				button.setCursorPassing(false);
@@ -109,7 +124,7 @@ public class Panel extends Node implements ActionListener,AnalogListener{
 		// TODO Auto-generated method stub
 		if(!enabled) return;
 		for(Button button:buttons) {
-			if(pointInButton(inputManager.getCursorPosition(),button) && arg1) {//left button down
+			if(pointInButton(app.getInputManager().getCursorPosition(),button) && arg1) {//left button down
 				button.setClicking(true);
 				
 			}else if(!arg1){
@@ -120,5 +135,10 @@ public class Panel extends Node implements ActionListener,AnalogListener{
 				//鼠标抬起时触发按钮
 			}
 		}
+	}
+	public void setBackground(Background bg) {
+		background=bg;
+		if(enabled)
+			this.attachChild(bg);
 	}
 }
