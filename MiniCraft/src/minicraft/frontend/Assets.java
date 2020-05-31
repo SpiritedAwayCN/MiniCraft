@@ -18,12 +18,19 @@ public class Assets {
 	public static Texture BLOCK_BOX,BLOCK_BOX_SELECTED;
 	public static Texture NULL_TEXTURE;
 	
+	public static Texture GUI_BUTTON;
+	public static Texture GUI_START_MENU_BACKGROUND;
+	
 	public static Material MATERIAL_LIGHTING;
 	public static Material MATERIAL_UNSHADED;
 	
 	public static boolean initialized=false;
 	
-	static void initialize(AssetManager assetManager) {
+	public static AssetManager assetManager;
+	
+	public static void initialize(AssetManager assetManager) {
+		Assets.assetManager=assetManager;
+		
 		assetManager.registerLocator("assets", FileLocator.class);
 		
 		final String[] blockTexFilepath= {
@@ -70,8 +77,11 @@ public class Assets {
 		BLOCK_BOX=assetManager.loadTexture("gui/block_box.png");
 		BLOCK_BOX_SELECTED=assetManager.loadTexture("gui/block_box_selected.png");
 		NULL_TEXTURE=assetManager.loadTexture("gui/empty.png");
+		GUI_BUTTON=assetManager.loadTexture("gui/button.png");
+		GUI_START_MENU_BACKGROUND=assetManager.loadTexture("gui/menu_background.png");
 		BLOCK_BOX.setMagFilter(MagFilter.Nearest);
 		BLOCK_BOX_SELECTED.setMagFilter(MagFilter.Nearest);
+		GUI_BUTTON.setMagFilter(MagFilter.Nearest);
 		
 		MATERIAL_LIGHTING=new Material(assetManager, "Common/MatDefs/Light/Lighting.j3md");
 		MATERIAL_UNSHADED=new Material(assetManager, "Common/MatDefs/Misc/Unshaded.j3md");
