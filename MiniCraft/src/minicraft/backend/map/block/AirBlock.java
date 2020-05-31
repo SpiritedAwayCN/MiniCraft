@@ -33,4 +33,9 @@ public class AirBlock extends BlockBackend{
     public boolean getShouldBeShown() {
         return false;
     }
+
+    @Override
+    public boolean isFullHitbox() {
+        return false;
+    }
 }

@@ -128,6 +128,7 @@ public class GamerCamera extends FlyByCamera {
     protected void moveCamera(float value, boolean sideways){
         Vector3f vel = new Vector3f();
         Vector3f pos = cam.getLocation().clone();
+        // System.out.println("begin " + pos.y);
 
         if (sideways){
             cam.getLeft(vel);
@@ -143,13 +144,21 @@ public class GamerCamera extends FlyByCamera {
         else
             pos.addLocal(vel);
 
-        cam.setLocation(pos);
-        this.miniCraftApp.overworld.movePlayerTo(pos);
+        // System.out.println("end " + pos.y);
+        Vector3f temp = pos.subtract(MiniCraftApp.playerEyeBias);
+        this.miniCraftApp.overworld.movePlayerTo(temp);
+        cam.setLocation(temp.add(MiniCraftApp.playerEyeBias));
     }
     
     @Override
     protected void riseCamera(float value) {
-        super.riseCamera(value);
-        this.miniCraftApp.overworld.movePlayerTo(cam.getLocation());
+        if(this.miniCraftApp.overworld.getPlayer().getLowGravelty()){
+            super.riseCamera(value);
+            this.miniCraftApp.overworld.movePlayerTo(cam.getLocation());
+        }else if(this.miniCraftApp.overworld.getPlayer().getOnGround()){
+            this.miniCraftApp.overworld.getPlayer().setOnGround(false);
+            this.miniCraftApp.overworld.getPlayer().setNaturalV(new Vector3f(0, (float)0.2, 0));
+        }
+
     }
 }

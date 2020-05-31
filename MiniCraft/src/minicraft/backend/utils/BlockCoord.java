@@ -41,16 +41,18 @@ public class BlockCoord {
         this.z = z;
     }
 
-    public void addXYZ(int addX, int addY, int addZ){
+    public BlockCoord addXYZ(int addX, int addY, int addZ){
         this.x += addX;
         this.y += addY;
         this.z += addZ;
+        return this;
     }
 
-    public void setXYZ(int x, int y, int z){
+    public BlockCoord setXYZ(int x, int y, int z){
         this.x = x;
         this.y = y;
         this.z = z;
+        return this;
     }
 
     public ChunkCoord toChunkCoord(){

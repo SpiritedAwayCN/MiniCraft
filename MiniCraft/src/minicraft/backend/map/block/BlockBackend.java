@@ -40,6 +40,10 @@ public abstract class BlockBackend {
         return shouldBeShown;
     }
 
+    public boolean isFullHitbox(){
+        return true;
+    }
+
     public void setShouldBeShown(boolean shouldBeShown) {
         this.shouldBeShown = shouldBeShown;
     }
@@ -76,10 +80,9 @@ public abstract class BlockBackend {
         BlockBackend block = getBlockInstanceByID(0); // air
         block.blockCoord = this.blockCoord;
         block.chunk = this.chunk;
-
         if(this.chunk.setBlockInChunk(block) == false)
             return false;
-        
+        chunk.getMap().getPlayer().checkFoot();
         // this.chunk = null;
         // this.blockCoord = null;
         return true;

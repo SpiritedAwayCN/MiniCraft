@@ -14,6 +14,7 @@ import com.jme3.app.DebugKeysAppState;
 //用了minicraft.frontend.FlyCamAppState
 import com.jme3.asset.plugins.FileLocator;
 import com.jme3.audio.AudioListenerState;
+import com.jme3.bullet.BulletAppState;
 import com.jme3.cursors.plugins.JmeCursor;
 import com.jme3.input.KeyInput;
 import com.jme3.input.MouseInput;
@@ -367,9 +368,8 @@ public class MiniCraftApp extends SimpleApplication {
 				if(overworld==null) {
 					overworld=new DimensionMap("overworld", this);
 					overworld.generateFromGenerator(false);
-					System.out.println("22");
 					//should be replaced to stats for player
-					cam.setLocation(new Vector3f(0,5.5f,0));
+					cam.setLocation(overworld.getPlayer().getCoordinate().add(playerEyeBias));
 					initScene(true);
 				}else {
 					initScene(false);
@@ -411,7 +411,7 @@ public class MiniCraftApp extends SimpleApplication {
 		}
 	}
 
-
+	public static final Vector3f playerEyeBias = new Vector3f(0, (float)1.5, 0);
 
 	private long counter = 0;
 	/**
@@ -420,13 +420,19 @@ public class MiniCraftApp extends SimpleApplication {
 	@Override
 	public void simpleUpdate(float deltaTime) {
 		// updateBlockVisibility();
+		if(!appStatus.equals(INGAME)) return;
 		counter++;
 		if(counter > 1000){
 			counter = 0;
-			System.out.println("gc");
 			System.gc();
 		}
 		
+		try{
+			if(overworld.getPlayer().updateFalling())
+				cam.setLocation(overworld.getPlayer().getCoordinate().add(playerEyeBias));
+		}catch(NullPointerException e){
+
+		}
 		
 	}
 	/*
@@ -512,10 +518,7 @@ public class MiniCraftApp extends SimpleApplication {
 		if(blockid==-1) return;
 		block=BlockBackend.getBlockInstanceByID(blockList.getSelectedBlockid());	block.placeAt(r, overworld);
 		overworld.updateBlockSetTemp(r, false);
-
 	}
-
-	
 
 	public static void main(String[] args) {
 		// 配置参数

@@ -32,7 +32,7 @@ public class DimensionMap {
         chunkIndexBiasZ = -Constant.minZ / Constant.chunkZ;
 
         mapChunks = new Chunk[(Constant.maxX - Constant.minX + 1) / Constant.chunkX][(Constant.maxZ - Constant.minZ + 1) / Constant.chunkZ];
-        player = new PlayerBackend();
+        player = new PlayerBackend(this);
     }
 
     public DimensionMap(String name, MiniCraftApp app){
@@ -57,6 +57,12 @@ public class DimensionMap {
             for(int j = 0; j < mapChunks[i].length; j++){
                 mapChunks[i][j] = new Chunk(new ChunkCoord(i - chunkIndexBiasX, j - chunkIndexBiasZ), initialBlockMap, this);
             }
+        int iy = Constant.maxY;
+        for(; iy > 0; iy--){
+            if(initialBlockMap[-Constant.minX][iy - 1][-Constant.minZ] != 0) break;
+        }
+        System.out.println(iy);
+        player.setCoordinate(new Vector3f(0, (float)0.5 + iy, 0));
     }
 
     public Chunk getChunkByCoord(ChunkCoord chunkCoord){
@@ -102,6 +108,8 @@ public class DimensionMap {
      * 通过玩家的位置刷新整个世界（目前暂不会卸载已加载的）
      */
     public void refreshWholeUpdateBlockSet(){
+        this.miniCraftApp.getRootNode().detachAllChildren(); 
+
         ChunkCoord st = player.toChunkCoordinate();
         int cx = st.getX(), cz = st.getZ();
         
@@ -301,6 +309,7 @@ public class DimensionMap {
      * @return 是否导致了区块的加载/卸载，若为true，通常意味着updateSet有更新
      */
     public boolean movePlayerTo(Vector3f coord){
+        player.updateCoordinate(coord);
         player.setCoordinate(coord);
         ChunkCoord newcoord = player.toChunkCoordinate(), oldcoord = player.getChunkCoordinate();
         int ox = oldcoord.getX(), oz = oldcoord.getZ();
