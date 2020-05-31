@@ -77,18 +77,18 @@ public class DimensionMapTest {
         }
     }
 
-    @Test
-    public void initUpdateTest(){
-        DimensionMap overworld = new DimensionMap("world");
-        overworld.generateFromGenerator(true);
+    // @Test
+    // public void initUpdateTest(){
+    //     DimensionMap overworld = new DimensionMap("world");
+    //     overworld.generateFromGenerator(true);
 
-        HashSet<BlockBackend> blockset = overworld.refreshWholeUpdateBlockSet();
+    //     HashSet<BlockBackend> blockset = overworld.refreshWholeUpdateBlockSet();
 
-        assertEquals(6400, blockset.size());
+    //     assertEquals(6400, blockset.size());
 
-        for(BlockBackend b: blockset){
-            assertEquals(4, b.getBlockCoord().getY());
-        }
+    //     for(BlockBackend b: blockset){
+    //         assertEquals(4, b.getBlockCoord().getY());
+    //     }
 
-    }
+    // }
 }

@@ -21,7 +21,6 @@ public class DimensionMap {
     private final int chunkIndexBiasZ;
 
     private PlayerBackend player;
-    private HashSet<BlockBackend> updateBlockSet;
     public ConcurrentHashMap<BlockCoord, GeometryBlock> inChildBlockList = new ConcurrentHashMap<>();
     
     
@@ -34,7 +33,6 @@ public class DimensionMap {
 
         mapChunks = new Chunk[(Constant.maxX - Constant.minX + 1) / Constant.chunkX][(Constant.maxZ - Constant.minZ + 1) / Constant.chunkZ];
         player = new PlayerBackend();
-        updateBlockSet = new HashSet<>();
     }
 
     public DimensionMap(String name, MiniCraftApp app){
@@ -101,19 +99,9 @@ public class DimensionMap {
     }
 
     /**
-     * 需要更新的方块列表，注意前端用完后必须调用clear，后端没有任何删除此集合元素的操作
-     * @return 待前端更新的方块列表，但不会有字段表明具体是该显示还是删除，应结合上下文推断
-     */
-    public HashSet<BlockBackend> getUpdateBlockSet() {
-        return updateBlockSet;
-    }
-
-    /**
      * 通过玩家的位置刷新整个世界（目前暂不会卸载已加载的）
-     * 所有应显示的方块全都加入updateBlockSet
-     * 注：还没写，因为相当难写(考虑到之后有视距问题)，先用一个简单方法弄着
      */
-    public HashSet<BlockBackend> refreshWholeUpdateBlockSet(){
+    public void refreshWholeUpdateBlockSet(){
         ChunkCoord st = player.toChunkCoordinate();
         int cx = st.getX(), cz = st.getZ();
         
@@ -130,8 +118,6 @@ public class DimensionMap {
                 loadChunkByCoord(st.setXZ(cx + i, cz + j));
             }
         }
-        this.updateBlockSet.clear();
-        return this.updateBlockSet;
     }
 
     private void setChunkPreLoad(ChunkCoord chunkCoordinate){
@@ -188,10 +174,10 @@ public class DimensionMap {
 	    	BlockBackend b=this.getBlockByCoord(r);
 	    	if(b.getBlockid()==0)//空气不算
 				continue;
-			updateBlockSet.add(b);
+			// updateBlockSet.add(b);
 	    }
     	
-        return updateBlockSet;
+        return null;
     }
     /**
      * 请用updateBlockSetTemp()
@@ -227,9 +213,8 @@ public class DimensionMap {
      * 通过方块坐标，得到在该位置放置/破坏后 出现更新的方块
      * @param blockCoordinate 坐标
      * @param isBreak 该位置发生了破坏(true)/放置(false)
-     * @return 待更新方块列表（包括当前），其中blockbackend.getShouldBeShown可判断是否显示
      */
-    public HashSet<BlockBackend> updateBlockSetTemp(BlockCoord blockCoordinate, boolean isBreak){
+    public void updateBlockSetTemp(BlockCoord blockCoordinate, boolean isBreak){
         //由前端修改
     	//updateBlockSet.clear();
         BlockBackend block = getBlockByCoord(blockCoordinate);
@@ -244,7 +229,8 @@ public class DimensionMap {
             block.setShouldBeShown(false);
             // updateBlockSet.add(block);
             block.getChunk().detachIfAttached(block);
-            updateBlockRecusiveBreak(blockCoordinate, true);
+            HashSet<BlockBackend> vis = new HashSet<>();
+            updateBlockRecusiveBreak(blockCoordinate, true, vis);
         }else{
             int x = blockCoordinate.getX(), y = blockCoordinate.getY(), z = blockCoordinate.getZ();
             final int dx[] = {1, 0, -1, 0, 0, 0}, dz[] = {0, 1, 0, -1, 0, 0}, dy[]={0, 0, 0, 0, 1, -1};
@@ -257,19 +243,18 @@ public class DimensionMap {
                 updateBlockRecusivePlace(new BlockCoord(tx, ty, tz), true, vis);
             }
         }
-        return updateBlockSet;
     }
 
 
-    private void updateBlockRecusiveBreak(BlockCoord blockCoordinate, boolean root){
+    private void updateBlockRecusiveBreak(BlockCoord blockCoordinate, boolean root, HashSet<BlockBackend> vis){
     	
     	BlockBackend block;
     	block = getBlockByCoord(blockCoordinate);
         if(block == null) return;
         if(!root){
-            if(block.getBlockid()==0 || updateBlockSet.contains(block) || block.getShouldBeShown()) return;
+            if(block.getBlockid()==0 || vis.contains(block) || block.getShouldBeShown()) return;
             block.setShouldBeShown(true);
-            // updateBlockSet.add(block);
+            vis.add(block);
             block.getChunk().attachChildWithDetach(block);
             if(!block.isTransparent()) return;
         }
@@ -279,7 +264,7 @@ public class DimensionMap {
         
         for(int dir = 0; dir < 6; dir++){
             int tx = x + dx[dir], ty = y + dy[dir], tz = z + dz[dir];
-            updateBlockRecusiveBreak(new BlockCoord(tx, ty, tz), false);
+            updateBlockRecusiveBreak(new BlockCoord(tx, ty, tz), false, vis);
         }
     }
 
@@ -288,7 +273,7 @@ public class DimensionMap {
     	block = getBlockByCoord(blockCoordinate);
         if(block == null || block.getChunk().getLoadLevel() < 2) return false;
         if(block.getBlockid() == 0) return true;
-        if(!root && (!block.getShouldBeShown() || vis.contains(block) ||updateBlockSet.contains(block))) return false;
+        if(!root && (!block.getShouldBeShown() || vis.contains(block))) return false;
         if(!root && !block.isTransparent()){
             return false;
         } 
@@ -348,7 +333,7 @@ public class DimensionMap {
     }
 
     private void unloadIfTooFar(ChunkCoord oldCoordinate, int nx, int nz){
-        if(Math.min(Math.abs(oldCoordinate.getX() - nx), Math.abs(oldCoordinate.getZ() - nz)) <= Constant.viewChunkDistance)
+        if(Math.max(Math.abs(oldCoordinate.getX() - nx), Math.abs(oldCoordinate.getZ() - nz)) <= Constant.viewChunkDistance)
             return;
         Chunk chunk = getChunkByCoord(oldCoordinate);
         if(chunk != null && chunk.getLoadLevel() > 0){

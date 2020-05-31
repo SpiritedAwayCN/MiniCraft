@@ -421,7 +421,7 @@ public class MiniCraftApp extends SimpleApplication {
 	public void simpleUpdate(float deltaTime) {
 		// updateBlockVisibility();
 		counter++;
-		if((counter & 0x200) != 0){
+		if(counter > 1000){
 			counter = 0;
 			System.out.println("gc");
 			System.gc();
