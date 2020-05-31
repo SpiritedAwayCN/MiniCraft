@@ -60,7 +60,7 @@ public class MiniCraftApp extends SimpleApplication {
 	public static final String INPUT_PLACE_BLOCK = "MYAPP_Blace_Block";
 	
 	DimensionMap overworld;
-	GeometryBlock[] geoms;//不得已才这么写，待改进
+	// GeometryBlock[] geoms;//不得已才这么写，待改进
 	
 	
 	MiniCraftApp(){
@@ -124,7 +124,7 @@ public class MiniCraftApp extends SimpleApplication {
 		System.out.println("MiniCraftApp.simpleInitApp()");
 		
 		
-		overworld=new DimensionMap("overworld");
+		overworld=new DimensionMap("overworld", this);
 		overworld.generateFromGenerator(false);
 		//should be replaced to stats for player
 		cam.setLocation(new Vector3f(0,5.5f,0));
@@ -139,22 +139,23 @@ public class MiniCraftApp extends SimpleApplication {
         initGUI();
 	}
 	private void initScene() {
-		geoms=new GeometryBlock[256*64*256];
+		// geoms=new GeometryBlock[256*64*256];
 		
 		//BlockBackend block;
 		new Thread(()->
 		{
-			HashSet<BlockBackend> blocksToAdd=overworld.refreshWholeUpdateBlockSet();
-			Geometry geom;
-			for(BlockBackend block:blocksToAdd) {
-				if(block.getBlockid()==0)
-					continue;
-				geom=new GeometryBlock(block);
-				rootNode.attachChild(geom);
-				geoms[geom.hashCode()]=(GeometryBlock) geom;
-				//只好手写hashSet
-			}
-			blocksToAdd.clear();
+			overworld.refreshWholeUpdateBlockSet();
+			// HashSet<BlockBackend> blocksToAdd=overworld.refreshWholeUpdateBlockSet();
+			// Geometry geom;
+			// for(BlockBackend block:blocksToAdd) {
+			// 	if(block.getBlockid()==0)
+			// 		continue;
+			// 	geom=new GeometryBlock(block);
+			// 	rootNode.attachChild(geom);
+			// 	geoms[geom.hashCode()]=(GeometryBlock) geom;
+			// 	//只好手写hashSet
+			// }
+			// blocksToAdd.clear();
 		}).run();
 		
         
@@ -229,16 +230,24 @@ public class MiniCraftApp extends SimpleApplication {
 	}
 
 
+
+	private long counter = 0;
 	/**
 	 * 主循环
 	 */
 	@Override
 	public void simpleUpdate(float deltaTime) {
-		updateBlockVisibility();
+		// updateBlockVisibility();
+		counter++;
+		if((counter & 0x200) != 0){
+			counter = 0;
+			System.out.println("gc");
+			System.gc();
+		}
 		
 		
 	}
-	
+	/*
 	void updateBlockVisibility() {
 		//更新周围方块，使其显示
 		HashSet<BlockBackend> blocksToUpdate=overworld.getUpdateBlockSet();
@@ -252,12 +261,8 @@ public class MiniCraftApp extends SimpleApplication {
 			//添加显示
 			if(b.getShouldBeShown()) {
 				GeometryBlock geom=new GeometryBlock(b);
-				if(b.isTransparent()) {
-					geom.setQueueBucket(Bucket.Transparent);
-				}
 				rootNode.attachChild(geom);
 				geoms[b.hashCode()]=(GeometryBlock) geom;
-				
 			}else {//不显示
 				//System.out.println("rootNode.detaching sth.");
 				rootNode.detachChild(geoms[b.hashCode()]);
@@ -267,6 +272,8 @@ public class MiniCraftApp extends SimpleApplication {
 		}
 		blocksToUpdate.clear();//将更新一笔勾销
 	}
+	*/
+
 	/*
 	 * @return 当flag=true,返回找到的最后一个空气方块；flag=false，返回找到的第一个实体方块
 	 */

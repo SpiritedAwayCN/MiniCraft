@@ -1,13 +1,18 @@
 package minicraft.backend.map;
 
+import com.jme3.renderer.queue.RenderQueue.Bucket;
+import com.jme3.scene.Node;
+
 import minicraft.backend.constants.Constant;
 import minicraft.backend.map.block.BlockBackend;
 import minicraft.backend.utils.*;
+import minicraft.frontend.GeometryBlock;
 
-public class Chunk {
+public class Chunk extends Node{
     private ChunkCoord chunkCoordinate;
     private BlockBackend[][][] blocks;
     private DimensionMap map;
+    private boolean initialized = false;
 
     private final int biasX, biasZ;
 
@@ -78,11 +83,10 @@ public class Chunk {
         for(int i = 0; i < Constant.chunkX; i++)
             for(int j = 0; j < Constant.maxY; j++)
                 for(int k = 0; k < Constant.chunkZ; k++){
-                    if(blocks[i][j][k].getShouldBeShown()){
-                        blocks[i][j][k].setShouldBeShown(false);
-                        map.getUpdateBlockSet().add(blocks[i][j][k]);
-                    }
+                    blocks[i][j][k].setShouldBeShown(false);
+                    // map.getUpdateBlockSet().add(blocks[i][j][k]);
                 }
+        this.map.miniCraftApp.getRootNode().detachChild(this);
         this.loadLevel = 0;
     }
 
@@ -91,7 +95,11 @@ public class Chunk {
      * 其余情况应该没问题
      */
     public void loadAllBlocksInChunk(){
-        updateSurface();
+        if(!initialized){
+            updateSurface();
+            initialized = true;
+        }
+        this.map.miniCraftApp.getRootNode().attachChild(this);
         this.loadLevel = 2;
     }
 
@@ -109,7 +117,8 @@ public class Chunk {
             if(block == null || block.getChunk().getLoadLevel() < 2 || block.getBlockid()==0) return;
             if(!(block.isTransparent() && block.getShouldBeShown() == false)){
                 block.setShouldBeShown(true);
-                map.getUpdateBlockSet().add(block);
+                // map.getUpdateBlockSet().add(block);
+                block.getChunk().attachChildWithDetach(block);
                 return;
             }
         }else{
@@ -119,7 +128,8 @@ public class Chunk {
         // System.out.println(block.getBlockCoordinate());
         if(block.getBlockid() != 0){
             block.setShouldBeShown(true);
-            map.getUpdateBlockSet().add(block);
+            // map.getUpdateBlockSet().add(block);
+            block.getChunk().attachChildWithDetach(block);
             if(!block.isTransparent()) return;
         }
         if(!root && (block.getBlockid()==0 || !block.isTransparent())) return;
@@ -144,23 +154,24 @@ public class Chunk {
                     if(j == Constant.maxY - 1 || blocks[i][j][k].getBlockid() == 0){
                         updateRucusive(i, j, k, masks, true);
                     }else{
-                        if(i == 0 && chunkWest != null && chunkWest.getLoadLevel() >= 2){
+                        if(i == 0 && chunkWest != null){
                             BlockBackend block = chunkWest.getBlocks()[Constant.chunkX-1][j][k];
                             if(block.getBlockid() == 0 || (block.getShouldBeShown() && block.isTransparent()))
                                 updateRucusive(i, j, k, masks, false);
                         }
-                        if(i == Constant.chunkX-1 && chunkEast != null && chunkEast.getLoadLevel() >= 2){
+                        if(i == Constant.chunkX-1 && chunkEast != null){
+                            
                             BlockBackend block = chunkEast.getBlocks()[0][j][k];
                             if(block.getBlockid() == 0 || (block.getShouldBeShown() && block.isTransparent()))
                                 updateRucusive(i, j, k, masks, false);
                         }
-                        if(k == 0 && chunkNorth != null && chunkNorth.getLoadLevel() >= 2){
+                        if(k == 0 && chunkNorth != null){
                             BlockBackend block = chunkNorth.getBlocks()[i][j][Constant.chunkZ-1];
                             if(block.getBlockid() == 0 || (block.getShouldBeShown() && block.isTransparent())){
                                 updateRucusive(i, j, k, masks, false);
                             }
                         }
-                        if(k == Constant.chunkZ-1 && chunkSouth != null && chunkSouth.getLoadLevel() >= 2){
+                        if(k == Constant.chunkZ-1 && chunkSouth != null){
                             BlockBackend block = chunkSouth.getBlocks()[i][j][0];
                             if(block.getBlockid() == 0 || (block.getShouldBeShown() && block.isTransparent()))
                                 updateRucusive(i, j, k, masks, false);
@@ -169,5 +180,23 @@ public class Chunk {
                 }
     }
 
+    public void attachChildWithDetach(BlockBackend block){
+        GeometryBlock geometryBlock = map.inChildBlockList.get(block.getBlockCoord());
+        if(geometryBlock != null){
+            this.detachChild(geometryBlock);
+        }
+        GeometryBlock geom = new GeometryBlock(block);
+        if(block.isTransparent())
+            geom.setQueueBucket(Bucket.Transparent);
+        this.attachChild(geom);
+        map.inChildBlockList.put(block.getBlockCoord(), geom);
+    }
+
+    public void detachIfAttached(BlockBackend block){
+        GeometryBlock geometryBlock = map.inChildBlockList.get(block.getBlockCoord());
+        if(geometryBlock == null) return;
+        map.inChildBlockList.remove(block.getBlockCoord());
+        this.detachChild(geometryBlock);
+    }
 
 }

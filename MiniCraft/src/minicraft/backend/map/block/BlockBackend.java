@@ -59,7 +59,7 @@ public abstract class BlockBackend {
     public boolean isTransparent(){
         return false; //透明方块在子类中重载
     }
-    
+
     /*
      * 返回是否是各面相同的材质，默认为true
      */
@@ -80,8 +80,8 @@ public abstract class BlockBackend {
         if(this.chunk.setBlockInChunk(block) == false)
             return false;
         
-        this.chunk = null;
-        this.blockCoord = null;
+        // this.chunk = null;
+        // this.blockCoord = null;
         return true;
     }
 

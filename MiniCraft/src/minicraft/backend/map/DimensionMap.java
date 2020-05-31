@@ -1,6 +1,7 @@
 package minicraft.backend.map;
 
 import java.util.HashSet;
+import java.util.concurrent.ConcurrentHashMap;
 
 import com.jme3.math.Vector3f;
 
@@ -9,8 +10,11 @@ import minicraft.backend.entity.PlayerBackend;
 import minicraft.backend.map.block.BlockBackend;
 import minicraft.backend.map.generator.*;
 import minicraft.backend.utils.*;
+import minicraft.frontend.GeometryBlock;
+import minicraft.frontend.MiniCraftApp;
 
 public class DimensionMap {
+    public MiniCraftApp miniCraftApp;
     private String name;
     private Chunk[][] mapChunks;
     private final int chunkIndexBiasX;
@@ -18,6 +22,7 @@ public class DimensionMap {
 
     private PlayerBackend player;
     private HashSet<BlockBackend> updateBlockSet;
+    public ConcurrentHashMap<BlockCoord, GeometryBlock> inChildBlockList = new ConcurrentHashMap<>();
     
     
     private int[][][] initialBlockMap;
@@ -30,6 +35,11 @@ public class DimensionMap {
         mapChunks = new Chunk[(Constant.maxX - Constant.minX + 1) / Constant.chunkX][(Constant.maxZ - Constant.minZ + 1) / Constant.chunkZ];
         player = new PlayerBackend();
         updateBlockSet = new HashSet<>();
+    }
+
+    public DimensionMap(String name, MiniCraftApp app){
+        this(name);
+        this.miniCraftApp = app;
     }
 
     /**
@@ -120,7 +130,7 @@ public class DimensionMap {
                 loadChunkByCoord(st.setXZ(cx + i, cz + j));
             }
         }
-
+        this.updateBlockSet.clear();
         return this.updateBlockSet;
     }
 
@@ -225,19 +235,22 @@ public class DimensionMap {
         BlockBackend block = getBlockByCoord(blockCoordinate);
         if(block.isTransparent()){
             // 透明就只更新当前这个
-            if(block.getBlockid() != 0){
-                block.setShouldBeShown(!isBreak);
-                updateBlockSet.add(block);
+            if(block.getBlockid() != 0){ //只有place才执行到这
+                block.setShouldBeShown(true);
+                block.getChunk().attachChildWithDetach(block);
+                // updateBlockSet.add(block);
             }
         }else if(isBreak){
             block.setShouldBeShown(false);
-            updateBlockSet.add(block);
+            // updateBlockSet.add(block);
+            block.getChunk().detachIfAttached(block);
             updateBlockRecusiveBreak(blockCoordinate, true);
         }else{
             int x = blockCoordinate.getX(), y = blockCoordinate.getY(), z = blockCoordinate.getZ();
             final int dx[] = {1, 0, -1, 0, 0, 0}, dz[] = {0, 1, 0, -1, 0, 0}, dy[]={0, 0, 0, 0, 1, -1};
             block.setShouldBeShown(true);
-            updateBlockSet.add(block);
+            // updateBlockSet.add(block);
+            block.getChunk().attachChildWithDetach(block);
             HashSet<BlockBackend> vis = new HashSet<>();
             for(int dir = 0; dir < 6; dir++){
                 int tx = x + dx[dir], ty = y + dy[dir], tz = z + dz[dir];
@@ -252,11 +265,12 @@ public class DimensionMap {
     	
     	BlockBackend block;
     	block = getBlockByCoord(blockCoordinate);
-        if(block == null || block.getChunk().getLoadLevel() < 2) return;
+        if(block == null) return;
         if(!root){
             if(block.getBlockid()==0 || updateBlockSet.contains(block) || block.getShouldBeShown()) return;
             block.setShouldBeShown(true);
-            updateBlockSet.add(block);
+            // updateBlockSet.add(block);
+            block.getChunk().attachChildWithDetach(block);
             if(!block.isTransparent()) return;
         }
 
@@ -290,7 +304,8 @@ public class DimensionMap {
         }
         if(block.getShouldBeShown()){
             block.setShouldBeShown(false);
-            updateBlockSet.add(block);
+            // updateBlockSet.add(block);
+            block.getChunk().detachIfAttached(block);
         }
         return false;
     }
