@@ -53,7 +53,10 @@ import minicraft.frontend.gui.Background;
 import minicraft.frontend.gui.BlockBox;
 import minicraft.frontend.gui.BlockList;
 import minicraft.frontend.gui.Button;
+import minicraft.frontend.gui.IngameMenu;
+import minicraft.frontend.gui.OptionsPanel;
 import minicraft.frontend.gui.Panel;
+import minicraft.frontend.gui.StartMenu;
 
 /**
  * Minicraft主类
@@ -66,11 +69,11 @@ public class MiniCraftApp extends SimpleApplication {
 	public static final String INPUT_BREAK_BLOCK = "MYAPP_Block_Break";
 	public static final String INPUT_PLACE_BLOCK = "MYAPP_Blace_Block";
 
-	private static final String START_MENU = "START_MENU";
-	private static final String INGAME = "INGAME";
-	private static final String INGAME_MENU = "INGAME_MENU";
-	private static final String ABOUT_PANEL = "ABOUT_PANEL";
-	private static final String OPTIONS_PANEL = "OPTIONS_PANEL";
+	public static final String START_MENU = "START_MENU";
+	public static final String INGAME = "INGAME";
+	public static final String INGAME_MENU = "INGAME_MENU";
+	public static final String ABOUT_PANEL = "ABOUT_PANEL";
+	public static final String OPTIONS_PANEL = "OPTIONS_PANEL";
 
 	private Panel startMenu, ingameMenu, optionsPanel, aboutPanel;
 	BlockList blockList;
@@ -205,8 +208,8 @@ public class MiniCraftApp extends SimpleApplication {
 		// rootNode.setShadowMode(ShadowMode.CastAndReceive);
 
 	}
-
-	private void switchRenderShadow() {
+	
+	public void switchRenderShadow() {
 		renderShadow = !renderShadow;
 		if (renderShadow) {
 			rootNode.setShadowMode(ShadowMode.CastAndReceive);
@@ -215,7 +218,7 @@ public class MiniCraftApp extends SimpleApplication {
 		}
 	}
 
-	private void switchRenderTransparentLeaves() {
+	public void switchRenderTransparentLeaves() {
 		renderTransparentLeaves = !renderTransparentLeaves;
 		if (renderTransparentLeaves) {
 			minicraft.backend.map.block.OakLeavesBlock.setTransparent(false);
@@ -235,107 +238,25 @@ public class MiniCraftApp extends SimpleApplication {
 		inputManager.setMouseCursor(cur);
 
 		// private Panel startMenu,ingameMenu,optionsPanel,aboutPanel;
-		startMenu = new Panel(this);
-		startMenu.addComponent(new Button("Quit", new ActionListener() {
-			@Override
-			public void onAction(String name, boolean value, float tpf) {
-				stop();
-			}
-		}));
-		startMenu.addComponent(new Button("About", new ActionListener() {
-			@Override
-			public void onAction(String name, boolean value, float tpf) {
-				// System.out.println("startMenu.About hit");
-				JOptionPane.showMessageDialog(null,
-						"作者：\n石淳安/Spirited_Away\n李辰剑/IcyChlorine\n2020-5,copyright reserved.");
-			}
-		}));
-		startMenu.addComponent(new Button("Options", new ActionListener() {
-			@Override
-			public void onAction(String name, boolean value, float tpf) {
-				// System.out.println("startMenu.Options hit");
-				switchAppStatus(OPTIONS_PANEL);
-			}
-		}));
-		Button gameStart = new Button("Start Game");
-		gameStart.addActionListener(new ActionListener() {
-			@Override
-			public void onAction(String name, boolean value, float tpf) {
-				// System.out.println("startMenu.GameStart hit");
-				gameStart.setText("Loading...");// 无法正常显示，待修
-				switchAppStatus(INGAME);
-				gameStart.setText("Start Game");
-			}
-		});
-		startMenu.addComponent(gameStart);
-		Background bg1 = new Background(Assets.GUI_START_MENU_BACKGROUND, 1920, 1080);
-		bg1.reshape(cam.getWidth(), cam.getHeight());
-
-		startMenu.setBackground(bg1);
-		guiNode.attachChild(startMenu);
-
-		optionsPanel = new Panel(this);
-		optionsPanel.setEnabled(false);
-		optionsPanel.addComponent(new Button("Back", new ActionListener() {
-			@Override
-			public void onAction(String name, boolean value, float tpf) {
-				// System.out.println("ingameMenu.About hit");
-				switchAppStatus(START_MENU);
-			}
-		}));
-		optionsPanel.addComponent(new Button("Switch Render Shadow", new ActionListener() {
-			@Override
-			public void onAction(String name, boolean value, float tpf) {
-				// System.out.println("startMenu.Options hit");
-				switchRenderShadow();
-			}
-		}));
-		optionsPanel.addComponent(new Button("Switch Render Transparent Leaves", new ActionListener() {
-			@Override
-			public void onAction(String name, boolean value, float tpf) {
-				// System.out.println("startMenu.Options hit");
-				switchRenderTransparentLeaves();
-			}
-		}));
-		optionsPanel.setBackground(bg1);
-		guiNode.attachChild(optionsPanel);
-
-		ingameMenu = new Panel(this);
-		ingameMenu.setEnabled(false);
-		ingameMenu.addComponent(new Button("Start Menu", new ActionListener() {
-			@Override
-			public void onAction(String name, boolean value, float tpf) {
-				// System.out.println("ingameMenu.About hit");
-				switchAppStatus(START_MENU);
-			}
-		}));
-		ingameMenu.addComponent(new Button("Switch Render Shadow", new ActionListener() {
-			@Override
-			public void onAction(String name, boolean value, float tpf) {
-				// System.out.println("startMenu.Options hit");
-				switchRenderShadow();
-			}
-		}));
-		ingameMenu.addComponent(new Button("Switch Render Transparent Leaves", new ActionListener() {
-			@Override
-			public void onAction(String name, boolean value, float tpf) {
-				// System.out.println("startMenu.Options hit");
-				switchRenderTransparentLeaves();
-			}
-		}));
-		Background bg2 = new Background(new ColorRGBA(1, 1, 1, 0.35f), cam.getWidth(), cam.getHeight());
-		ingameMenu.setBackground(bg2);
-		guiNode.attachChild(ingameMenu);
-
-		// 将图片后移一个单位，避免遮住状态界面。
+		
+		startMenu=new StartMenu(this);
+		optionsPanel=new OptionsPanel(this);
+		ingameMenu=new IngameMenu(this);
 		blockList = new BlockList(this);
+		
+		//startMenu.setEnabled(true);
+		optionsPanel.setEnabled(false);
+		ingameMenu.setEnabled(false);
 		blockList.setEnabled(false);
-
+		
+		guiNode.attachChild(startMenu);	
+		guiNode.attachChild(optionsPanel);
+		guiNode.attachChild(ingameMenu);
 		guiNode.attachChild(blockList);
 
 	}
 
-	private void switchAppStatus(String appStatusNew) {
+	public void switchAppStatus(String appStatusNew) {
 		if (appStatus.equals(appStatusNew))
 			return;
 		// 关掉些什么
