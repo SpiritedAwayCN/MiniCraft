@@ -53,5 +53,6 @@
 	<classpathentry kind="lib" path="lib/lemur-1.13.0.jar"/>
 	<classpathentry kind="lib" path="lib/slf4j-api-1.7.25.jar"/>
 	<classpathentry kind="lib" path="lib/groovy-all-2.4.15.jar"/>
+	<classpathentry kind="lib" path="lib/fastjson-1.2.68.jar"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>

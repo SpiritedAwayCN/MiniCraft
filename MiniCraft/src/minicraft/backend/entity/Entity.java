@@ -13,7 +13,6 @@ public abstract class Entity {
     protected String name;
     protected ChunkCoord chunkCoordinate;
     protected Vector3f naturalV = new Vector3f(0, 0, 0);
-    protected Vector3f forceV = new Vector3f(0, 0, 0);
     protected boolean onGround;
     protected boolean lowGravelty;
     protected DimensionMap map;
@@ -29,6 +28,15 @@ public abstract class Entity {
         this.coordinate = coordinate;
         this.chunkCoordinate = toChunkCoordinate();
         this.map = map;
+    }
+
+    public Entity(EntityForSave es){
+        this.chunkCoordinate = es.getChunkCoordinate();
+        this.name = es.getName();
+        this.coordinate = es.getCoordinate();
+        this.onGround = es.getOnGround();
+        this.lowGravelty = es.getLowGravelty();
+        this.naturalV = es.getNaturalV();
     }
 
     public String getName() {
@@ -142,6 +150,9 @@ public abstract class Entity {
         BlockBackend block = map.getBlockByCoord(toBlockCoordinate().addXYZ(0, -1, 0));
         if(block != null && !block.isFullHitbox())
             onGround = false;
+    }
+    public EntityForSave toSave(){
+        return new EntityForSave(this);
     }
 
 }

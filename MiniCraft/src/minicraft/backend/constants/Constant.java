@@ -13,6 +13,8 @@ public class Constant {
 
     public static final int viewChunkDistance = 4;
 
+    public static final String saveDir = "./saves";
+
     // 一行5个，方便数数
     public static final String[] BLOCKNAME_STRINGS = {
         "Air", "Stone", "Grass", "Dirt", "Bedrock",

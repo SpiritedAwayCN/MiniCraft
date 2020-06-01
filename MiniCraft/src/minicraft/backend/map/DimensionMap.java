@@ -2,8 +2,10 @@ package minicraft.backend.map;
 
 import java.util.HashSet;
 import java.util.concurrent.ConcurrentHashMap;
+import java.io.*;
 
 import com.jme3.math.Vector3f;
+import com.alibaba.fastjson.JSON;
 
 import minicraft.backend.constants.Constant;
 import minicraft.backend.entity.PlayerBackend;
@@ -63,6 +65,29 @@ public class DimensionMap {
         }
         System.out.println(iy);
         player.setCoordinate(new Vector3f(0, (float)0.5 + iy, 0));
+    }
+
+    /**
+     * 从存档读取世界，DimensionMap.name字段将被存档覆盖
+     * @param worldName 世界名称(只要名称，不需要'./saves/'，但需要'.json')
+     * @throws Exception 读取失败的异常
+     */
+    public void generateFromSave(String worldName) throws Exception{
+        String fileName = "./saves/" + worldName;
+        MapForSave mapForSave = null;
+
+        BufferedReader br = new BufferedReader(new InputStreamReader(new FileInputStream(fileName)));
+        mapForSave = JSON.parseObject(br.readLine(), MapForSave.class);
+        br.close();
+
+        initialBlockMap = mapForSave.getBlockMap();
+        for(int i = 0; i < mapChunks.length; i++)
+            for(int j = 0; j < mapChunks[i].length; j++){
+                mapChunks[i][j] = new Chunk(new ChunkCoord(i - chunkIndexBiasX, j - chunkIndexBiasZ), initialBlockMap, this);
+            }
+        player = new PlayerBackend(mapForSave.getPlayer(), this);
+        
+        name = worldName;
     }
 
     public Chunk getChunkByCoord(ChunkCoord chunkCoord){
@@ -348,6 +373,28 @@ public class DimensionMap {
         if(chunk != null && chunk.getLoadLevel() > 0){
             // System.out.printf("unload : %d %d\n", oldCoordinate.getX(), oldCoordinate.getZ());
             chunk.unloadAllBlocksInChunk();
+        }
+    }
+
+    public void saveMap(){
+        new Thread(){{
+            long st = System.currentTimeMillis();
+            saveProcess();
+            long ed = System.currentTimeMillis();
+            System.out.println("Saved in " + (ed-st) + "ms.");
+        }}.run();
+    }
+
+    private synchronized void saveProcess(){
+        MapForSave mapForSave = new MapForSave(this);
+        File dir = new File(Constant.saveDir);
+        if(!dir.exists()) dir.mkdirs();
+        String fileName = Constant.saveDir + "/" + this.name + ".json";
+        try (OutputStream out = new FileOutputStream(fileName)) {
+            String output = JSON.toJSONString(mapForSave);
+            out.write(output.getBytes());
+        } catch (Exception e) {
+            e.printStackTrace();
         }
     }
 }

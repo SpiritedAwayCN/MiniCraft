@@ -12,4 +12,9 @@ public class PlayerBackend extends Entity{
     public PlayerBackend(Vector3f coord, String name, DimensionMap map){
         super(coord, name, map);
     }
+
+    public PlayerBackend(EntityForSave entityForSave, DimensionMap map){
+        super(entityForSave);
+        this.map = map;
+    }
 }
