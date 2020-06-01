@@ -46,6 +46,7 @@ public class Assets {
 				"texture/stone_bricks.png",
 				"texture/sand.bmp",
 				"texture/cobblestone.png",
+				"texture/bricks.png",
 				"texture/gold_block.png",
 				"texture/iron_block.png"
 		};
