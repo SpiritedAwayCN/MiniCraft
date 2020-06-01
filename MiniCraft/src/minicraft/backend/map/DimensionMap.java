@@ -69,11 +69,11 @@ public class DimensionMap {
 
     /**
      * 从存档读取世界，DimensionMap.name字段将被存档覆盖
-     * @param worldName 世界名称(只要名称，不需要'./saves/'，但需要'.json')
+     * @param worldName 世界名称(只要名称，不需要'./saves/'，也不需要'.json')
      * @throws Exception 读取失败的异常
      */
     public void generateFromSave(String worldName) throws Exception{
-        String fileName = "./saves/" + worldName;
+        String fileName = "./saves/" + worldName + ".json";
         MapForSave mapForSave = null;
 
         BufferedReader br = new BufferedReader(new InputStreamReader(new FileInputStream(fileName)));

@@ -218,7 +218,8 @@ public class MiniCraftApp extends SimpleApplication {
 		FilterPostProcessor fpp = new FilterPostProcessor(assetManager);
 		fpp.addFilter(dlsf);
 		viewPort.addProcessor(fpp);
-
+		
+		// 阴影默认关
 		// rootNode.setShadowMode(ShadowMode.CastAndReceive);
 
 	}
@@ -298,7 +299,7 @@ public class MiniCraftApp extends SimpleApplication {
 					overworld = new DimensionMap("overworld", this);
 					// overworld.generateFromGenerator(false);
 					try {
-						overworld.generateFromSave("overworld.json");
+						overworld.generateFromSave("overworld");
 					} catch (Exception e) {
 						// 读取失败的异常 先暴力处理 得需要一个UI
 						e.printStackTrace();
