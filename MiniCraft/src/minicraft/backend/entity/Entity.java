@@ -19,7 +19,7 @@ public abstract class Entity {
     protected static final float hitBoxWide = (float)0.2;
     protected static final float hitBoxHeight = (float)1.8;
 
-    protected final Vector3f G = new Vector3f(0, (float)-0.01, 0);
+    protected final Vector3f G = new Vector3f(0, (float)-0.04, 0);
     // 受重力
     
     Entity(){}
@@ -120,6 +120,7 @@ public abstract class Entity {
             block = map.getBlockByCoord(blockCoord);
             if(block == null || block.isFullHitbox()){
                 onGround = true;
+                naturalV.y = 0;
                 coordinate.y = blockCoord.getY() + 1;
                 // System.out.println(blockCoord);
                 return true;

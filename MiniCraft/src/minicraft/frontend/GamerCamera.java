@@ -157,7 +157,7 @@ public class GamerCamera extends FlyByCamera {
             this.miniCraftApp.overworld.movePlayerTo(cam.getLocation().subtract(MiniCraftApp.playerEyeBias));
         }else if(this.miniCraftApp.overworld.getPlayer().getOnGround()){
             this.miniCraftApp.overworld.getPlayer().setOnGround(false);
-            this.miniCraftApp.overworld.getPlayer().setNaturalV(new Vector3f(0, (float)0.2, 0));
+            this.miniCraftApp.overworld.getPlayer().setNaturalV(new Vector3f(0, (float)0.35, 0));
         }
 
     }
