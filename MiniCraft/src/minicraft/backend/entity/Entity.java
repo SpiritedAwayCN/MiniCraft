@@ -101,6 +101,7 @@ public abstract class Entity {
 
     public boolean updateFalling(float dt){
         if(lowGravelty || onGround) return false;
+        // System.out.println(dt);
         naturalV.addLocal(G);
         // System.out.println("ny " + naturalV.y);
         if(naturalV.y < -5) naturalV.y = -5;
@@ -153,6 +154,9 @@ public abstract class Entity {
     }
     public EntityForSave toSave(){
         return new EntityForSave(this);
+    }
+    public void setLowGravelty(boolean lowGravelty) {
+        this.lowGravelty = lowGravelty;
     }
 
 }
