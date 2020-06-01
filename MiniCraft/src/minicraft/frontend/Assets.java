@@ -41,7 +41,9 @@ public class Assets {
 				"texture/bedrock.bmp",
 				"texture/glass.png",
 				"texture/spruce_log.png",
-				"texture/oak_leaves.png"
+				"texture/oak_leaves.png",
+				"texture/oak_planks.png",
+				"texture/stone_bricks.png"
 		};
 		final String[] blockImageFilepath= {
 				null,//air
@@ -51,7 +53,9 @@ public class Assets {
 				"gui/block_bedrock.png",
 				"gui/block_glass.png",
 				"gui/block_spruce_log.png",
-				"gui/block_oak_leaves.png"
+				"gui/block_oak_leaves.png",
+				"gui/block_oak_planks.png",
+				"gui/block_stone_bricks.png"
 		};
 		
 

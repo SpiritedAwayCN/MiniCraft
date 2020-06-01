@@ -87,7 +87,7 @@ public class DimensionMap {
             }
         player = new PlayerBackend(mapForSave.getPlayer(), this);
         
-        name = worldName;
+        name = worldName.replaceAll("\\.json$", "");
     }
 
     public Chunk getChunkByCoord(ChunkCoord chunkCoord){
