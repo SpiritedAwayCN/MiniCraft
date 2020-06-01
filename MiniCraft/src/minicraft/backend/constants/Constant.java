@@ -18,7 +18,8 @@ public class Constant {
     // 一行5个，方便数数
     public static final String[] BLOCKNAME_STRINGS = {
         "Air", "Stone", "Grass", "Dirt", "Bedrock",
-        "Glass","SpruceLog","OakLeaves", "OakPlank", "StoneBrick"};
+        "Glass","SpruceLog","OakLeaves", "OakPlank", "StoneBrick",
+        "Sand", "Cobblestone", "Brick", "Gold", "Iron"};
     //方块id常量
     public static final int BLOCK_AIR=0;
     public static final int BLOCK_STONE=1;
@@ -30,6 +31,13 @@ public class Constant {
     public static final int BLOCK_OAK_LEAVES=7;
     public static final int BLOCK_OAK_PLANK = 8;
     public static final int BLOCK_STONE_BRICK = 9;
+    public static final int BLOCK_SAND = 10;
+    public static final int BLOCK_COBBLESTONE = 11;
+    public static final int BLOCK_BRICK = 12;
+    public static final int BLOCK_GOLD_BLOCK = 13;
+    public static final int BLOCK_IRON_BLOCK = 14;
+
+
     //方块种类数
     public static final int BLOCK_TYPE_NUM=BLOCKNAME_STRINGS.length;
     

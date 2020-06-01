@@ -43,7 +43,11 @@ public class Assets {
 				"texture/spruce_log.png",
 				"texture/oak_leaves.png",
 				"texture/oak_planks.png",
-				"texture/stone_bricks.png"
+				"texture/stone_bricks.png",
+				"texture/sand.bmp",
+				"texture/cobblestone.png",
+				"texture/gold_block.png",
+				"texture/iron_block.png"
 		};
 		final String[] blockImageFilepath= {
 				null,//air
@@ -55,7 +59,12 @@ public class Assets {
 				"gui/block_spruce_log.png",
 				"gui/block_oak_leaves.png",
 				"gui/block_oak_planks.png",
-				"gui/block_stone_bricks.png"
+				"gui/block_stone_bricks.png",
+				"gui/block_sand.png",
+				"gui/block_cobblestone.png",
+				"gui/block_brick.png",
+				"gui/block_gold.png",
+				"gui/block_iron.png"
 		};
 		
 
