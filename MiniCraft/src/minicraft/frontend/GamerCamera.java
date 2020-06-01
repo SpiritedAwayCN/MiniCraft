@@ -82,17 +82,10 @@ public class GamerCamera extends FlyByCamera {
         this.inputManager = inputManager;
 
         // both mouse and button - rotation of cam
-        inputManager.addMapping(CameraInput.FLYCAM_LEFT, new MouseAxisTrigger(MouseInput.AXIS_X, true),
-                new KeyTrigger(KeyInput.KEY_LEFT));
-
-        inputManager.addMapping(CameraInput.FLYCAM_RIGHT, new MouseAxisTrigger(MouseInput.AXIS_X, false),
-                new KeyTrigger(KeyInput.KEY_RIGHT));
-
-        inputManager.addMapping(CameraInput.FLYCAM_UP, new MouseAxisTrigger(MouseInput.AXIS_Y, false),
-                new KeyTrigger(KeyInput.KEY_UP));
-
-        inputManager.addMapping(CameraInput.FLYCAM_DOWN, new MouseAxisTrigger(MouseInput.AXIS_Y, true),
-                new KeyTrigger(KeyInput.KEY_DOWN));
+        inputManager.addMapping(CameraInput.FLYCAM_LEFT, new MouseAxisTrigger(MouseInput.AXIS_X, true));
+        inputManager.addMapping(CameraInput.FLYCAM_RIGHT, new MouseAxisTrigger(MouseInput.AXIS_X, false));
+        inputManager.addMapping(CameraInput.FLYCAM_UP, new MouseAxisTrigger(MouseInput.AXIS_Y, false));
+        inputManager.addMapping(CameraInput.FLYCAM_DOWN, new MouseAxisTrigger(MouseInput.AXIS_Y, true));
 
         // mouse only - zoom in/out with wheel, and rotate drag
         inputManager.addMapping(CameraInput.FLYCAM_ZOOMIN, new MouseAxisTrigger(MouseInput.AXIS_WHEEL, false));
