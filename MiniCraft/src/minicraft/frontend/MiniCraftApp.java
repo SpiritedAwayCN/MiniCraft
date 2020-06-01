@@ -431,10 +431,10 @@ public class MiniCraftApp extends SimpleApplication {
 		}
 		
 		try{
-			if(overworld.getPlayer().updateFalling())
+			if(overworld.getPlayer().updateFalling(deltaTime))
 				cam.setLocation(overworld.getPlayer().getCoordinate().add(playerEyeBias));
 		}catch(NullPointerException e){
-
+			
 		}
 		
 	}

@@ -99,7 +99,7 @@ public abstract class Entity {
         this.chunkCoordinate = chunkCoordinate;
     }
 
-    public boolean updateFalling(){
+    public boolean updateFalling(float dt){
         if(lowGravelty || onGround) return false;
         naturalV.addLocal(G);
         // System.out.println("ny " + naturalV.y);
