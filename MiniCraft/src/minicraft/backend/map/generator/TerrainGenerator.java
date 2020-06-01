@@ -29,6 +29,7 @@ public class TerrainGenerator extends Generator {
     public void generateBlockMap() {
         super.generateBlockMap();
         generateTrees(random.nextInt(6) + 15, random.nextInt(25) + 40);
+        generatePlants(random.nextInt(2) + 4, random.nextInt(10) + 15);
     }
     Random random;
     private int rx, rz;
@@ -43,6 +44,27 @@ public class TerrainGenerator extends Generator {
             if(rx >= heightMap.length) rx = heightMap.length - 1;
             if(rz < 0) rz = 0;
             if(rz >= heightMap[0].length) rz = heightMap[0].length - 1;
+        }
+    }
+
+    private final int plantMindist = 2;
+    private void generatePlants(int att, int attEach){
+        for(int i = 0; i < att; i++){
+            rx = random.nextInt(heightMap.length);
+            rz = random.nextInt(heightMap[0].length);
+            int blocktype = Constant.BLOCK_PUMPKIN;
+            if(Math.random() < 0.5) blocktype++; //melon
+            outer:for(int j = 0; j < attEach; j++){
+                int sx = rx, sz = rz;
+                randomWalk(sx, sz, 15);
+                for(int ii = -plantMindist; ii <= plantMindist; ii++)
+                    for(int jj = -plantMindist; jj <=plantMindist; jj++){
+                        int x = rx + ii, z = rz + jj;
+                        if(x < 0 || x >= heightMap.length || z < 0 || z >= heightMap[0].length) continue;
+                        if(blockMap[x][heightMap[x][z]+1][z] != 0) continue outer;
+                    }
+                blockMap[rx][heightMap[rx][rz]+1][rz] = blocktype;
+            }
         }
     }
 

@@ -65,7 +65,7 @@ public abstract class Entity {
             for(BlockCoord blockCoord = new BlockCoord(bx, sy, oz); blockCoord.getY() <= ty;
                 blockCoord.addXYZ(0, 1, 0)){
                     BlockBackend block = map.getBlockByCoord(blockCoord);
-                    if(block == null || block.isFullHitbox()){
+                    if(block == null || (!lowGravelty && block.isFullHitbox())){
                         coord.x = bx - (hitBoxWide + 0.5f) * factorX;
                         break;
                     }
@@ -75,7 +75,7 @@ public abstract class Entity {
             for(BlockCoord blockCoord = new BlockCoord(ox, sy, bz); blockCoord.getY() <= ty;
                 blockCoord.addXYZ(0, 1, 0)){
                     BlockBackend block = map.getBlockByCoord(blockCoord);
-                    if(block == null || block.isFullHitbox()){
+                    if(block == null || (!lowGravelty && block.isFullHitbox())){
                         coord.z = bz - (hitBoxWide + 0.5f) * factorZ;
                         break;
                     }

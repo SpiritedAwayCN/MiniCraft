@@ -2,8 +2,6 @@ package minicraft.backend.map;
 
 import static org.junit.Assert.*;
 
-import java.util.HashSet;
-
 import org.junit.Test;
 
 import minicraft.backend.constants.Constant;

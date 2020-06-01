@@ -383,6 +383,7 @@ public class DimensionMap {
             saveProcess();
             long ed = System.currentTimeMillis();
             System.out.println("Saved in " + (ed-st) + "ms.");
+            System.gc();
         }}.run();
     }
 
