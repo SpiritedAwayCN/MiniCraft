@@ -134,7 +134,8 @@ public class DimensionMap {
      */
     public void refreshWholeUpdateBlockSet(){
         this.miniCraftApp.getRootNode().detachAllChildren(); 
-
+        System.gc();
+        
         ChunkCoord st = player.toChunkCoordinate();
         int cx = st.getX(), cz = st.getZ();
         
