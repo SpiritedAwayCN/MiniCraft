@@ -67,7 +67,8 @@ public class MiniCraftApp extends SimpleApplication {
 
 	public static final String INPUT_MAPPING_MENU = "MYAPP_Menu";
 	public static final String INPUT_BREAK_BLOCK = "MYAPP_Block_Break";
-	public static final String INPUT_PLACE_BLOCK = "MYAPP_Blace_Block";
+	public static final String INPUT_PLACE_BLOCK = "MYAPP_Place_Block";
+	public static final String INPUT_TAB_SWITCH = "MYAPP_TAB_SWITCH";
 
 	public static final String START_MENU = "START_MENU";
 	public static final String INGAME = "INGAME";
@@ -119,6 +120,19 @@ public class MiniCraftApp extends SimpleApplication {
 						switchAppStatus(INGAME);
 				}
 			}, INPUT_MAPPING_MENU);
+			inputManager.addMapping(INPUT_TAB_SWITCH, new KeyTrigger(KeyInput.KEY_TAB));
+			inputManager.addListener(new ActionListener() {
+				@Override
+				public void onAction(String name, boolean value, float tpf) {
+					if (value == false)
+						return;
+					if(!appStatus.equals(INGAME)) 
+						return;
+					overworld.getPlayer().setLowGravelty(
+							!overworld.getPlayer().getLowGravelty());
+					
+				}
+			}, INPUT_TAB_SWITCH);
 
 			inputManager.addMapping(INPUT_BREAK_BLOCK, new MouseButtonTrigger(MouseInput.BUTTON_LEFT));
 			inputManager.addListener(new ActionListener() {
@@ -338,6 +352,8 @@ public class MiniCraftApp extends SimpleApplication {
 	public static final Vector3f playerEyeBias = new Vector3f(0, (float)1.5, 0);
 
 	private long counter = 0;
+	private float cumulatedTime=0;
+	public static final float timePerTick=0.05f;
 	/**
 	 * 主循环
 	 */
@@ -351,11 +367,13 @@ public class MiniCraftApp extends SimpleApplication {
 			System.gc();
 		}
 		
-		try{
-			if(overworld.getPlayer().updateFalling(deltaTime))
-				cam.setLocation(overworld.getPlayer().getCoordinate().add(playerEyeBias));
-		}catch(NullPointerException e){
-			
+		cumulatedTime+=deltaTime;
+		while(cumulatedTime>timePerTick) {//保证每tick更新一次
+			try{
+				if(overworld.getPlayer().updateFalling(deltaTime))
+					cam.setLocation(overworld.getPlayer().getCoordinate().add(playerEyeBias));
+			}catch(NullPointerException e){}
+			cumulatedTime-=timePerTick;
 		}
 		
 	}
