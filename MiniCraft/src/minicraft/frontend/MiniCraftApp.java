@@ -49,6 +49,7 @@ import minicraft.backend.constants.Constant;
 import minicraft.backend.map.DimensionMap;
 import minicraft.backend.map.block.BlockBackend;
 import minicraft.backend.utils.BlockCoord;
+import minicraft.frontend.control.GameOption;
 import minicraft.frontend.gui.Background;
 import minicraft.frontend.gui.BlockBox;
 import minicraft.frontend.gui.BlockList;
@@ -107,7 +108,7 @@ public class MiniCraftApp extends SimpleApplication {
 		// 将esc的作用改写为释放/隐藏鼠标，便于用鼠标调整窗口大小
 		if (inputManager != null) {
 			inputManager.deleteMapping(INPUT_MAPPING_EXIT);
-			inputManager.addMapping(INPUT_MAPPING_MENU, new KeyTrigger(KeyInput.KEY_ESCAPE));
+			inputManager.addMapping(INPUT_MAPPING_MENU, new KeyTrigger(option.getKeyMappingMenu()));
 			inputManager.addListener(new ActionListener() {
 				@Override
 				public void onAction(String name, boolean value, float tpf) {
@@ -120,7 +121,7 @@ public class MiniCraftApp extends SimpleApplication {
 						switchAppStatus(INGAME);
 				}
 			}, INPUT_MAPPING_MENU);
-			inputManager.addMapping(INPUT_TAB_SWITCH, new KeyTrigger(KeyInput.KEY_TAB));
+			inputManager.addMapping(INPUT_TAB_SWITCH, new KeyTrigger(option.getKeyMappingSwitch()));
 			inputManager.addListener(new ActionListener() {
 				@Override
 				public void onAction(String name, boolean value, float tpf) {
@@ -134,7 +135,7 @@ public class MiniCraftApp extends SimpleApplication {
 				}
 			}, INPUT_TAB_SWITCH);
 
-			inputManager.addMapping(INPUT_BREAK_BLOCK, new MouseButtonTrigger(MouseInput.BUTTON_LEFT));
+			inputManager.addMapping(INPUT_BREAK_BLOCK, new MouseButtonTrigger(option.getMouseMappingBreak()));
 			inputManager.addListener(new ActionListener() {
 				@Override
 				public void onAction(String name, boolean value, float tpf) {
@@ -144,7 +145,7 @@ public class MiniCraftApp extends SimpleApplication {
 					}
 				}
 			}, INPUT_BREAK_BLOCK);
-			inputManager.addMapping(INPUT_PLACE_BLOCK, new MouseButtonTrigger(MouseInput.BUTTON_RIGHT));
+			inputManager.addMapping(INPUT_PLACE_BLOCK, new MouseButtonTrigger(option.getMouseMappingPlace()));
 			inputManager.addListener(new ActionListener() {
 				@Override
 				public void onAction(String name, boolean value, float tpf) {
@@ -167,7 +168,7 @@ public class MiniCraftApp extends SimpleApplication {
 		initGUI();
 
 		// 设置天空颜色
-		viewPort.setBackgroundColor(new ColorRGBA(0.2f, 0.4f, 0.6f, 1));
+		viewPort.setBackgroundColor(new ColorRGBA(0.66f, 0.95f, 1.0f, 1));
 
 	}
 
@@ -462,6 +463,8 @@ public class MiniCraftApp extends SimpleApplication {
 		block=BlockBackend.getBlockInstanceByID(blockList.getSelectedBlockid());	block.placeAt(r, overworld);
 		overworld.updateBlockSetTemp(r, false);
 	}
+
+	public GameOption option = GameOption.loadInstanceFromFile();
 
 	public static void main(String[] args) {
 		// 配置参数

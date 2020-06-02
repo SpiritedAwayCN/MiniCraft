@@ -14,6 +14,7 @@ import minicraft.backend.map.generator.*;
 import minicraft.backend.utils.*;
 import minicraft.frontend.GeometryBlock;
 import minicraft.frontend.MiniCraftApp;
+import minicraft.frontend.control.GameOption;
 
 public class DimensionMap {
     public MiniCraftApp miniCraftApp;
@@ -21,6 +22,7 @@ public class DimensionMap {
     private Chunk[][] mapChunks;
     private final int chunkIndexBiasX;
     private final int chunkIndexBiasZ;
+    private GameOption option;
 
     private PlayerBackend player;
     public ConcurrentHashMap<BlockCoord, GeometryBlock> inChildBlockList = new ConcurrentHashMap<>();
@@ -28,6 +30,7 @@ public class DimensionMap {
     
     private int[][][] initialBlockMap;
     
+    @Deprecated
     public DimensionMap(String name){
         this.name = name;
         chunkIndexBiasX = -Constant.minX / Constant.chunkX;
@@ -40,6 +43,7 @@ public class DimensionMap {
     public DimensionMap(String name, MiniCraftApp app){
         this(name);
         this.miniCraftApp = app;
+        this.option = app.option;
     }
 
     /**
@@ -138,17 +142,17 @@ public class DimensionMap {
         
         ChunkCoord st = player.toChunkCoordinate();
         int cx = st.getX(), cz = st.getZ();
-        
+        int viewdis = option.getViewChunkDistance();
         //全部设为预加载
-        for(int i = -Constant.viewChunkDistance; i <= Constant.viewChunkDistance; i++){
-            for(int j = -Constant.viewChunkDistance; j <= Constant.viewChunkDistance; j++){
+        for(int i = -viewdis; i <= viewdis; i++){
+            for(int j = -viewdis; j <= viewdis; j++){
                 setChunkPreLoad(st.setXZ(cx + i, cz + j));
             }
         }
 
         //再开始变强加载
-        for(int i = -Constant.viewChunkDistance; i <= Constant.viewChunkDistance; i++){
-            for(int j = -Constant.viewChunkDistance; j <= Constant.viewChunkDistance; j++){
+        for(int i = -viewdis; i <= viewdis; i++){
+            for(int j = -viewdis; j <= viewdis; j++){
                 loadChunkByCoord(st.setXZ(cx + i, cz + j));
             }
         }
@@ -345,20 +349,21 @@ public class DimensionMap {
         //StarSky修改
         //updateBlockSet.clear();
         ChunkCoord st = new ChunkCoord();
-        for(int i = -Constant.viewChunkDistance; i <= Constant.viewChunkDistance; i++){
-            for(int j = -Constant.viewChunkDistance; j <= Constant.viewChunkDistance; j++){
+        int viewdis = option.getViewChunkDistance();
+        for(int i = -viewdis; i <= viewdis; i++){
+            for(int j = -viewdis; j <= viewdis; j++){
                 unloadIfTooFar(st.setXZ(ox + i, oz + j), nx, nz);
             }
         }
         
-        for(int i = -Constant.viewChunkDistance; i <= Constant.viewChunkDistance; i++){
-            for(int j = -Constant.viewChunkDistance; j <= Constant.viewChunkDistance; j++){
+        for(int i = -viewdis; i <= viewdis; i++){
+            for(int j = -viewdis; j <= viewdis; j++){
                 setChunkPreLoadIfNot(st.setXZ(nx + i, nz + j));
             }
         }
 
-        for(int i = -Constant.viewChunkDistance; i <= Constant.viewChunkDistance; i++){
-            for(int j = -Constant.viewChunkDistance; j <= Constant.viewChunkDistance; j++){
+        for(int i = -viewdis; i <= viewdis; i++){
+            for(int j = -viewdis; j <= viewdis; j++){
                 loadChunkByCoord(st.setXZ(nx + i, nz + j));
             }
         }
@@ -368,7 +373,7 @@ public class DimensionMap {
     }
 
     private void unloadIfTooFar(ChunkCoord oldCoordinate, int nx, int nz){
-        if(Math.max(Math.abs(oldCoordinate.getX() - nx), Math.abs(oldCoordinate.getZ() - nz)) <= Constant.viewChunkDistance)
+        if(Math.max(Math.abs(oldCoordinate.getX() - nx), Math.abs(oldCoordinate.getZ() - nz)) <= option.getViewChunkDistance())
             return;
         Chunk chunk = getChunkByCoord(oldCoordinate);
         if(chunk != null && chunk.getLoadLevel() > 0){

@@ -11,7 +11,6 @@ public class Constant {
     public static final int chunkX = 16;
     public static final int chunkZ = 16;
 
-    public static final int viewChunkDistance = 4;
 
     public static final String saveDir = "./saves";
 

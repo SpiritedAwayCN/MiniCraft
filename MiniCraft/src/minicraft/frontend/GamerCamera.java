@@ -33,14 +33,14 @@ public class GamerCamera extends FlyByCamera {
 	        CameraInput.FLYCAM_FORWARD,
 	        CameraInput.FLYCAM_BACKWARD,
 
-	        CameraInput.FLYCAM_ZOOMIN,
-	        CameraInput.FLYCAM_ZOOMOUT,
-	        CameraInput.FLYCAM_ROTATEDRAG,
+	        // CameraInput.FLYCAM_ZOOMIN,
+	        // CameraInput.FLYCAM_ZOOMOUT,
+	        // CameraInput.FLYCAM_ROTATEDRAG,
 
 	        CameraInput.FLYCAM_RISE,
-	        CameraInput.FLYCAM_LOWER,
+	        CameraInput.FLYCAM_LOWER
 
-	        CameraInput.FLYCAM_INVERTY
+	        // CameraInput.FLYCAM_INVERTY
 	    };
     
     private MiniCraftApp miniCraftApp;
@@ -88,17 +88,17 @@ public class GamerCamera extends FlyByCamera {
         inputManager.addMapping(CameraInput.FLYCAM_DOWN, new MouseAxisTrigger(MouseInput.AXIS_Y, true));
 
         // mouse only - zoom in/out with wheel, and rotate drag
-        inputManager.addMapping(CameraInput.FLYCAM_ZOOMIN, new MouseAxisTrigger(MouseInput.AXIS_WHEEL, false));
-        inputManager.addMapping(CameraInput.FLYCAM_ZOOMOUT, new MouseAxisTrigger(MouseInput.AXIS_WHEEL, true));
-        inputManager.addMapping(CameraInput.FLYCAM_ROTATEDRAG, new MouseButtonTrigger(MouseInput.BUTTON_LEFT));
+        // inputManager.addMapping(CameraInput.FLYCAM_ZOOMIN, new MouseAxisTrigger(MouseInput.AXIS_WHEEL, false));
+        // inputManager.addMapping(CameraInput.FLYCAM_ZOOMOUT, new MouseAxisTrigger(MouseInput.AXIS_WHEEL, true));
+        // inputManager.addMapping(CameraInput.FLYCAM_ROTATEDRAG, new MouseButtonTrigger(MouseInput.BUTTON_LEFT));
 
         // keyboard only WASD for movement and 空格/CAPSLOCK for rise/lower height
         inputManager.addMapping(CameraInput.FLYCAM_STRAFELEFT, new KeyTrigger(KeyInput.KEY_A));
         inputManager.addMapping(CameraInput.FLYCAM_STRAFERIGHT, new KeyTrigger(KeyInput.KEY_D));
         inputManager.addMapping(CameraInput.FLYCAM_FORWARD, new KeyTrigger(KeyInput.KEY_W));
         inputManager.addMapping(CameraInput.FLYCAM_BACKWARD, new KeyTrigger(KeyInput.KEY_S));
-        inputManager.addMapping(CameraInput.FLYCAM_RISE, new KeyTrigger(KeyInput.KEY_SPACE));
-        inputManager.addMapping(CameraInput.FLYCAM_LOWER, new KeyTrigger(KeyInput.KEY_CAPITAL));
+        inputManager.addMapping(CameraInput.FLYCAM_RISE, new KeyTrigger(miniCraftApp.option.getKeyCamRise()));
+        inputManager.addMapping(CameraInput.FLYCAM_LOWER, new KeyTrigger(miniCraftApp.option.getKeyCamLower()));
 
         inputManager.addListener(this, mappings);
         inputManager.setCursorVisible(dragToRotate || !isEnabled());
