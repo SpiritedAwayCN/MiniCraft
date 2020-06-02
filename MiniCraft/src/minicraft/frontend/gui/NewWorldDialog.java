@@ -54,14 +54,7 @@ public class NewWorldDialog {
 		frame.getContentPane().setLayout(null);
 		frame.setResizable(false);
 		
-		frame.addWindowListener(new WindowAdapter() {
-			@Override
-	        public void windowClosing(WindowEvent e) {
-				
-				frame.dispose();
-	        }	
-			
-		});
+		
 		
 		textField = new JTextField();
 		textField.setBounds(58, 67, 202, 24);
