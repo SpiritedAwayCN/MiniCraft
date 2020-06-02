@@ -58,6 +58,7 @@ import minicraft.frontend.gui.IngameMenu;
 import minicraft.frontend.gui.OptionsPanel;
 import minicraft.frontend.gui.Panel;
 import minicraft.frontend.gui.StartMenu;
+import minicraft.frontend.gui.WorldSelectionDialog;
 
 /**
  * Minicraft主类
@@ -171,8 +172,9 @@ public class MiniCraftApp extends SimpleApplication {
 		viewPort.setBackgroundColor(new ColorRGBA(0.66f, 0.95f, 1.0f, 1));
 
 	}
-
-	private void initScene(boolean firstInit) {
+	
+	private boolean firstInit=true;
+	private void initScene() {
 		// geoms=new GeometryBlock[256*64*256];
 
 		// BlockBackend block;
@@ -222,6 +224,7 @@ public class MiniCraftApp extends SimpleApplication {
 		
 		// 阴影默认关
 		// rootNode.setShadowMode(ShadowMode.CastAndReceive);
+		firstInit=false;
 
 	}
 	
@@ -245,7 +248,7 @@ public class MiniCraftApp extends SimpleApplication {
 		}
 		rootNode.detachAllChildren();
 		if (appStatus.equals(INGAME) || appStatus.equals(INGAME_MENU))
-			initScene(false);
+			initScene();
 	}
 
 	private void initGUI() {
@@ -254,7 +257,6 @@ public class MiniCraftApp extends SimpleApplication {
 		inputManager.setMouseCursor(cur);
 
 		// private Panel startMenu,ingameMenu,optionsPanel,aboutPanel;
-		
 		startMenu=new StartMenu(this);
 		optionsPanel=new OptionsPanel(this);
 		ingameMenu=new IngameMenu(this);
@@ -295,8 +297,24 @@ public class MiniCraftApp extends SimpleApplication {
 		}
 		if (appStatusNew.equals(INGAME)) {
 			if (appStatus.equals(START_MENU)) {// 从开始菜单来
+				Object[] rst=WorldSelectionDialog.getWorldParam();
+				
+				overworld =new DimensionMap((String)rst[0], this);
+				if(rst.length==2)//new world
+				{
+					overworld.generateFromGenerator((Boolean)rst[1]);
+				}else {//read from file
+					try {
+						overworld.generateFromSave((String)rst[0]);
+					} catch (Exception e) {
+						// TODO Auto-generated catch block
+						e.printStackTrace();
+					}
+				}
+				cam.setLocation(overworld.getPlayer().getCoordinate().add(playerEyeBias));
+				initScene();
 				// 世界第一次
-				if (overworld == null) {
+				/*if (overworld == null) {
 					overworld = new DimensionMap("overworld", this);
 					// overworld.generateFromGenerator(false);
 					try {
@@ -312,7 +330,7 @@ public class MiniCraftApp extends SimpleApplication {
 					initScene(true);
 				}else {
 					initScene(false);
-				}
+				}*/
 				
 				
 			}
@@ -379,36 +397,7 @@ public class MiniCraftApp extends SimpleApplication {
 		}
 		
 	}
-	/*
-	void updateBlockVisibility() {
-		//更新周围方块，使其显示
-		HashSet<BlockBackend> blocksToUpdate=overworld.getUpdateBlockSet();
-		// if(blocksToUpdate.size()>0)
-		// 	System.out.println(blocksToUpdate.size());
-		for(BlockBackend b:blocksToUpdate) {
-			// System.out.println(b.getBlockCoord() + " " + b.getShouldBeShown());
-			if(b.getShouldBeShown() == (geoms[b.hashCode()]!=null)) {
-				continue;//显示状态相同，不用更新
-			}
-			//添加显示
-			if(b.getShouldBeShown()) {
-				GeometryBlock geom=new GeometryBlock(b);
-				//透明方块特判
-				if(b.isTransparent()) {
-					geom.setQueueBucket(Bucket.Transparent);
-				}
-				rootNode.attachChild(geom);
-				geoms[b.hashCode()]=(GeometryBlock) geom;
-			}else {//不显示
-				//System.out.println("rootNode.detaching sth.");
-				rootNode.detachChild(geoms[b.hashCode()]);
-				geoms[b.hashCode()]=null;
-				
-			}
-		}
-		blocksToUpdate.clear();//将更新一笔勾销
-	}
-	*/
+	
 
 	/*
 	 * @return 当flag=true,返回找到的最后一个空气方块；flag=false，返回找到的第一个实体方块

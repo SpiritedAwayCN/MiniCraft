@@ -31,7 +31,7 @@ public class BlockList extends Node implements ActionListener{
 		boxes=new BlockBox[ROW_SIZE];
 		for(int i=0;i<ROW_SIZE;i++) {
 			boxes[i]=new BlockBox();
-			if(Assets.BLOCK_IMAGE[i]!=null) {
+			if(Assets.BLOCK_IMAGE[i+1]!=null) {
 				boxes[i].setBlockByID(i+1);
 			}
 			boxes[i].setLocalTranslation(i*BlockBox.width,0,0);
