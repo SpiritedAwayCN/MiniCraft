@@ -3,6 +3,7 @@ package minicraft.frontend.control;
 import java.io.*;
 
 import com.alibaba.fastjson.JSON;
+import com.alibaba.fastjson.serializer.SerializerFeature;
 import com.jme3.input.*;
 
 public class GameOption {
@@ -79,7 +80,7 @@ public class GameOption {
 		if(option == null) {
 			try(OutputStream out = new FileOutputStream(fileName)) {
 				option = new GameOption();
-				String jsonString = JSON.toJSONString(option);
+				String jsonString = JSON.toJSONString(option, SerializerFeature.PrettyFormat);
 				out.write(jsonString.getBytes());
 			}catch (Exception e) {
 				e.printStackTrace();
