@@ -69,11 +69,7 @@ public class WorldSelectionDialog {
 			public void windowOpened(WindowEvent e) {
 				loadWorldsFromFile();
 			}
-			@Override
-	        public void windowClosing(WindowEvent e) {
-				frame.dispose();
-				//save();
-	        }	
+			
 			
 		});
 		
