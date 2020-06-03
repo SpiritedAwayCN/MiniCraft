@@ -1,6 +1,6 @@
 # MiniCraft
 
-利用JME3库实现的建议Minecraft
+利用JME3库实现的简易Minecraft
 
 ![demo](demo.png)
 
