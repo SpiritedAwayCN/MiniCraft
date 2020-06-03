@@ -50,7 +50,8 @@ public class Assets {
 				"texture/gold_block.png",
 				"texture/iron_block.png",
 				"texture/pumpkin.png",
-				"texture/melon.png"
+				"texture/melon.png",
+				"texture/slime_block.png"
 		};
 		final String[] blockImageFilepath= {
 				null,//air
@@ -69,7 +70,8 @@ public class Assets {
 				"gui/block_gold.png",
 				"gui/block_iron.png",
 				"gui/block_pumpkin.png",
-				"gui/block_melon.png"
+				"gui/block_melon.png",
+				"gui/block_slime.png"
 		};
 		
 

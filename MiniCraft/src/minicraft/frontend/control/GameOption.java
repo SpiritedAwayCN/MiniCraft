@@ -73,6 +73,10 @@ public class GameOption {
         GameOption option = null;
 		try(BufferedReader br = new BufferedReader(new InputStreamReader(new FileInputStream(fileName)))){
             option = JSON.parseObject(br.readLine(), GameOption.class);
+            if(option.viewChunkDistance < 2){
+                System.err.println("WARNING: Minimum of view distance must be greater than 2.");
+                option.viewChunkDistance = 2;
+            }
         }catch(Exception e){
             System.err.println("Options file not found, creating...");
             // e.printStackTrace();

@@ -24,7 +24,7 @@ public class Constant {
         "Air", "Stone", "Grass", "Dirt", "Bedrock",
         "Glass","SpruceLog","OakLeaves", "OakPlank", "StoneBrick",
         "Sand", "Cobblestone", "Brick", "Gold", "Iron",
-        "Pumpkin", "Melon"};
+        "Pumpkin", "Melon", "Slime"};
     //方块id常量
     public static final int BLOCK_AIR=0;
     public static final int BLOCK_STONE=1;
@@ -43,6 +43,7 @@ public class Constant {
     public static final int BLOCK_IRON_BLOCK = 14;
     public static final int BLOCK_PUMPKIN = 15;
     public static final int BLOCK_MELON = 16;
+    public static final int BLOCK_SLIME = 17;
 
     //方块种类数
     public static final int BLOCK_TYPE_NUM=BLOCKNAME_STRINGS.length;

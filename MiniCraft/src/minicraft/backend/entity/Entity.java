@@ -118,9 +118,13 @@ public abstract class Entity {
                 blockCoord.addXYZ(0, -1, 0)){
             block = map.getBlockByCoord(blockCoord);
             if(block == null || block.isFullHitbox()){
-                onGround = true;
-                naturalV.y = 0;
                 coordinate.y = blockCoord.getY() + 1;
+                if(block.getBlockid() == Constant.BLOCK_SLIME && naturalV.y < -0.35){
+                    naturalV.y *= -0.8;
+                }else{
+                    onGround = true;
+                    naturalV.y = 0;
+                }
                 // System.out.println(blockCoord);
                 return true;
             }
