@@ -24,9 +24,14 @@ public class SlimeBlock extends BlockBackend{
     public static int getBlockidStatic() {
         return blockID;
     }
+
+    @Override
+    public void playPlaceSound() {
+        chunk.getMap().miniCraftApp.audioSounds[5].playInstance();
+    }
     
     @Override
     public void playDestorySound() {
-        chunk.getMap().miniCraftApp.audioSounds[0].playInstance();
+        chunk.getMap().miniCraftApp.audioSounds[5].playInstance();
     }
 }

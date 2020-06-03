@@ -191,13 +191,14 @@ public class MiniCraftApp extends SimpleApplication {
 		audioInGame.setPositional(false);
 		audioInGame.setVolume(3);// 音量
 
-		audioSounds = new AudioNode[5];
+		audioSounds = new AudioNode[6];
 
 		audioSounds[0] = new AudioNode(assetManager, "./audio/sounds/glass1.ogg", DataType.Buffer);
 		audioSounds[1] = new AudioNode(assetManager, "./audio/sounds/grass1.ogg", DataType.Buffer);
 		audioSounds[2] = new AudioNode(assetManager, "./audio/sounds/sand1.ogg", DataType.Buffer);
 		audioSounds[3] = new AudioNode(assetManager, "./audio/sounds/stone1.ogg", DataType.Buffer);
 		audioSounds[4] = new AudioNode(assetManager, "./audio/sounds/wood1.ogg", DataType.Buffer);
+		audioSounds[5] = new AudioNode(assetManager, "./audio/sounds/slime.ogg", DataType.Buffer);
 		audioNature.play();
 	}
 	
