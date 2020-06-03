@@ -24,7 +24,7 @@ public class StartMenu extends Panel {
 			public void onAction(String name, boolean value, float tpf) {
 				// System.out.println("startMenu.About hit");
 				JOptionPane.showMessageDialog(null,
-						"作者：\n石淳安/Spirited_Away\n李辰剑/IcyChlorine\n2020-5,copyright reserved.");
+						"作者：\n石淳安/SpiritedAwayCN\n李辰剑/IcyChlorine\n2020-5,copyright reserved.");
 			}
 		}));
 		this.addComponent(new Button("Options", new ActionListener() {
