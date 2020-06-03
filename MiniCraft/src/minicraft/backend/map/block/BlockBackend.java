@@ -82,6 +82,7 @@ public abstract class BlockBackend {
         block.chunk = this.chunk;
         if(this.chunk.setBlockInChunk(block) == false)
             return false;
+        playDestorySound();
         chunk.getMap().getPlayer().checkFoot();
         // this.chunk = null;
         // this.blockCoord = null;
@@ -98,8 +99,9 @@ public abstract class BlockBackend {
         if(this.blockCoord != null) return false;
         this.blockCoord = blockCoordinate;
         this.chunk = map.getChunkByCoord(blockCoordinate.toChunkCoord());
-
-        return this.chunk.setBlockInChunk(this);
+        boolean ret = this.chunk.setBlockInChunk(this);
+        if(ret) playPlaceSound();
+        return ret;
     }
 
 
@@ -125,5 +127,13 @@ public abstract class BlockBackend {
 		return (r.getX()-Constant.minX)*Constant.maxY*(Constant.maxZ-Constant.minZ)
 				+(r.getY()-Constant.minY)*(Constant.maxZ-Constant.minZ)
 				+(r.getZ()-Constant.minZ);
-	}
+    }
+    
+    public void playPlaceSound(){
+        chunk.getMap().miniCraftApp.audioSounds[3].playInstance();
+    }
+
+    public void playDestorySound(){
+        chunk.getMap().miniCraftApp.audioSounds[3].playInstance();
+    }
 }

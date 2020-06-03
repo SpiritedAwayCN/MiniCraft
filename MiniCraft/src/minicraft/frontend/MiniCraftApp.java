@@ -14,6 +14,8 @@ import com.jme3.app.DebugKeysAppState;
 //用了minicraft.frontend.FlyCamAppState
 import com.jme3.asset.plugins.FileLocator;
 import com.jme3.audio.AudioListenerState;
+import com.jme3.audio.AudioNode;
+import com.jme3.audio.AudioData.DataType;
 import com.jme3.bullet.BulletAppState;
 import com.jme3.cursors.plugins.JmeCursor;
 import com.jme3.input.KeyInput;
@@ -168,9 +170,35 @@ public class MiniCraftApp extends SimpleApplication {
 
 		initGUI();
 
+		initAudio();
 		// 设置天空颜色
 		viewPort.setBackgroundColor(new ColorRGBA(0.66f, 0.95f, 1.0f, 1));
 
+	}
+
+	private AudioNode audioNature, audioInGame;
+	public AudioNode[] audioSounds;
+
+	private void initAudio(){
+		audioNature = new AudioNode(assetManager, "./audio/music/" + Constant.titleMusic, DataType.Stream);
+		audioNature.setLooping(true); // 循环播放
+		audioNature.setPositional(false);
+		audioNature.setVolume(3);// 音量
+		// 将音源添加到场景中
+		// rootNode.attachChild(audioNature);
+		audioInGame = new AudioNode(assetManager, "./audio/music/" + Constant.inGameStrinig, DataType.Stream);
+		audioInGame.setLooping(true); // 循环播放
+		audioInGame.setPositional(false);
+		audioInGame.setVolume(3);// 音量
+
+		audioSounds = new AudioNode[5];
+
+		audioSounds[0] = new AudioNode(assetManager, "./audio/sounds/glass1.ogg", DataType.Buffer);
+		audioSounds[1] = new AudioNode(assetManager, "./audio/sounds/grass1.ogg", DataType.Buffer);
+		audioSounds[2] = new AudioNode(assetManager, "./audio/sounds/sand1.ogg", DataType.Buffer);
+		audioSounds[3] = new AudioNode(assetManager, "./audio/sounds/stone1.ogg", DataType.Buffer);
+		audioSounds[4] = new AudioNode(assetManager, "./audio/sounds/wood1.ogg", DataType.Buffer);
+		audioNature.play();
 	}
 	
 	private boolean firstInit=true;
@@ -293,7 +321,9 @@ public class MiniCraftApp extends SimpleApplication {
 		}
 		// ------------>打开些什么
 		if (appStatusNew.equals(START_MENU)) {
+			audioInGame.stop();
 			startMenu.setEnabled(true);
+			audioNature.play();
 		}
 		if (appStatusNew.equals(INGAME)) {
 			if (appStatus.equals(START_MENU)) {// 从开始菜单来
@@ -312,7 +342,9 @@ public class MiniCraftApp extends SimpleApplication {
 					}
 				}
 				cam.setLocation(overworld.getPlayer().getCoordinate().add(playerEyeBias));
+				audioNature.stop();
 				initScene();
+				audioInGame.play();
 				// 世界第一次
 				/*if (overworld == null) {
 					overworld = new DimensionMap("overworld", this);
@@ -333,6 +365,8 @@ public class MiniCraftApp extends SimpleApplication {
 				}*/
 				
 				
+			}else{ //游戏中来
+				audioInGame.play();
 			}
 			blockList.setEnabled(true);
 			flyCam.setEnabled(true);//隐藏指针
@@ -340,6 +374,7 @@ public class MiniCraftApp extends SimpleApplication {
 			optionsPanel.setEnabled(true);
 		}else if(appStatusNew.equals(INGAME_MENU)) {
 			overworld.saveMap();
+			audioInGame.pause();
 			flyCam.setEnabled(false);//释放鼠标
 			ingameMenu.setEnabled(true);
 		}
@@ -427,7 +462,7 @@ public class MiniCraftApp extends SimpleApplication {
 	}
 	public void breakBlockTemp() {
 		if(!appStatus.equals(INGAME)) return;
-		System.out.println("app.breakBlockTemp()");
+		// System.out.println("app.breakBlockTemp()");
 		//获得视线指向的方块
 		BlockBackend block=findBlockByDir(cam.getLocation(),cam.getDirection(),false);
 		if(block==null) return;//no block within reach

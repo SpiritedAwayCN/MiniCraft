@@ -1,4 +1,5 @@
 /bin/
 /saves/
+/assets/audio/music/*.ogg
 
 options.json

@@ -1,5 +1,7 @@
 package minicraft.backend.constants;
 
+import com.jme3.audio.*;
+
 public class Constant {
     public static final int minX = -128;
     public static final int minZ = -128;
@@ -13,6 +15,9 @@ public class Constant {
 
 
     public static final String saveDir = "./saves";
+
+    public static final String titleMusic = "menu2.ogg";
+    public static final String inGameStrinig = "calm3.ogg";
 
     // 一行5个，方便数数
     public static final String[] BLOCKNAME_STRINGS = {

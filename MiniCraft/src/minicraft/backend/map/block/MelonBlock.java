@@ -23,5 +23,10 @@ public class MelonBlock extends BlockBackend {
     public static int getBlockidStatic() {
         return blockID;
     }
+    
+    @Override
+    public void playDestorySound() {
+        chunk.getMap().miniCraftApp.audioSounds[4].playInstance();
+    }
 
 }

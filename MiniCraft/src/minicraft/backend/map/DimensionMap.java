@@ -140,6 +140,7 @@ public class DimensionMap {
         this.miniCraftApp.getRootNode().detachAllChildren(); 
         System.gc();
         
+        
         ChunkCoord st = player.toChunkCoordinate();
         int cx = st.getX(), cz = st.getZ();
         int viewdis = option.getViewChunkDistance();
