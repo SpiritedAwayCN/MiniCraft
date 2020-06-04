@@ -25,7 +25,7 @@ import javax.swing.event.ListSelectionListener;
  */
 public class WorldSelectionDialog {
 
-	private JDialog frame;
+	private JDialog dialog;
 
 	private JList listWorlds;
 	private DefaultListModel<String> listModelWorlds;
@@ -34,15 +34,17 @@ public class WorldSelectionDialog {
 	private boolean newWorld;
 	private Boolean flat;//if newWorld
 	private Object[] returnParam;
+	
+	private boolean aborted;//这一窗口是否被取消/关闭
 	/**
 	 * for test.
 	 */
 	public static void main(String[] args) {
 		
 		Object[] rst=getWorldParam();
-		System.out.println(rst[0]);
-		if(rst.length==2)
-			System.out.println(rst[1]);
+		System.out.println(rst.length);
+		//if(rst.length==2)
+		//	System.out.println(rst[1]);
 		
 	}
 
@@ -57,55 +59,61 @@ public class WorldSelectionDialog {
 	 * Initialize the contents of the frame.
 	 */
 	private void initialize() {
-		frame = new JDialog();
-		frame.setBounds(500, 400, 450, 300);
-		frame.setDefaultCloseOperation(JDialog.DO_NOTHING_ON_CLOSE);
-		frame.setModal(true);
-		frame.getContentPane().setLayout(null);
-		frame.setResizable(false);
+		dialog = new JDialog();
+		dialog.setBounds(500, 400, 450, 300);
+		dialog.setDefaultCloseOperation(JDialog.DO_NOTHING_ON_CLOSE);
+		dialog.setModal(true);
+		dialog.getContentPane().setLayout(null);
+		dialog.setResizable(false);
 		
-		frame.addWindowListener(new WindowAdapter() {
+		dialog.addWindowListener(new WindowAdapter() {
 			@Override
 			public void windowOpened(WindowEvent e) {
 				loadWorldsFromFile();
 			}
-			
-			
+			@Override
+			public void windowClosing(WindowEvent e) {
+				aborted=true;
+				createResultAndQuit();
+			}
 		});
 		
-		FairButton btnCreateWorldl = new FairButton("Create World");
-		btnCreateWorldl.addActionListener(new ActionListener() {
+		FairButton btnCreateWorld = new FairButton("Create World");
+		btnCreateWorld.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 				try {
 					Object[] rst=NewWorldDialog.getWorldParam();
-					selectedWorldName=(String)rst[0];
-					flat=(Boolean)rst[1];
-					newWorld=true;
-					createResultAndQuit();
+					if(rst.length>0) {
+						selectedWorldName=(String)rst[0];
+						flat=(Boolean)rst[1];
+						newWorld=true;
+						createResultAndQuit();
+					}else {
+						//新世界窗口被取消了，于是什么也不做
+					}
 				}catch(Exception ex) {
-					JOptionPane.showMessageDialog(frame,
+					JOptionPane.showMessageDialog(dialog,
 							"世界名字不能为空！");
 				}
 			}
 		});
-		btnCreateWorldl.setBounds(248, 47, 129, 27);
-		frame.getContentPane().add(btnCreateWorldl);
+		btnCreateWorld.setBounds(248, 47, 129, 27);
+		dialog.getContentPane().add(btnCreateWorld);
 		
 		FairButton btnSelectWorld = new FairButton("Select World");
 		btnSelectWorld.setBounds(248, 86, 129, 27);
-		frame.getContentPane().add(btnSelectWorld);
+		dialog.getContentPane().add(btnSelectWorld);
 		btnSelectWorld.setEnabled(false);
-		
 		
 		FairButton btnDelWorld = new FairButton("Del World");
 		btnDelWorld.setBounds(248, 126, 129, 27);
-		frame.getContentPane().add(btnDelWorld);
+		dialog.getContentPane().add(btnDelWorld);
 		btnDelWorld.setEnabled(false);
 		
 		FairButton btnCancel = new FairButton("Cancel");
 		btnCancel.setBounds(248, 186, 129, 27);
-		frame.getContentPane().add(btnCancel);
-		btnCancel.setEnabled(false);
+		dialog.getContentPane().add(btnCancel);
+		//btnCancel.setEnabled(false);
 		
 		listWorlds = new JList();
 		listWorlds.setBounds(47, 50, 152, 168);
@@ -117,13 +125,15 @@ public class WorldSelectionDialog {
 				if(listWorlds.isSelectionEmpty()) {
 					btnSelectWorld.setEnabled(false);
 					btnDelWorld.setEnabled(false);
+					selectedWorldName=listModelWorlds.elementAt(listWorlds.getSelectedIndex());
 				}else {
 					btnSelectWorld.setEnabled(true);
 					btnDelWorld.setEnabled(true);
+					selectedWorldName=null;
 				}
 			}
 		});
-		frame.getContentPane().add(listWorlds);
+		dialog.getContentPane().add(listWorlds);
 		
 		btnSelectWorld.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
@@ -144,20 +154,29 @@ public class WorldSelectionDialog {
 				listModelWorlds.remove(listWorlds.getSelectedIndex());
 			}
 		});
-		
+		btnCancel.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				aborted=true;
+				createResultAndQuit();
+			}
+		});
 	}
 
 	protected void createResultAndQuit() {
 		// TODO Auto-generated method stub
-		if(newWorld) {
-			returnParam=new Object[2];
-			returnParam[0]=selectedWorldName;
-			returnParam[1]=flat;
-		}else {
-			returnParam=new Object[1];
-			returnParam[0]=selectedWorldName;
+		if(!aborted) {
+			if(newWorld) {
+				returnParam=new Object[2];
+				returnParam[0]=selectedWorldName;
+				returnParam[1]=flat;
+			}else {
+				returnParam=new Object[1];
+				returnParam[0]=selectedWorldName;
+			}
+		}else {//取消，或是关闭了这一窗口
+			returnParam=new Object[0];
 		}
-		frame.dispose();
+		dialog.dispose();//模态窗口关闭，即相当于return返回
 	}
 
 	protected void loadWorldsFromFile() {
@@ -174,7 +193,7 @@ public class WorldSelectionDialog {
 	
 	public static Object[] getWorldParam() {
 		WorldSelectionDialog worldSelectionDialog=new WorldSelectionDialog();
-		worldSelectionDialog.frame.setVisible(true);
+		worldSelectionDialog.dialog.setVisible(true);
 		return worldSelectionDialog.getResult();
 	}
 }

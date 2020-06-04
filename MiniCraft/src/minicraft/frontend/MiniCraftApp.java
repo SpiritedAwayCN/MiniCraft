@@ -143,7 +143,7 @@ public class MiniCraftApp extends SimpleApplication {
 				@Override
 				public void onAction(String name, boolean value, float tpf) {
 					if (value) {
-						breakBlockTemp();
+						breakBlock();
 						// System.out.println("left button hit");
 					}
 				}
@@ -153,7 +153,7 @@ public class MiniCraftApp extends SimpleApplication {
 				@Override
 				public void onAction(String name, boolean value, float tpf) {
 					if (value)
-						placeBlockTemp();
+						placeBlock();
 				}
 			}, INPUT_PLACE_BLOCK);
 		}
@@ -204,22 +204,8 @@ public class MiniCraftApp extends SimpleApplication {
 	
 	private boolean firstInit=true;
 	private void initScene() {
-		// geoms=new GeometryBlock[256*64*256];
-
-		// BlockBackend block;
 		new Thread(() -> {
 			overworld.refreshWholeUpdateBlockSet();
-			// HashSet<BlockBackend> blocksToAdd=overworld.refreshWholeUpdateBlockSet();
-			// Geometry geom;
-			// for(BlockBackend block:blocksToAdd) {
-			// if(block.getBlockid()==0)
-			// continue;
-			// geom=new GeometryBlock(block);
-			// rootNode.attachChild(geom);
-			// geoms[geom.hashCode()]=(GeometryBlock) geom;
-			// //只好手写hashSet
-			// }
-			// blocksToAdd.clear();
 		}).run();
 
 		if (!firstInit)
@@ -237,11 +223,11 @@ public class MiniCraftApp extends SimpleApplication {
 		sun.setColor(lightColor.mult(0.8f));
 		ambient.setColor(lightColor.mult(0.2f));
 
-		// #3 将模型和光源添加到场景图中
+		// 将模型和光源添加到场景图中
 		rootNode.addLight(sun);
 		rootNode.addLight(ambient);
 
-		/* 产生阴影 */
+		// 产生阴影 
 		final int SHADOWMAP_SIZE = 1024;
 
 		DirectionalLightShadowFilter dlsf = new DirectionalLightShadowFilter(assetManager, SHADOWMAP_SIZE, 1);
@@ -325,11 +311,13 @@ public class MiniCraftApp extends SimpleApplication {
 			audioInGame.stop();
 			startMenu.setEnabled(true);
 			audioNature.play();
-		}
-		if (appStatusNew.equals(INGAME)) {
-			if (appStatus.equals(START_MENU)) {// 从开始菜单来
-				Object[] rst=WorldSelectionDialog.getWorldParam();
-				
+		}else if (appStatusNew.equals(INGAME) && appStatus.equals(START_MENU)) {//从开始菜单来
+			Object[] rst=WorldSelectionDialog.getWorldParam();
+			
+			if(rst.length==0) {//选项被取消
+				startMenu.setEnabled(true);
+				appStatusNew=START_MENU;
+			}else {
 				overworld =new DimensionMap((String)rst[0], this);
 				if(rst.length==2)//new world
 				{
@@ -346,29 +334,11 @@ public class MiniCraftApp extends SimpleApplication {
 				audioNature.stop();
 				initScene();
 				audioInGame.play();
-				// 世界第一次
-				/*if (overworld == null) {
-					overworld = new DimensionMap("overworld", this);
-					// overworld.generateFromGenerator(false);
-					try {
-						overworld.generateFromSave("overworld");
-					} catch (Exception e) {
-						// 读取失败的异常 先暴力处理 得需要一个UI
-						e.printStackTrace();
-						overworld.generateFromGenerator(false);
-					}
-
-					//should be replaced to stats for player
-					cam.setLocation(overworld.getPlayer().getCoordinate().add(playerEyeBias));
-					initScene(true);
-				}else {
-					initScene(false);
-				}*/
-				
-				
-			}else{ //游戏中来
-				audioInGame.play();
+				blockList.setEnabled(true);
+				flyCam.setEnabled(true);//隐藏指针
 			}
+		}else if(appStatusNew.equals(INGAME) && appStatus.equals(INGAME_MENU)){ //游戏中来
+			audioInGame.play();
 			blockList.setEnabled(true);
 			flyCam.setEnabled(true);//隐藏指针
 		}else if(appStatusNew.equals(OPTIONS_PANEL)) {
@@ -461,7 +431,7 @@ public class MiniCraftApp extends SimpleApplication {
 		}
 		return null;
 	}
-	public void breakBlockTemp() {
+	public void breakBlock() {
 		if(!appStatus.equals(INGAME)) return;
 		// System.out.println("app.breakBlockTemp()");
 		//获得视线指向的方块
@@ -475,7 +445,7 @@ public class MiniCraftApp extends SimpleApplication {
 		//block.setShouldBeShown(false);
 
 	}
-	public void placeBlockTemp() {
+	public void placeBlock() {
 		if(!appStatus.equals(INGAME)) return;
 		//System.out.println("app.placeBlockTemp()");
 		BlockBackend block=findBlockByDir(cam.getLocation(),cam.getDirection(),true);
@@ -485,7 +455,8 @@ public class MiniCraftApp extends SimpleApplication {
 		//放置方块
 		int blockid=blockList.getSelectedBlockid();
 		if(blockid==-1) return;
-		block=BlockBackend.getBlockInstanceByID(blockList.getSelectedBlockid());	block.placeAt(r, overworld);
+		block=BlockBackend.getBlockInstanceByID(blockList.getSelectedBlockid());	
+		block.placeAt(r, overworld);
 		overworld.updateBlockSetTemp(r, false);
 	}
 

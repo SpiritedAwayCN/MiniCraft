@@ -18,20 +18,30 @@ import java.awt.event.ActionEvent;
  */
 public class NewWorldDialog {
 
-	private JDialog frame;
+	private JDialog dialog;
 	private JTextField textField;
 	private FairButton btnOK;
 	
 	private String newWorldName;
 	private Boolean flat;
+	
+	private boolean aborted;//没有正常返回值，被取消了
 
 	/**
 	 * Launch the application.
 	 */
 	public static void main(String[] args) {
-		//Object[] rst=getWorldParam();
+		Object[] rst;
+		try {
+			rst = getWorldParam();
+			System.out.println(rst.length);
+		} catch (Exception e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
 		//System.out.println(rst[0]);
 		//System.out.println(rst[1]);
+		
 	}
 
 	/**
@@ -45,54 +55,67 @@ public class NewWorldDialog {
 	 * Initialize the contents of the frame.
 	 */
 	private void initialize() {
-		frame = new JDialog();
-		frame.setBounds(500, 400, 350, 250);
+		dialog = new JDialog();
+		dialog.setBounds(500, 400, 350, 250);
 		//frame.setSize(250,150);
-		frame.setTitle("Create New World");
-		frame.setDefaultCloseOperation(JDialog.DO_NOTHING_ON_CLOSE);
-		frame.setModal(true);
-		frame.getContentPane().setLayout(null);
-		frame.setResizable(false);
-		
+		dialog.setTitle("Create New World");
+		dialog.setDefaultCloseOperation(JDialog.DO_NOTHING_ON_CLOSE);
+		dialog.setModal(true);
+		dialog.getContentPane().setLayout(null);
+		dialog.setResizable(false);
+		dialog.addWindowListener(new WindowAdapter() {
+			@Override
+			public void windowClosing(WindowEvent e) {
+				aborted=true;
+				dialog.dispose();
+			}
+		});
 		
 		
 		textField = new JTextField();
 		textField.setBounds(58, 67, 202, 24);
-		frame.getContentPane().add(textField);
+		dialog.getContentPane().add(textField);
 		textField.setColumns(10);
 		
 		JLabel lblNewLabel = new JLabel("请输入新世界的名字：");
 		lblNewLabel.setBounds(58, 36, 162, 18);
-		frame.getContentPane().add(lblNewLabel);
+		dialog.getContentPane().add(lblNewLabel);
 		
 		JCheckBox chkboxFlat = new JCheckBox("超平坦");
 		chkboxFlat.setBounds(58, 134, 73, 27);
-		frame.getContentPane().add(chkboxFlat);
+		dialog.getContentPane().add(chkboxFlat);
 		
 		btnOK = new FairButton("OK");
 		btnOK.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 				newWorldName=textField.getText();
 				flat=chkboxFlat.isSelected();
-				frame.dispose();
+				dialog.dispose();
 			}
 		});
 		btnOK.setBounds(147, 134, 113, 27);
-		frame.getContentPane().add(btnOK);
+		dialog.getContentPane().add(btnOK);
 	}
 	/*
 	 * @return Object[2] 其中Object[0]为String,是世界的名字，Object[1]为Boolean,表示是否为超平坦
+	 * 	当窗口被关闭/取消时，返回Object[0]
 	 * @throws 当世界名字为空时抛出异常
 	 */
 	public static Object[] getWorldParam() 
 		throws Exception{
 		NewWorldDialog newWorldDialog=new NewWorldDialog();
-		newWorldDialog.frame.setVisible(true);
-		Object[] rst=new Object[2];
-		if(newWorldDialog.newWorldName.isEmpty())
-			throw new Exception();
-		rst[0]=new String(newWorldDialog.newWorldName);
-		rst[1]=new Boolean(newWorldDialog.flat);
-		return rst;
+		newWorldDialog.dialog.setVisible(true);
+		
+		if(!newWorldDialog.aborted) {
+			Object[] rst=new Object[2];
+			if(newWorldDialog.newWorldName.isEmpty())
+				throw new Exception();
+			rst[0]=new String(newWorldDialog.newWorldName);
+			rst[1]=new Boolean(newWorldDialog.flat);
+			return rst;
+		}else {
+			Object[] rst=new Object[0];
+			return rst;
+		}
 	}
 }

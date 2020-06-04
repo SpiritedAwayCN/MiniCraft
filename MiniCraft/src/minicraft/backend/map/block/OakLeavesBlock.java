@@ -30,6 +30,9 @@ public class OakLeavesBlock extends BlockBackend {
     public void playDestorySound() {
         chunk.getMap().miniCraftApp.audioSounds[1].playInstance();
     }
-
+    @Override
+    public void playPlaceSound() {
+        chunk.getMap().miniCraftApp.audioSounds[1].playInstance();
+    }
 
 }
