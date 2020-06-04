@@ -101,12 +101,14 @@ public abstract class Entity {
     public boolean updateFalling(float dt){
         if(lowGravelty || onGround) return false;
         // System.out.println(dt);
-        naturalV.addLocal(G);
+        dt /= 0.05;
+        double ovy = naturalV.y, dy = ovy * dt + G.y * dt * dt / 2;
+        naturalV.addLocal(G.mult(dt));
         // System.out.println("ny " + naturalV.y);
-        if(naturalV.y < -5) naturalV.y = -5;
-        int oy = (int)Math.round(coordinate.y), ny = (int)Math.round(coordinate.y + naturalV.y);
+        // if(naturalV.y < -5) naturalV.y = -5;
+        int oy = (int)Math.round(coordinate.y), ny = (int)Math.round(coordinate.y + dy);
         int x = (int)Math.round(coordinate.x), z = (int)Math.round(coordinate.z);
-        int uy = (int)Math.floor(coordinate.y + naturalV.y + hitBoxHeight);
+        int uy = (int)Math.floor(coordinate.y + hitBoxHeight + dy);
         BlockBackend block = map.getBlockByCoord(new BlockCoord(x, uy, z));
         if(naturalV.y > 0 && block != null && block.isFullHitbox()){
             naturalV.y = 0;
@@ -129,7 +131,7 @@ public abstract class Entity {
                 return true;
             }
         }
-        coordinate.y += naturalV.y;
+        coordinate.y += dy;
         // System.out.println("cy " + coordinate.y);
         if(coordinate.y < 0) coordinate.y = 0;
         return true;

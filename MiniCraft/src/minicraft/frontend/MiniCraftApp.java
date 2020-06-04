@@ -393,14 +393,14 @@ public class MiniCraftApp extends SimpleApplication {
 			System.gc();
 		}
 		
-		cumulatedTime+=deltaTime;
-		while(cumulatedTime>timePerTick) {//保证每tick更新一次
+		// cumulatedTime+=deltaTime;
+		// while(cumulatedTime>timePerTick) {//保证每tick更新一次
 			try{
 				if(overworld.getPlayer().updateFalling(deltaTime))
 					cam.setLocation(overworld.getPlayer().getCoordinate().add(playerEyeBias));
 			}catch(NullPointerException e){}
-			cumulatedTime-=timePerTick;
-		}
+		// 	cumulatedTime-=timePerTick;
+		// }
 		
 	}
 	
