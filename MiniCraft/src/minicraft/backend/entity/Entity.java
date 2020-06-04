@@ -59,7 +59,7 @@ public abstract class Entity {
         int bz = oz + factorZ;
         int nx = Math.round(coord.x + hitBoxWide * factorX), nz = Math.round(coord.z + hitBoxWide * factorZ);
 
-        int sy = (int)Math.floor(coord.y), ty = (int)Math.floor(coord.y + hitBoxHeight);
+        int sy = (int)Math.round(coord.y), ty = (int)Math.round(coord.y + hitBoxHeight);
         if(nx != ox){
             for(BlockCoord blockCoord = new BlockCoord(bx, sy, oz); blockCoord.getY() <= ty;
                 blockCoord.addXYZ(0, 1, 0)){
@@ -108,11 +108,11 @@ public abstract class Entity {
         // if(naturalV.y < -5) naturalV.y = -5;
         int oy = (int)Math.round(coordinate.y), ny = (int)Math.round(coordinate.y + dy);
         int x = (int)Math.round(coordinate.x), z = (int)Math.round(coordinate.z);
-        int uy = (int)Math.floor(coordinate.y + hitBoxHeight + dy);
+        int uy = (int)Math.round(coordinate.y + hitBoxHeight + dy);
         BlockBackend block = map.getBlockByCoord(new BlockCoord(x, uy, z));
         if(naturalV.y > 0 && block != null && block.isFullHitbox()){
             naturalV.y = 0;
-            coordinate.y = uy - hitBoxHeight;
+            coordinate.y = uy - hitBoxHeight - 0.5f;
             return true;
         }
         
@@ -120,7 +120,8 @@ public abstract class Entity {
                 blockCoord.addXYZ(0, -1, 0)){
             block = map.getBlockByCoord(blockCoord);
             if(block == null || block.isFullHitbox()){
-                coordinate.y = blockCoord.getY() + 1;
+                coordinate.y = blockCoord.getY() + 0.5f;
+                System.out.println(coordinate.y);
                 if(block.getBlockid() == Constant.BLOCK_SLIME && naturalV.y < -0.35){
                     naturalV.y *= -0.8;
                 }else{

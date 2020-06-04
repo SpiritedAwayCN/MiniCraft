@@ -375,7 +375,7 @@ public class MiniCraftApp extends SimpleApplication {
 		}
 	}
 
-	public static final Vector3f playerEyeBias = new Vector3f(0, (float)1.5, 0);
+	public static final Vector3f playerEyeBias = new Vector3f(0, (float)2.0, 0);
 
 	private long counter = 0;
 	private float cumulatedTime=0;
