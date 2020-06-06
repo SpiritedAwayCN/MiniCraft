@@ -292,6 +292,9 @@ public class MiniCraftApp extends SimpleApplication {
 	public void switchAppStatus(String appStatusNew) {
 		if (appStatus.equals(appStatusNew))
 			return;
+		if(appStatusNew.equals(INGAME) && !(appStatus.equals(START_MENU) || appStatus.equals(INGAME_MENU)))
+			return;
+
 		// 关掉些什么
 		if (appStatus.equals(START_MENU)) {
 			startMenu.setEnabled(false);
@@ -306,6 +309,7 @@ public class MiniCraftApp extends SimpleApplication {
 				rootNode.detachAllChildren();
 			}
 		}
+		// System.out.println(appStatus + ", " + appStatusNew);
 		// ------------>打开些什么
 		if (appStatusNew.equals(START_MENU)) {
 			audioInGame.stop();
