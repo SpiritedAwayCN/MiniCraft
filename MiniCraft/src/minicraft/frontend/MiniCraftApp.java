@@ -377,30 +377,19 @@ public class MiniCraftApp extends SimpleApplication {
 
 	public static final Vector3f playerEyeBias = new Vector3f(0, (float)2.0, 0);
 
-	private long counter = 0;
-	private float cumulatedTime=0;
 	public static final float timePerTick=0.05f;
 	/**
 	 * 主循环
 	 */
 	@Override
 	public void simpleUpdate(float deltaTime) {
-		// updateBlockVisibility();
 		if(!appStatus.equals(INGAME)) return;
-		counter++;
-		if(counter > 1000){
-			counter = 0;
-			System.gc();
-		}
+
+		try {
+		if(overworld.getPlayer().updateFalling(deltaTime))
+			cam.setLocation(overworld.getPlayer().getCoordinate().add(playerEyeBias));
+		}catch(NullPointerException e) {}
 		
-		// cumulatedTime+=deltaTime;
-		// while(cumulatedTime>timePerTick) {//保证每tick更新一次
-			try{
-				if(overworld.getPlayer().updateFalling(deltaTime))
-					cam.setLocation(overworld.getPlayer().getCoordinate().add(playerEyeBias));
-			}catch(NullPointerException e){}
-		// 	cumulatedTime-=timePerTick;
-		// }
 		
 	}
 	
